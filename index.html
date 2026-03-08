@@ -299,8 +299,12 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
           <span style="font-size:9px;padding:3px 9px;border-radius:9px;background:rgba(0,188,212,.1);border:1px solid rgba(0,188,212,.2);color:var(--cyan);" id="connBadge">⚡ CONNECT BROKER</span>
           <span style="font-size:9px;padding:3px 9px;border-radius:9px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.2);color:var(--gold);">📵 READ ONLY</span>
           <span style="font-size:9px;padding:3px 9px;border-radius:9px;background:rgba(0,0,0,.3);border:1px solid var(--b1);" id="sessionHomeBadge">⏰ SESSION</span>
+          <span style="font-size:9px;padding:3px 9px;border-radius:9px;display:none;" id="v4HomeStatus">📅 NORMAL DAY</span>
         </div>
       </div>
+
+      <!-- v4: EU OPEN / FINAL HOUR ALERT BANNER -->
+      <div id="v4Banner" style="display:none;padding:12px 14px;border-radius:12px;margin-bottom:10px;"></div>
 
       <!-- ★ PRIORITY #1 — LIVE CONNECTION DASHBOARD ★ -->
       <div style="background:var(--p1);border:1px solid var(--b1);border-radius:14px;padding:14px;margin-bottom:12px;position:relative;overflow:hidden;">
@@ -410,6 +414,13 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
       <div class="sig sn" id="gbHero">
         <div class="sg-t" style="color:var(--cyan);">⚡ GAMMA BLAST SCANNER</div>
         <div class="sg-d">Expiry day explosive move detector — real-time OI unwinding analysis</div>
+      </div>
+
+      <!-- v4: Normal Day Playbook Card -->
+      <div class="card" id="normalPlaybookCard">
+        <div class="ct">📅 <span class="hl">TODAY'S PLAYBOOK</span> <span id="playbookDayBadge" style="margin-left:auto;font-size:8px;padding:2px 7px;border-radius:6px;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.2);">NORMAL DAY</span></div>
+        <div id="normalPlaybookContent" style="margin-top:6px;"></div>
+        <button class="btn btn-ol btn-sm" style="margin-top:8px;width:100%;" ontouchend="showNormalPlaybook()">🔄 REFRESH PLAYBOOK</button>
       </div>
       <div class="card">
         <div class="ct">🎯 <span class="hl">SCAN SETTINGS</span></div>
@@ -1089,7 +1100,7 @@ function unlock(){
   S.locked=false;S.ss=Date.now();S.la=Date.now();
   document.getElementById('pinScreen').style.display='none';
   document.getElementById('app').style.display='flex';
-  setMsg('');startIdle();buildChecklist();updateSecScore();initHomeDashboard();initCalendar();initSpikeEngine();
+  setMsg('');startIdle();buildChecklist();updateSecScore();initHomeDashboard();initCalendar();initSpikeEngine();startV4Monitor();updateV4HomeStatus();showNormalPlaybook();
   document.getElementById('connBadge').textContent=(S.cr.fa&&S.cr.ft)||(S.cr.dc&&S.cr.dt)?'✅ BROKER CONNECTED':'⚡ CONNECT BROKER';
 }
 function lockNow(){
@@ -1808,6 +1819,167 @@ function initSpikeEngine(){
   }
 }
 
+// ═══════════════════════════════════════════════════════
+// DHANVEER v4 — FINAL HOUR ENGINE + EU OPEN DETECTOR
+// + NORMAL DAY PLAYBOOK
+// New — does not replace any existing engine
+// ═══════════════════════════════════════════════════════
+
+// v4 state
+const V4={euAlertFired:false,finalAlertFired:false,preLoadStrike:null,preLoadSym:null,normalDayTimer:null,lastNormalScan:0};
+
+// ── EU OPEN DETECTOR + FINAL HOUR MONITOR ──
+// Runs every 60s independently — no conflict with other scanners
+function startV4Monitor(){
+  if(V4._t)clearInterval(V4._t);
+  V4._t=setInterval(()=>{
+    const s=getSession();
+    updateV4Banner(s);
+    if(s.isEU&&!V4.euAlertFired) fireEUAlert(s);
+    if(s.isFinal&&!V4.finalAlertFired) fireFinalAlert(s);
+    if(!s.isEU&&!s.isFinal){V4.euAlertFired=false;V4.finalAlertFired=false;}
+  },10000);// check every 10s
+}
+
+function updateV4Banner(s){
+  const b=document.getElementById('v4Banner');
+  if(!b)return;
+  if(s.isEU||s.isFinal){
+    b.style.display='block';
+    b.style.background=s.isEU?'rgba(255,152,0,.12)':'rgba(255,51,85,.15)';
+    b.style.border='1px solid '+(s.isEU?'var(--orange)':'var(--red)');
+    b.innerHTML='<div style="font-size:9px;letter-spacing:2px;color:'+(s.isEU?'var(--orange)':'var(--red)')+';">'+s.name+'</div>'
+      +'<div style="font-size:11px;color:#fff;margin:2px 0;">'+s.advice+'</div>'
+      +'<div style="font-size:9px;color:var(--dim2);">'+s.danger+'</div>';
+  } else {
+    b.style.display='none';
+  }
+}
+
+function fireEUAlert(s){
+  V4.euAlertFired=true;
+  // Soft 2-beep EU warning
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [440,550,440,550].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=f;o.type='sine';
+      g.gain.setValueAtTime(0,ctx.currentTime+i*.2);
+      g.gain.linearRampToValueAtTime(.25,ctx.currentTime+i*.2+.05);
+      g.gain.linearRampToValueAtTime(0,ctx.currentTime+i*.2+.15);
+      o.start(ctx.currentTime+i*.2);o.stop(ctx.currentTime+i*.2+.2);
+    });
+  }catch(e){}
+  // Show pre-load instruction overlay
+  showPreLoadAlert();
+}
+
+function fireFinalAlert(s){
+  V4.finalAlertFired=true;
+  // Strong alarm
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [880,1100,880,1100,880].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=f;o.type='square';
+      g.gain.setValueAtTime(0,ctx.currentTime+i*.15);
+      g.gain.linearRampToValueAtTime(.4,ctx.currentTime+i*.15+.04);
+      g.gain.linearRampToValueAtTime(0,ctx.currentTime+i*.15+.15);
+      o.start(ctx.currentTime+i*.15);o.stop(ctx.currentTime+i*.15+.2);
+    });
+  }catch(e){}
+}
+
+function showPreLoadAlert(){
+  const ex=document.getElementById('v4PreLoadOverlay');if(ex)ex.remove();
+  const sym=document.getElementById('spkSym')?.value||document.getElementById('gbSym')?.value||'NIFTY';
+  const step=STEP[sym]||50;
+  // Get current spot from last known scan or show placeholder
+  const spot=SPK.prev?.spot||0;
+  const atm=spot>0?Math.round(spot/step)*step:0;
+  const otm1=atm>0?atm+step*2:0;
+  const otm2=atm>0?atm+step*3:0;
+  V4.preLoadStrike=otm1;V4.preLoadSym=sym;
+  const div=document.createElement('div');
+  div.id='v4PreLoadOverlay';
+  div.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(2,6,9,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;';
+  div.innerHTML=
+    '<div style="font-size:9px;letter-spacing:4px;color:var(--orange);margin-bottom:8px;">EU OPEN WINDOW — 2:28 PM</div>'
+    +'<div style="font-family:Teko,sans-serif;font-size:28px;color:#fff;margin-bottom:4px;">GET READY NOW</div>'
+    +'<div style="font-size:11px;color:var(--dim2);margin-bottom:20px;">Do NOT buy yet — just be positioned</div>'
+    +'<div style="width:100%;max-width:320px;padding:16px;background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.25);border-radius:12px;margin-bottom:16px;">'
+    +'<div style="font-size:9px;color:var(--orange);letter-spacing:2px;margin-bottom:8px;">YOUR ACTION IN NEXT 2 MINUTES</div>'
+    +'<div style="font-size:11px;color:#fff;line-height:2;">&#10102; Open <strong>Dhan app</strong> now<br>'
+    +'&#10103; Go to <strong>'+sym+' Options</strong><br>'
+    +'&#10104; Find strike <strong style="color:var(--gold);">'+(otm1>0?otm1:'ATM+2 strike')+'</strong><br>'
+    +'&#10105; Keep order screen open<br>'
+    +'&#10106; <strong style="color:var(--green);">Wait for DHANVEER FIRE signal</strong><br>'
+    +'&#10107; When FIRE — tap BUY instantly</div></div>'
+    +'<div style="font-size:10px;color:var(--dim2);margin-bottom:16px;text-align:center;">Spike Radar is scanning every 5 seconds<br>FIRE alert will fill your screen automatically</div>'
+    +'<button onclick="var el=document.getElementById(\'v4PreLoadOverlay\');if(el)el.remove();" style="padding:12px 32px;background:var(--gold);border:none;border-radius:10px;color:#000;font-family:Teko,sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;">UNDERSTOOD — I AM READY</button>';
+  document.body.appendChild(div);
+  // Auto dismiss after 90 seconds
+  setTimeout(()=>{const el=document.getElementById('v4PreLoadOverlay');if(el)el.remove();},90000);
+}
+
+// ── NORMAL DAY PLAYBOOK ENGINE ──
+// Works every trading day — not just expiry
+const NORMAL_PLAYBOOK=[
+  {time:'9:15',window:'Opening',strategy:'Gap fill play',desc:'If gap up >100pts — buy ATM PE. If gap down >100pts — buy ATM CE. Gap fills 70% of time.',risk:'HIGH — wide spreads',action:'ATM option, SL=40%, T1=2x'},
+  {time:'10:30',window:'Mid Morning',strategy:'Trend confirmation',desc:'Direction established. OI buildup at resistance = sell signal. OI buildup at support = buy signal.',risk:'MODERATE',action:'ATM+1 option in trend direction, SL=40%, T1=3x'},
+  {time:'11:30',window:'Operator Window',strategy:'Operator pump scan',desc:'Low volume window. Watch for OTM call OI building quietly. Volume concentration at 1-2 strikes = operator entry.',risk:'MODERATE',action:'OTM+2 if Spike Radar >65 score'},
+  {time:'14:00',window:'EU Open',strategy:'FII flow change',desc:'European markets open. FII repositioning causes sharp moves. Direction Confirmer must show 4/5 factors.',risk:'HIGH',action:'Quick scalp only. Exit within 15 mins.'},
+  {time:'14:30',window:'Final Setup',strategy:'Late trend continuation',desc:'If strong trend from morning continues — add to position. If range-bound all day — avoid.',risk:'MODERATE',action:'Only if morning trend intact. No reversal trades.'},
+];
+
+function showNormalPlaybook(){
+  const el=document.getElementById('normalPlaybookContent');
+  if(!el)return;
+  const ist=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
+  const m=ist.getHours()*60+ist.getMinutes();
+  el.innerHTML=NORMAL_PLAYBOOK.map(p=>{
+    const pMins=parseInt(p.time.split(':')[0])*60+parseInt(p.time.split(':')[1]||0);
+    const isActive=m>=pMins&&m<pMins+90;
+    const isPast=m>pMins+90;
+    const col=isActive?'var(--green)':isPast?'var(--dim2)':'var(--gold)';
+    const bg=isActive?'rgba(0,230,118,.06)':isPast?'rgba(0,0,0,.2)':'rgba(0,0,0,.3)';
+    return '<div style="padding:12px;background:'+bg+';border-radius:10px;border-left:3px solid '+col+';margin-bottom:8px;opacity:'+(isPast?.5:1)+'">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">'
+      +'<div style="font-family:Teko,sans-serif;font-size:16px;color:'+col+';">'+p.time+'</div>'
+      +'<div style="font-size:9px;color:'+col+';letter-spacing:1px;">'+p.window.toUpperCase()+'</div>'
+      +(isActive?'<div style="margin-left:auto;font-size:9px;background:var(--green);color:#000;padding:2px 6px;border-radius:4px;">NOW</div>':'')+'</div>'
+      +'<div style="font-size:11px;color:#fff;margin-bottom:3px;">'+p.strategy+'</div>'
+      +'<div style="font-size:9px;color:var(--dim2);margin-bottom:4px;">'+p.desc+'</div>'
+      +'<div style="font-size:9px;color:var(--orange);">Risk: '+p.risk+'</div>'
+      +'<div style="font-size:9px;color:var(--green);">Action: '+p.action+'</div></div>';
+  }).join('');
+}
+
+// ── HOME SCREEN V4 BADGE ──
+function updateV4HomeStatus(){
+  const el=document.getElementById('v4HomeStatus');if(!el)return;
+  const today=toISTDate(new Date());
+  const expiry=isExpiryToday(today);
+  const s=getSession();
+  if(expiry){
+    el.style.display='inline-flex';
+    el.style.background='rgba(255,51,85,.15)';
+    el.style.border='1px solid var(--red)';
+    el.style.color='var(--red)';
+    el.textContent='🗓️ EXPIRY TODAY';
+  } else if(s.name.includes('CLOSED')){
+    el.style.display='none';
+  } else {
+    el.style.display='inline-flex';
+    el.style.background='rgba(100,100,100,.1)';
+    el.style.border='1px solid var(--dim2)';
+    el.style.color='var(--dim2)';
+    el.textContent='📅 NORMAL DAY';
+  }
+}
+
 // Source: NSE/BSE official circulars post SEBI Sep 2025
 // ═══════════════════════════════════════════════════════
 
@@ -2104,7 +2276,8 @@ function updateHomeSession(){
 // Auto-run ping 4 seconds after unlock (app is fully loaded)
 function initHomeDashboard(){
   updateHomeSession();
-  setInterval(updateHomeSession,30000);
+  updateV4HomeStatus();
+  setInterval(()=>{updateHomeSession();updateV4HomeStatus();},30000);
   setTimeout(()=>{runHomePing();},4000);
 }
 
@@ -2139,12 +2312,18 @@ function getSmartInterval(){
   const manual=parseInt(document.getElementById('gbIv')?.value)||15;
   const smart=document.getElementById('gbSmartIv')?.value==='1';
   if(!smart) return manual;
+  const ist=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
+  const m=ist.getHours()*60+ist.getMinutes();
+  const today=toISTDate(ist);
+  const isExpiry=isExpiryToday(today);
+  // v4: Final hour on expiry — 5 second mode
+  if(isExpiry&&m>=840&&m<=915) return 5;
+  // EU open window on expiry — 8 second mode
+  if(isExpiry&&m>=828&&m<=855) return 8;
+  // Opening burst and Expiry close -> 10s
   const s=getSession();
-  // Opening burst and Expiry close -> fastest
   if(s.name.includes('OPENING')||s.name.includes('EXPIRY')) return 10;
-  // Mid morning -> 15s
   if(s.name.includes('MID')) return 15;
-  // Afternoon lull -> 30s (market choppy, save battery)
   return 30;
 }
 
@@ -2332,14 +2511,30 @@ function beepSoft(){
 setTimeout(testPing, 3000);
 
 
+function isExpiryToday(d){
+  const day=d.getDay();// 0=Sun,2=Tue,4=Thu
+  const ds=toDateStr(d);
+  if(isHoliday(ds))return false;
+  if(day===2)return true;// Tuesday = Nifty expiry
+  if(day===4)return true;// Thursday = Sensex expiry
+  return false;
+}
+
 function getSession(){
   const ist=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
   const m=ist.getHours()*60+ist.getMinutes();
-  if(m>=555&&m<630)return{name:'🔥 OPENING BURST',range:'9:15–10:30',advice:'Most explosive moves. PCR + OI velocity are key. Act fast.',col:'var(--red)',pct:((m-555)/75)*100,danger:'HIGH — Wide spreads, fast moves. Use tight SL.'};
-  if(m>=630&&m<750)return{name:'📈 MID MORNING',range:'10:30–12:30',advice:'Trend establishes. Best Risk:Reward setups. Confirm direction first.',col:'var(--green)',pct:((m-630)/120)*100,danger:'MODERATE — Good R:R window. Best time for Gamma Blast entries.'};
-  if(m>=750&&m<840)return{name:'😴 AFTERNOON LULL',range:'12:30–2:00',advice:'Low volume, choppy. Avoid fresh entries. Manage existing positions.',col:'var(--orange)',pct:((m-750)/90)*100,danger:'LOW — Market often fakes. Wait for clear breakout only.'};
-  if(m>=840&&m<=930)return{name:'⚡ EXPIRY CLOSE',range:'2:00–3:30',advice:'THETA CRUSHING NOW. Exit all longs by 3:15. Do not hold to expiry.',col:'var(--red)',pct:((m-840)/90)*100,danger:'EXTREME — Theta destroying premium fast. Exit before 3:15 PM!'};
-  return{name:'🌙 MARKET CLOSED',range:'—',advice:'Market is closed. Plan your trades for tomorrow.',col:'var(--dim2)',pct:0,danger:'—'};
+  const today=toISTDate(ist);
+  const expiry=isExpiryToday(today);
+  // v4: Final Hour sub-sessions on expiry day
+  if(expiry&&m>=915&&m<=930)return{name:'🚨 FINAL CLOSE',range:'3:15–3:30',advice:'EXIT ALL POSITIONS NOW. Theta destroying every second.',col:'var(--red)',pct:100,danger:'CRITICAL — Exit immediately. No new entries.',isExpiry:true,isFinal:true};
+  if(expiry&&m>=855&&m<915)return{name:'⚡ FINAL HOUR',range:'3:00–3:15',advice:'Last squeeze window. Only highest score signals. Trail SL tight.',col:'var(--red)',pct:((m-855)/60)*100,danger:'EXTREME — Fast moves. Use trailing SL aggressively.',isExpiry:true,isFinal:true};
+  if(expiry&&m>=840&&m<855)return{name:'🌍 EU OPEN WINDOW',range:'2:00–3:00',advice:'EU markets open. FII flow changing. Watch for OI cascade trigger.',col:'var(--orange)',pct:((m-840)/90)*100,danger:'HIGH — EU open triggers FII repositioning. Biggest moves here.',isExpiry:true,isEU:true};
+  if(expiry&&m>=828&&m<840)return{name:'⏰ PRE EU ALERT',range:'2:28–2:40',advice:'EU open in minutes. Get Dhan open. Locate ATM+2 strike NOW.',col:'var(--gold)',pct:((m-828)/12)*100,danger:'PREPARE — Do not enter yet. Just be ready on Dhan.',isExpiry:true,isEU:true};
+  if(m>=555&&m<630)return{name:'🔥 OPENING BURST',range:'9:15–10:30',advice:'Most explosive moves. PCR + OI velocity are key. Act fast.',col:'var(--red)',pct:((m-555)/75)*100,danger:'HIGH — Wide spreads, fast moves. Use tight SL.',isExpiry:expiry};
+  if(m>=630&&m<750)return{name:'📈 MID MORNING',range:'10:30–12:30',advice:'Trend establishes. Best Risk:Reward setups. Confirm direction first.',col:'var(--green)',pct:((m-630)/120)*100,danger:'MODERATE — Good R:R window. Best time for Gamma Blast entries.',isExpiry:expiry};
+  if(m>=750&&m<840)return{name:'😴 AFTERNOON LULL',range:'12:30–2:00',advice:'Low volume choppy. Avoid entries. Manage existing positions.',col:'var(--orange)',pct:((m-750)/90)*100,danger:'LOW — Market often fakes. Wait for 2PM window.',isExpiry:expiry};
+  if(m>=840&&m<=930)return{name:'⚡ EXPIRY CLOSE',range:'2:00–3:30',advice:'THETA CRUSHING NOW. Exit all longs by 3:15.',col:'var(--red)',pct:((m-840)/90)*100,danger:'EXTREME — Theta destroying premium fast. Exit before 3:15 PM!',isExpiry:expiry};
+  return{name:'🌙 MARKET CLOSED',range:'—',advice:'Market is closed. Plan your trades for tomorrow.',col:'var(--dim2)',pct:0,danger:'—',isExpiry:false};
 }
 function updateSessionUI(){
   const s=getSession();
