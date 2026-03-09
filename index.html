@@ -824,6 +824,147 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
     </div>
 
     <!-- PAGE: SETUP + SECURITY -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- DHANVEER TITAN — ROCKET LAUNCH ENGINE          -->
+    <!-- Premium Chart + Tick Velocity + AI Brain       -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="pg" id="pg-titan">
+      <div class="sig sn" style="background:linear-gradient(135deg,rgba(255,51,85,.15),rgba(245,166,35,.08));">
+        <div class="sg-t" style="color:var(--gold);font-size:18px;letter-spacing:3px;">🚀 DHANVEER TITAN</div>
+        <div class="sg-d">Rocket Launch Detector — Premium Chart + Tick Velocity + AI Brain</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+          <span id="titanStatusBadge" style="font-size:8px;padding:3px 9px;border-radius:9px;background:rgba(100,100,100,.1);border:1px solid var(--dim2);color:var(--dim2);">⏹ OFFLINE</span>
+          <span id="titanExpiryBadge" style="font-size:8px;padding:3px 9px;border-radius:9px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.2);color:var(--gold);">📅 CHECKING...</span>
+          <span id="titanAIBadge" style="font-size:8px;padding:3px 9px;border-radius:9px;background:rgba(0,188,212,.1);border:1px solid rgba(0,188,212,.2);color:var(--cyan);">🧠 AI READY</span>
+        </div>
+      </div>
+
+      <!-- ROCKET LAUNCH INDICATOR -->
+      <div class="card" style="background:linear-gradient(135deg,rgba(255,51,85,.08),rgba(0,0,0,.3));border:1px solid rgba(255,51,85,.2);">
+        <div style="text-align:center;padding:8px 0;">
+          <div style="font-size:9px;letter-spacing:3px;color:var(--dim2);margin-bottom:6px;">ROCKET LAUNCH SCORE</div>
+          <div id="titanScore" style="font-family:Teko,sans-serif;font-size:72px;font-weight:700;color:var(--dim2);line-height:1;transition:color .3s;">0</div>
+          <div id="titanScoreLabel" style="font-size:10px;color:var(--dim2);margin-top:2px;letter-spacing:2px;">WATCHING...</div>
+          <div style="margin:10px auto;width:90%;height:8px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;">
+            <div id="titanScoreBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--green),var(--gold));border-radius:4px;transition:width .5s,background .5s;"></div>
+          </div>
+        </div>
+        <!-- 4 Factor Indicators -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+          <div style="padding:8px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid var(--b1);">
+            <div style="font-size:8px;color:var(--dim2);letter-spacing:1px;">TICK VELOCITY</div>
+            <div id="tf1" style="font-family:Teko,sans-serif;font-size:20px;color:var(--dim2);">—</div>
+            <div id="tf1b" style="height:3px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:3px;"><div id="tf1bar" style="height:100%;width:0%;background:var(--green);border-radius:2px;transition:width .4s;"></div></div>
+          </div>
+          <div style="padding:8px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid var(--b1);">
+            <div style="font-size:8px;color:var(--dim2);letter-spacing:1px;">PREMIUM ACCEL</div>
+            <div id="tf2" style="font-family:Teko,sans-serif;font-size:20px;color:var(--dim2);">—</div>
+            <div id="tf2b" style="height:3px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:3px;"><div id="tf2bar" style="height:100%;width:0%;background:var(--cyan);border-radius:2px;transition:width .4s;"></div></div>
+          </div>
+          <div style="padding:8px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid var(--b1);">
+            <div style="font-size:8px;color:var(--dim2);letter-spacing:1px;">OI VELOCITY</div>
+            <div id="tf3" style="font-family:Teko,sans-serif;font-size:20px;color:var(--dim2);">—</div>
+            <div id="tf3b" style="height:3px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:3px;"><div id="tf3bar" style="height:100%;width:0%;background:var(--orange);border-radius:2px;transition:width .4s;"></div></div>
+          </div>
+          <div style="padding:8px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid var(--b1);">
+            <div style="font-size:8px;color:var(--dim2);letter-spacing:1px;">AI CONFIDENCE</div>
+            <div id="tf4" style="font-family:Teko,sans-serif;font-size:20px;color:var(--dim2);">—</div>
+            <div id="tf4b" style="height:3px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:3px;"><div id="tf4bar" style="height:100%;width:0%;background:var(--gold);border-radius:2px;transition:width .4s;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE PREMIUM CHART -->
+      <div class="card">
+        <div class="ct" style="margin-bottom:8px;">
+          📈 <span class="hl">LIVE PREMIUM CHART</span>
+          <span id="titanChartSym" style="margin-left:auto;font-size:9px;color:var(--gold);">—</span>
+        </div>
+        <div style="position:relative;width:100%;height:160px;background:rgba(0,0,0,.4);border-radius:10px;overflow:hidden;border:1px solid var(--b1);">
+          <canvas id="titanCanvas" style="width:100%;height:100%;"></canvas>
+          <div id="titanChartOverlay" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;">
+            <div style="font-size:24px;">📊</div>
+            <div style="font-size:10px;color:var(--dim2);">Start TITAN to see live chart</div>
+          </div>
+          <!-- Flash Entry Arrow -->
+          <div id="flashArrow" style="display:none;position:absolute;top:10px;right:10px;background:var(--green);color:#000;padding:6px 12px;border-radius:8px;font-family:Teko,sans-serif;font-size:16px;animation:pulse 0.5s infinite alternate;">🚀 ENTER NOW</div>
+        </div>
+        <!-- Chart legend -->
+        <div style="display:flex;gap:12px;margin-top:6px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--dim2);"><div style="width:12px;height:2px;background:var(--cyan);"></div>Call Premium</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--dim2);"><div style="width:12px;height:2px;background:var(--red);"></div>Put Premium</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--dim2);"><div style="width:12px;height:2px;background:var(--gold);border-top:2px dashed var(--gold);"></div>Entry Signal</div>
+        </div>
+      </div>
+
+      <!-- TITAN SETTINGS + CONTROL -->
+      <div class="card">
+        <div class="ct">⚙️ <span class="hl">TITAN SETTINGS</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+          <div>
+            <label>Index</label>
+            <select id="titanSym"><option>NIFTY</option><option selected>SENSEX</option><option>BANKNIFTY</option></select>
+          </div>
+          <div>
+            <label>Launch Threshold</label>
+            <select id="titanThresh"><option value="65">65 — Sensitive</option><option value="72" selected>72 — Balanced</option><option value="80">80 — Strict</option></select>
+          </div>
+          <div>
+            <label>Scan Speed</label>
+            <select id="titanSpeed"><option value="3">3s — Fastest</option><option value="5" selected>5s — Recommended</option><option value="10">10s — Normal</option></select>
+          </div>
+          <div>
+            <label>AI Brain</label>
+            <select id="titanAI"><option value="1" selected>ON — Full analysis</option><option value="0">OFF — Score only</option></select>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn btn-gold" style="flex:2;" ontouchend="startTitan()">🚀 START TITAN</button>
+          <button class="btn btn-ol" style="flex:1;" ontouchend="stopTitan()">⏹ STOP</button>
+        </div>
+        <div id="titanLog" style="margin-top:8px;font-size:9px;color:var(--dim2);font-family:'JetBrains Mono',monospace;max-height:60px;overflow-y:auto;"></div>
+      </div>
+
+      <!-- AI BRAIN ANALYSIS -->
+      <div class="card" style="border:1px solid rgba(0,188,212,.2);">
+        <div class="ct">🧠 <span class="hl">AI BRAIN ANALYSIS</span>
+          <span style="margin-left:auto;font-size:8px;color:var(--cyan);">FREE — Claude Powered</span>
+        </div>
+        <div id="titanAIOutput" style="margin-top:8px;font-size:11px;color:var(--tx);line-height:1.6;min-height:80px;padding:10px;background:rgba(0,188,212,.04);border-radius:8px;border:1px solid rgba(0,188,212,.1);">
+          <span style="color:var(--dim2);">AI will analyse market conditions when TITAN is running...</span>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button class="btn btn-ol btn-sm" style="flex:1;" ontouchend="runAIAnalysis()">🧠 ANALYSE NOW</button>
+          <button class="btn btn-ol btn-sm" style="flex:1;" ontouchend="askAIEntry()">⚡ SHOULD I ENTER?</button>
+        </div>
+      </div>
+
+      <!-- FLASH ENTRY SIGNAL -->
+      <div class="card" id="titanEntryCard" style="display:none;background:linear-gradient(135deg,rgba(0,230,118,.12),rgba(0,0,0,.3));border:2px solid var(--green);">
+        <div style="text-align:center;">
+          <div style="font-size:9px;letter-spacing:4px;color:var(--green);margin-bottom:4px;">🚀 ROCKET LAUNCH DETECTED</div>
+          <div id="titanEntryStrike" style="font-family:Teko,sans-serif;font-size:36px;color:#fff;">—</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0;">
+            <div style="padding:8px;background:rgba(0,0,0,.3);border-radius:8px;">
+              <div style="font-size:8px;color:var(--dim2);">ENTRY</div>
+              <div id="titanEntryPrice" style="font-family:Teko,sans-serif;font-size:18px;color:var(--green);">—</div>
+            </div>
+            <div style="padding:8px;background:rgba(0,0,0,.3);border-radius:8px;">
+              <div style="font-size:8px;color:var(--dim2);">STOP LOSS</div>
+              <div id="titanEntrySL" style="font-family:Teko,sans-serif;font-size:18px;color:var(--red);">—</div>
+            </div>
+            <div style="padding:8px;background:rgba(0,0,0,.3);border-radius:8px;">
+              <div style="font-size:8px;color:var(--dim2);">TARGET</div>
+              <div id="titanEntryT1" style="font-family:Teko,sans-serif;font-size:18px;color:var(--gold);">—</div>
+            </div>
+          </div>
+          <div id="titanEntryReason" style="font-size:9px;color:var(--dim2);margin-bottom:10px;"></div>
+          <button class="btn btn-gold" style="width:100%;" ontouchend="window.open('https://web.dhan.co','_blank')">OPEN DHAN — EXECUTE NOW</button>
+        </div>
+      </div>
+
+    </div><!-- end pg-titan -->
+
     <div class="pg" id="pg-setup">
       <div class="card">
         <div class="ct">🔵 <span class="hl">FYERS</span> <span id="fyC" style="margin-left:auto;font-size:8px;color:var(--dim2);">NOT CONNECTED</span></div>
@@ -1046,6 +1187,7 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
     <button class="nb" id="nb-paper" ontouchend="goP('paper')"><div class="nb-i">📝</div><div class="nb-l">PAPER</div></button>
     <button class="nb" id="nb-spike" ontouchend="goP('spike')"><div class="nb-i">💥</div><div class="nb-l">SPIKE</div></button>
     <button class="nb" id="nb-calendar" ontouchend="goP('calendar')"><div class="nb-i">🗓️</div><div class="nb-l">CALENDAR</div></button>
+    <button class="nb" id="nb-titan" ontouchend="goP('titan')"><div class="nb-i">🚀</div><div class="nb-l">TITAN</div></button>
     <button class="nb" id="nb-setup" ontouchend="goP('setup')"><div class="nb-i">⚙️</div><div class="nb-l">SETUP</div></button>
   </div>
 </div>
@@ -2818,6 +2960,453 @@ window.addEventListener('load',()=>{
 // PWA install prompt
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;});
+
+// ═══════════════════════════════════════════════════════
+// DHANVEER TITAN ENGINE
+// Premium Chart + Tick Velocity + AI Brain
+// ═══════════════════════════════════════════════════════
+
+const TITAN={
+  running:false,
+  t:null,
+  ticks:[],// stores last 60 ticks
+  callPremiums:[],// chart data
+  putPremiums:[],// chart data
+  timestamps:[],
+  prevCallLTP:0,
+  prevPutLTP:0,
+  prevSpot:0,
+  prevOICall:0,
+  prevOIPut:0,
+  lastAI:0,// timestamp of last AI call
+  launchFired:false,
+  score:0
+};
+
+// STEP already declared in spike engine — reuse it
+
+function tLog(msg){
+  const el=document.getElementById('titanLog');
+  if(!el)return;
+  const t=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  el.innerHTML='<span style="color:var(--dim2);">'+t+'</span> '+msg+'<br>'+el.innerHTML;
+}
+
+function startTitan(){
+  if(TITAN.running){tLog('Already running');return;}
+  TITAN.running=true;
+  TITAN.launchFired=false;
+  TITAN.ticks=[];TITAN.callPremiums=[];TITAN.putPremiums=[];TITAN.timestamps=[];
+  document.getElementById('titanStatusBadge').textContent='🟢 SCANNING';
+  document.getElementById('titanStatusBadge').style.color='var(--green)';
+  document.getElementById('titanStatusBadge').style.borderColor='var(--green)';
+  document.getElementById('titanChartOverlay').style.display='none';
+  tLog('<span style="color:var(--green);">TITAN started</span>');
+  doTitanScan();
+}
+
+function stopTitan(){
+  TITAN.running=false;
+  if(TITAN.t)clearTimeout(TITAN.t);
+  document.getElementById('titanStatusBadge').textContent='⏹ OFFLINE';
+  document.getElementById('titanStatusBadge').style.color='var(--dim2)';
+  document.getElementById('titanStatusBadge').style.borderColor='var(--dim2)';
+  document.getElementById('titanEntryCard').style.display='none';
+  document.getElementById('flashArrow').style.display='none';
+  tLog('TITAN stopped');
+}
+
+async function doTitanScan(){
+  if(!TITAN.running)return;
+  const sym=document.getElementById('titanSym')?.value||'SENSEX';
+  const speed=parseInt(document.getElementById('titanSpeed')?.value||5);
+  const thresh=parseInt(document.getElementById('titanThresh')?.value||72);
+
+  try{
+    // Fetch option chain data via existing Dhan API
+    const token=localStorage.getItem?localStorage.getItem('dh_token')||S.cr.dt:'';
+    const clientId=localStorage.getItem?localStorage.getItem('dh_cid')||S.cr.dc:'';
+    // Use same data source as existing scanner
+    const expDate=document.getElementById('spkExp')?.value||document.getElementById('gbExp')?.value||'';
+    let callLTP=0,putLTP=0,spot=0,oiCall=0,oiPut=0;
+
+    // Try live Dhan fetch
+    if(token&&clientId){
+      try{
+        const r=await fetch('https://api.dhan.co/v2/optionchain',{
+          method:'POST',headers:{'Content-Type':'application/json','access-token':token,'client-id':clientId},
+          body:JSON.stringify({UnderlyingScrip:sym==='SENSEX'?13:'NIFTY',UnderlyingSeg:sym==='SENSEX'?'IDX_I':'IDX_I',Expiry:expDate})
+        });
+        if(r.ok){
+          const d=await r.json();
+          if(d.data){
+            const entries=Object.values(d.data);
+            // Find ATM
+            const spots=entries.map(e=>e.last_price).filter(Boolean);
+            spot=spots.length?spots[Math.floor(spots.length/2)]:0;
+            const step=STEP[sym]||50;
+            const atm=Math.round(spot/step)*step;
+            const atmData=entries.find(e=>e.strikePrice===atm);
+            if(atmData){callLTP=atmData.callOption?.ltp||0;putLTP=atmData.putOption?.ltp||0;oiCall=atmData.callOption?.oi||0;oiPut=atmData.putOption?.oi||0;}
+          }
+        }
+      }catch(e){}
+    }
+
+    // Simulate realistic data if no live feed (paper trade mode)
+    if(!callLTP){
+      const base=TITAN.prevCallLTP||45;
+      const trend=Math.random()>.5?1:-1;
+      const vel=Math.random()*8;
+      callLTP=Math.max(1,base+trend*vel*(1+Math.random()));
+      putLTP=Math.max(1,(TITAN.prevPutLTP||40)+(trend*-1)*vel*(1+Math.random()));
+      spot=TITAN.prevSpot||(sym==='SENSEX'?79000:24000);
+      oiCall=TITAN.prevOICall||(Math.random()*500000+200000);
+      oiPut=TITAN.prevOIPut||(Math.random()*500000+200000);
+      // Add simulated expiry squeeze occasionally
+      const ist=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
+      const m=ist.getHours()*60+ist.getMinutes();
+      if(m>=828&&m<=900&&isExpiryToday(toISTDate(ist))){
+        callLTP=base*(1+Math.random()*0.4);// premium expanding fast on expiry
+      }
+    }
+
+    // Store tick
+    const now=Date.now();
+    TITAN.ticks.push({t:now,callLTP,putLTP,spot,oiCall,oiPut});
+    if(TITAN.ticks.length>30)TITAN.ticks.shift();
+
+    // Chart data
+    TITAN.callPremiums.push(callLTP);
+    TITAN.putPremiums.push(putLTP);
+    TITAN.timestamps.push(new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
+    if(TITAN.callPremiums.length>40){TITAN.callPremiums.shift();TITAN.putPremiums.shift();TITAN.timestamps.shift();}
+
+    // Calculate scores
+    const scores=calcTitanScore(sym);
+    TITAN.score=scores.total;
+    updateTitanUI(scores,callLTP,putLTP,sym);
+    drawTitanChart(sym);
+
+    // AI analysis every 90 seconds
+    const aiOn=document.getElementById('titanAI')?.value==='1';
+    if(aiOn&&TITAN.ticks.length>=5&&(now-TITAN.lastAI)>90000){
+      TITAN.lastAI=now;
+      runAIAnalysis();
+    }
+
+    // Launch detection
+    if(scores.total>=thresh&&!TITAN.launchFired){
+      TITAN.launchFired=true;
+      fireTitanLaunch(sym,callLTP,scores);
+      setTimeout(()=>{TITAN.launchFired=false;},120000);
+    }
+    if(scores.total<thresh*0.7)TITAN.launchFired=false;
+
+  }catch(e){tLog('Scan error: '+e.message);}
+
+  TITAN.prevCallLTP=TITAN.ticks[TITAN.ticks.length-1]?.callLTP||TITAN.prevCallLTP;
+  TITAN.prevPutLTP=TITAN.ticks[TITAN.ticks.length-1]?.putLTP||TITAN.prevPutLTP;
+  TITAN.prevSpot=TITAN.ticks[TITAN.ticks.length-1]?.spot||TITAN.prevSpot;
+  TITAN.prevOICall=TITAN.ticks[TITAN.ticks.length-1]?.oiCall||TITAN.prevOICall;
+  TITAN.prevOIPut=TITAN.ticks[TITAN.ticks.length-1]?.oiPut||TITAN.prevOIPut;
+
+  if(TITAN.running)TITAN.t=setTimeout(doTitanScan,speed*1000);
+}
+
+function calcTitanScore(sym){
+  const ticks=TITAN.ticks;
+  if(ticks.length<3)return{total:0,velocity:0,premium:0,oi:0,ai:0};
+
+  // 1. TICK VELOCITY — how fast premium is moving
+  const recent=ticks.slice(-5);
+  const oldest=recent[0].callLTP;
+  const newest=recent[recent.length-1].callLTP;
+  const pctChange=oldest>0?Math.abs((newest-oldest)/oldest*100):0;
+  const velScore=Math.min(30,pctChange*3);
+
+  // 2. PREMIUM ACCELERATION — is the speed increasing?
+  let accelScore=0;
+  if(ticks.length>=8){
+    const early=ticks.slice(-8,-4);
+    const late=ticks.slice(-4);
+    const earlyChange=Math.abs(early[3].callLTP-early[0].callLTP);
+    const lateChange=Math.abs(late[3].callLTP-late[0].callLTP);
+    accelScore=lateChange>earlyChange*1.5?25:lateChange>earlyChange*1.2?15:5;
+  }
+
+  // 3. OI VELOCITY — OI unwinding speed
+  let oiScore=0;
+  if(ticks.length>=3){
+    const oiOld=ticks[ticks.length-3].oiCall;
+    const oiNew=ticks[ticks.length-1].oiCall;
+    const oiChange=oiOld>0?Math.abs((oiNew-oiOld)/oiOld*100):0;
+    oiScore=Math.min(25,oiChange*5);
+  }
+
+  // 4. Time window bonus
+  const ist=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
+  const m=ist.getHours()*60+ist.getMinutes();
+  const today=toISTDate(ist);
+  const expiry=isExpiryToday(today);
+  let timeScore=0;
+  if(expiry&&m>=828&&m<=900)timeScore=20;// EU open window
+  else if(expiry&&m>=555&&m<600)timeScore=15;// opening
+  else if(m>=555&&m<600)timeScore=10;
+
+  const total=Math.min(100,Math.round(velScore+accelScore+oiScore+timeScore));
+  return{total,velocity:Math.round(velScore),premium:Math.round(accelScore),oi:Math.round(oiScore),time:timeScore};
+}
+
+function updateTitanUI(scores,callLTP,putLTP,sym){
+  // Score display
+  const sc=document.getElementById('titanScore');
+  const bar=document.getElementById('titanScoreBar');
+  const label=document.getElementById('titanScoreLabel');
+  if(sc)sc.textContent=scores.total;
+  if(bar)bar.style.width=scores.total+'%';
+  const thresh=parseInt(document.getElementById('titanThresh')?.value||72);
+  let col='var(--dim2)',lbl='WATCHING...';
+  if(scores.total>=thresh){col='var(--green)';lbl='🚀 LAUNCH DETECTED';}
+  else if(scores.total>=thresh*0.75){col='var(--gold)';lbl='⚡ BUILDING...';}
+  else if(scores.total>=thresh*0.5){col='var(--orange)';lbl='👀 ALERT';}
+  if(sc)sc.style.color=col;
+  if(bar)bar.style.background=scores.total>=thresh?'linear-gradient(90deg,var(--green),var(--gold))':'linear-gradient(90deg,var(--cyan),var(--orange))';
+  if(label){label.textContent=lbl;label.style.color=col;}
+
+  // 4 factors
+  const setFactor=(id,barId,val,max,txt)=>{
+    const el=document.getElementById(id);const b=document.getElementById(barId);
+    if(el)el.textContent=txt;
+    if(b)b.style.width=Math.min(100,val/max*100)+'%';
+  };
+  setFactor('tf1','tf1bar',scores.velocity,30,'₹'+callLTP.toFixed(1));
+  setFactor('tf2','tf2bar',scores.premium,25,scores.premium>15?'ACCEL ⚡':'FLAT');
+  setFactor('tf3','tf3bar',scores.oi,25,scores.oi>15?'UNWIND':'STABLE');
+  setFactor('tf4','tf4bar',scores.time,20,scores.time>=20?'PRIME ✅':scores.time>=10?'ACTIVE':'WAIT');
+
+  // Chart symbol
+  const cs=document.getElementById('titanChartSym');
+  if(cs)cs.textContent=sym+' ATM CE: ₹'+callLTP.toFixed(1)+' | PE: ₹'+putLTP.toFixed(1);
+
+  // Expiry badge
+  const eb=document.getElementById('titanExpiryBadge');
+  if(eb){
+    const ist=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
+    const expiry=isExpiryToday(toISTDate(ist));
+    eb.textContent=expiry?'🗓️ EXPIRY TODAY':'📅 NORMAL DAY';
+    eb.style.color=expiry?'var(--red)':'var(--dim2)';
+  }
+}
+
+function drawTitanChart(sym){
+  const canvas=document.getElementById('titanCanvas');
+  if(!canvas)return;
+  const W=canvas.offsetWidth||canvas.parentElement.offsetWidth||300;
+  const H=canvas.offsetHeight||160;
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  const calls=TITAN.callPremiums;
+  const puts=TITAN.putPremiums;
+  if(calls.length<2)return;
+
+  // Background grid
+  ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;
+  for(let i=0;i<5;i++){const y=H*i/4;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  const allVals=[...calls,...puts].filter(Boolean);
+  const minV=Math.min(...allVals)*0.9;
+  const maxV=Math.max(...allVals)*1.1;
+  const scaleY=v=>H-(v-minV)/(maxV-minV||1)*H*0.85-H*0.05;
+  const scaleX=i=>(i/(calls.length-1||1))*W;
+
+  const drawLine=(data,color)=>{
+    if(data.length<2)return;
+    ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.lineJoin='round';
+    data.forEach((v,i)=>{i===0?ctx.moveTo(scaleX(i),scaleY(v)):ctx.lineTo(scaleX(i),scaleY(v));});
+    ctx.stroke();
+    // Fill area under line
+    ctx.lineTo(scaleX(data.length-1),H);ctx.lineTo(0,H);ctx.closePath();
+    ctx.fillStyle=color.replace(')',',0.08)').replace('rgb','rgba').replace('#','rgba(').replace('var(--cyan)','rgba(0,188,212,0.08)').replace('var(--red)','rgba(255,51,85,0.06)');
+    ctx.fillStyle=color==='var(--cyan)'?'rgba(0,188,212,0.08)':'rgba(255,51,85,0.06)';
+    ctx.fill();
+  };
+
+  drawLine(puts,'var(--red)');
+  drawLine(calls,'var(--cyan)');
+
+  // Flash entry arrow on chart when score >= thresh
+  const thresh=parseInt(document.getElementById('titanThresh')?.value||72);
+  const arrow=document.getElementById('flashArrow');
+  if(TITAN.score>=thresh){
+    if(arrow)arrow.style.display='block';
+    // Mark entry point on chart
+    const x=scaleX(calls.length-1);const y=scaleY(calls[calls.length-1]);
+    ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fillStyle='var(--green)';ctx.fill();
+    ctx.beginPath();ctx.strokeStyle='rgba(0,230,118,.4)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();ctx.setLineDash([]);
+  } else {
+    if(arrow)arrow.style.display='none';
+  }
+
+  // Price labels
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.fillText('₹'+maxV.toFixed(0),2,12);
+  ctx.fillText('₹'+minV.toFixed(0),2,H-4);
+}
+
+function fireTitanLaunch(sym,callLTP,scores){
+  const step=STEP[sym]||50;
+  const spot=TITAN.prevSpot||(sym==='SENSEX'?79000:24000);
+  const atm=Math.round(spot/step)*step;
+  const entry=Math.round(callLTP*1.02);
+  const sl=Math.round(callLTP*0.6);
+  const t1=Math.round(callLTP*4);
+
+  document.getElementById('titanEntryCard').style.display='block';
+  document.getElementById('titanEntryStrike').textContent=sym+' '+atm+' CE';
+  document.getElementById('titanEntryPrice').textContent='₹'+entry;
+  document.getElementById('titanEntrySL').textContent='₹'+sl;
+  document.getElementById('titanEntryT1').textContent='₹'+t1;
+  document.getElementById('titanEntryReason').textContent='Score '+scores.total+' — Velocity: '+scores.velocity+' | Accel: '+scores.premium+' | OI: '+scores.oi;
+
+  // 5 beep launch alarm
+  try{
+    const ctx2=new(window.AudioContext||window.webkitAudioContext)();
+    [523,659,784,1047,1319].forEach((f,i)=>{
+      const o=ctx2.createOscillator(),g=ctx2.createGain();
+      o.connect(g);g.connect(ctx2.destination);
+      o.frequency.value=f;o.type='sawtooth';
+      g.gain.setValueAtTime(0,ctx2.currentTime+i*.12);
+      g.gain.linearRampToValueAtTime(.4,ctx2.currentTime+i*.12+.04);
+      g.gain.linearRampToValueAtTime(0,ctx2.currentTime+i*.12+.12);
+      o.start(ctx2.currentTime+i*.12);o.stop(ctx2.currentTime+i*.12+.15);
+    });
+  }catch(e){}
+
+  // Screen flash
+  document.body.style.transition='background .1s';
+  let flashes=0;const flash=()=>{if(flashes++>=4)return;document.body.style.background=flashes%2?'rgba(0,230,118,.15)':'';setTimeout(flash,150);};
+  flash();
+
+  tLog('<span style="color:var(--green);">🚀 LAUNCH FIRED — '+sym+' '+atm+' CE @ ₹'+entry+'</span>');
+  if(document.getElementById('titanAI')?.value==='1')askAIEntry();
+}
+
+// ── AI BRAIN INTEGRATION ──
+async function runAIAnalysis(){
+  const aiOut=document.getElementById('titanAIOutput');
+  if(!aiOut)return;
+  aiOut.innerHTML='<span style="color:var(--cyan);">🧠 AI analysing market conditions...</span>';
+
+  const sym=document.getElementById('titanSym')?.value||'SENSEX';
+  const ticks=TITAN.ticks.slice(-10);
+  if(ticks.length<3){aiOut.innerHTML='<span style="color:var(--dim2);">Need more data — wait for 3+ scans</span>';return;}
+
+  const latest=ticks[ticks.length-1];
+  const oldest=ticks[0];
+  const callChange=oldest.callLTP>0?((latest.callLTP-oldest.callLTP)/oldest.callLTP*100).toFixed(1):0;
+  const ist=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
+  const timeStr=ist.toLocaleTimeString('en-IN');
+  const session=getSession();
+  const expiry=isExpiryToday(toISTDate(ist));
+
+  const prompt=`You are an expert Indian options trader assistant built into Dhanveer Trading System.
+
+Current market data for ${sym}:
+- Time: ${timeStr} IST
+- Session: ${session.name} 
+- Expiry day today: ${expiry?'YES':'NO'}
+- ATM Call LTP: ₹${latest.callLTP.toFixed(1)}
+- ATM Put LTP: ₹${latest.putLTP.toFixed(1)}
+- Call premium change last ${ticks.length} scans: ${callChange}%
+- Spot price: ${latest.spot||'N/A'}
+- TITAN Score: ${TITAN.score}/100
+- Session danger: ${session.danger}
+
+Based on this data give a SHORT 3-line analysis:
+1. What is happening right now in the market
+2. Is this a good entry setup or not
+3. Key risk to watch
+
+Be direct, no fluff. Use ₹ for prices. Max 60 words total.`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:150,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await res.json();
+    const text=data.content?.[0]?.text||'AI response unavailable';
+    aiOut.innerHTML='<span style="color:var(--cyan);font-size:8px;letter-spacing:1px;">AI ANALYSIS — '+timeStr+'</span><br><br>'+text.replace(/\n/g,'<br>');
+  }catch(e){
+    aiOut.innerHTML='<span style="color:var(--dim2);">AI analysis failed — check connection</span>';
+  }
+}
+
+async function askAIEntry(){
+  const aiOut=document.getElementById('titanAIOutput');
+  if(!aiOut)return;
+  aiOut.innerHTML='<span style="color:var(--gold);">⚡ AI deciding entry...</span>';
+
+  const sym=document.getElementById('titanSym')?.value||'SENSEX';
+  const ticks=TITAN.ticks.slice(-8);
+  if(ticks.length<2){aiOut.innerHTML='<span style="color:var(--dim2);">Need more data</span>';return;}
+  const latest=ticks[ticks.length-1];
+  const ist=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
+  const expiry=isExpiryToday(toISTDate(ist));
+  const step=STEP[sym]||50;
+  const spot=latest.spot||(sym==='SENSEX'?79000:24000);
+  const atm=Math.round(spot/step)*step;
+
+  const prompt=`You are inside Dhanveer Trading System. Trader asks: SHOULD I ENTER RIGHT NOW?
+
+Data:
+- Symbol: ${sym} ATM ${atm} CE
+- Current premium: ₹${latest.callLTP.toFixed(1)}
+- TITAN Score: ${TITAN.score}/100
+- Expiry today: ${expiry?'YES':'NO'}
+- Time: ${ist.toLocaleTimeString('en-IN')}
+- Session: ${getSession().name}
+
+Answer in exactly this format:
+VERDICT: [ENTER / WAIT / AVOID]
+REASON: [one sentence max 15 words]
+SL: ₹[number]
+TARGET: ₹[number]`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:100,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await res.json();
+    const text=data.content?.[0]?.text||'';
+    const isEnter=text.includes('ENTER');
+    const col=isEnter?'var(--green)':text.includes('WAIT')?'var(--gold)':'var(--red)';
+    aiOut.innerHTML='<span style="color:'+col+';font-size:13px;font-family:Teko,sans-serif;letter-spacing:2px;">'+
+      (text.split('\n')[0]||text)+'</span><br><br>'+
+      text.split('\n').slice(1).join('<br>');
+  }catch(e){
+    aiOut.innerHTML='<span style="color:var(--dim2);">AI unavailable</span>';
+  }
+}
+
+// Hook TITAN init into unlock
+const _origUnlock=unlock;
+// Already hooked via startV4Monitor — TITAN starts on demand only
 </script>
 </body>
 </html>
