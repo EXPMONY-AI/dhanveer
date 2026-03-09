@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Dhanveer"/>
 <meta name="theme-color" content="#020609"/>
-<title>Dhanveer Trading System</title>
+<title>Dhanveer v5 Trading System</title>
 <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -293,7 +293,7 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
     <div class="pg on" id="pg-home">
       <div class="hero">
         <div class="h-title">⚔ DHANVEER</div>
-        <div class="h-sub">INSTITUTIONAL TRADING SYSTEM</div>
+        <div class="h-sub">INSTITUTIONAL TRADING SYSTEM v5</div>
         <div style="margin-top:12px;display:flex;gap:7px;flex-wrap:wrap;">
           <span style="font-size:9px;padding:3px 9px;border-radius:9px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.2);color:var(--green);">🔒 SECURED</span>
           <span style="font-size:9px;padding:3px 9px;border-radius:9px;background:rgba(0,188,212,.1);border:1px solid rgba(0,188,212,.2);color:var(--cyan);" id="connBadge">⚡ CONNECT BROKER</span>
@@ -1193,11 +1193,17 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
 </div>
 <script>
 'use strict';
+// ═══════ PERSISTENT STORAGE ═══════
+function lsGet(k,def=null){try{const v=localStorage.getItem('dv5_'+k);return v!==null?JSON.parse(v):def;}catch(e){return def;}}
+function lsSet(k,v){try{localStorage.setItem('dv5_'+k,JSON.stringify(v));}catch(e){}}
+function lsDel(k){try{localStorage.removeItem('dv5_'+k);}catch(e){}}
+
 // ═══════ STATE ═══════
 const S={
-  ph:null,pb:'',fails:0,MAX:5,ss:null,la:Date.now(),locked:true,chgPin:false,npb:'',
-  cr:{fa:'',ft:'',dc:'',dt:''},pr:{br:'dhan',ll:5000,snd:true},
-  pt:[],fii:[],chks:[false,false,false,false,false,false]
+  ph:lsGet('ph',null),pb:'',fails:0,MAX:5,ss:null,la:Date.now(),locked:true,chgPin:false,npb:'',
+  cr:lsGet('cr',{fa:'',ft:'',dc:'',dt:''}),
+  pr:lsGet('pr',{br:'dhan',ll:5000,snd:true}),
+  pt:lsGet('pt',[]),fii:[],chks:lsGet('chks',[false,false,false,false,false,false])
 };
 
 // ═══════ CHECKLIST ═══════
@@ -1207,7 +1213,7 @@ function buildChecklist(){
     <span id="chkI${i}" style="font-size:14px;">☐</span><span id="chkT${i}">${t}</span></div>`).join('');
 }
 function toggleChk(i){
-  S.chks[i]=!S.chks[i];
+  S.chks[i]=!S.chks[i];lsSet('chks',S.chks);
   document.getElementById('chkI'+i).textContent=S.chks[i]?'☑':'☐';
   const t=document.getElementById('chkT'+i);
   t.style.color=S.chks[i]?'var(--green)':'var(--tx)';
@@ -1228,15 +1234,15 @@ function pp(k){
 function ud(n=false){const b=n?S.npb:S.pb;for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);d.className='pd'+(i<b.length?' on':'');}}
 async function submitPin(){
   const h=await sha(S.pb);S.pb='';ud();
-  if(!S.ph){S.ph=h;setMsg('✅ PIN created! Welcome to Dhanveer','ok');setTimeout(unlock,700);}
-  else if(h===S.ph){S.fails=0;document.getElementById('attB').style.display='none';setMsg('✅ Unlocking...','ok');setTimeout(unlock,400);}
+  if(!S.ph){S.ph=h;lsSet('ph',h);setMsg('✅ PIN created! Welcome to Dhanveer','ok');setTimeout(unlock,700);}
+  else if(h===S.ph){S.fails=0;lsSet('ph',S.ph);document.getElementById('attB').style.display='none';setMsg('✅ Unlocking...','ok');setTimeout(unlock,400);}
   else{
     S.fails++;const rem=S.MAX-S.fails;
     if(rem<=0){trigWipe();}
     else{setMsg(`❌ Wrong PIN — ${rem} attempts left`,'er');const a=document.getElementById('attB');a.style.display='block';a.textContent=`⚠ ${rem} LEFT`;for(let i=0;i<4;i++)document.getElementById('pd'+i).className='pd er';setTimeout(ud,600);}
   }
 }
-async function cfmPin(){const h=await sha(S.npb);S.npb='';S.ph=h;S.chgPin=false;setMsg('✅ New PIN saved!','ok');document.getElementById('psP').textContent='ENTER YOUR PIN';setTimeout(unlock,600);}
+async function cfmPin(){const h=await sha(S.npb);S.npb='';S.ph=h;lsSet('ph',h);S.chgPin=false;setMsg('✅ New PIN saved!','ok');document.getElementById('psP').textContent='ENTER YOUR PIN';setTimeout(unlock,600);}
 function setMsg(m,t=''){const e=document.getElementById('psM');e.textContent=m;e.className='ps-msg'+(t?' '+t:'');}
 function unlock(){
   S.locked=false;S.ss=Date.now();S.la=Date.now();
@@ -1244,6 +1250,9 @@ function unlock(){
   document.getElementById('app').style.display='flex';
   setMsg('');startIdle();buildChecklist();updateSecScore();initHomeDashboard();initCalendar();initSpikeEngine();startV4Monitor();updateV4HomeStatus();showNormalPlaybook();
   document.getElementById('connBadge').textContent=(S.cr.fa&&S.cr.ft)||(S.cr.dc&&S.cr.dt)?'✅ BROKER CONNECTED':'⚡ CONNECT BROKER';
+  // Show saved credential status in setup
+  if(S.cr.dc){document.getElementById('dhM').innerHTML='<span class="lg">&#10003; Client ID: '+S.cr.dc+' — token loaded from storage.</span>';document.getElementById('dhC').textContent='&#9989; CONNECTED';}
+  if(S.cr.fa){document.getElementById('fyM').innerHTML='<span class="lg">&#10003; Fyers App ID: '+S.cr.fa+' — token loaded from storage.</span>';}
 }
 function lockNow(){
   S.locked=true;S.pb='';S.npb='';ud();
@@ -1256,7 +1265,7 @@ function lockNow(){
 function changePin(){S.chgPin=true;lockNow();setTimeout(()=>{document.getElementById('psP').textContent='ENTER NEW 4-DIGIT PIN';document.getElementById('psN').textContent='Choose your new PIN carefully.';},100);}
 function trigWipe(){document.getElementById('wipeM').style.display='flex';let c=3;document.getElementById('wN').textContent=c;const t=setInterval(()=>{c--;document.getElementById('wN').textContent=c;if(c<=0){clearInterval(t);wipeAll(true);}},1000);}
 function wipeAll(fa=false){
-  S.cr={fa:'',ft:'',dc:'',dt:''};S.ph=null;S.fails=0;S.pb='';
+  S.cr={fa:'',ft:'',dc:'',dt:''};S.ph=null;S.fails=0;S.pb='';lsDel('cr');lsDel('ph');lsDel('pt');
   ['fA','fT','dC','dT'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('wipeM').style.display='none';
   document.getElementById('pinScreen').style.display='flex';
@@ -1269,7 +1278,8 @@ function wipeAll(fa=false){
 function resetIdle(){S.la=Date.now();}
 document.addEventListener('touchstart',resetIdle,{passive:true});
 document.addEventListener('click',resetIdle);
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&!S.locked)lockNow();});
+// Auto-lock on hide disabled — credentials persist via localStorage
+// document.addEventListener('visibilitychange',()=>{if(document.hidden&&!S.locked)lockNow();});
 function startIdle(){
   clearInterval(S.it);
   S.it=setInterval(()=>{
@@ -1329,10 +1339,10 @@ async function getChain(sym,exp){
 function getPCR(chain){let tC=0,tP=0,pain={};for(const r of chain){tC+=r.cOI;tP+=r.pOI;pain[r.strike]=0;}for(const r of chain)for(const s of chain){if(s.strike<r.strike)pain[r.strike]+=(r.strike-s.strike)*s.cOI;if(s.strike>r.strike)pain[r.strike]+=(s.strike-r.strike)*s.pOI;}const mp=Object.entries(pain).sort((a,b)=>a[1]-b[1])[0]?.[0]||0;return{pcr:(tP/(tC||1)).toFixed(3),maxPain:mp,tC,tP,pain};}
 
 // ═══════ SETUP ═══════
-function saveF(){S.cr.fa=document.getElementById('fA').value.trim();S.cr.ft=document.getElementById('fT').value.trim();document.getElementById('fA').value='';document.getElementById('fT').value='';document.getElementById('fyM').innerHTML='<span class="lg">&#10003; Saved. Credentials hidden for security.</span>';document.getElementById('connBadge').textContent='&#9989; BROKER CONNECTED';}
-function saveD(){S.cr.dc=document.getElementById('dC').value.trim();S.cr.dt=document.getElementById('dT').value.trim();document.getElementById('dC').value='';document.getElementById('dT').value='';document.getElementById('dhM').innerHTML='<span class="lg">&#10003; Saved. Credentials hidden for security.</span>';document.getElementById('dhC').textContent='&#9989; CONNECTED';document.getElementById('connBadge').textContent='&#9989; BROKER CONNECTED';}
-function clrF(){S.cr.fa='';S.cr.ft='';document.getElementById('fA').value='';document.getElementById('fT').value='';document.getElementById('fyM').innerHTML='<span class="ld">Cleared</span>';}
-function clrD(){S.cr.dc='';S.cr.dt='';document.getElementById('dC').value='';document.getElementById('dT').value='';document.getElementById('dhM').innerHTML='<span class="ld">Cleared</span>';}
+function saveF(){S.cr.fa=document.getElementById('fA').value.trim();S.cr.ft=document.getElementById('fT').value.trim();lsSet('cr',S.cr);document.getElementById('fA').value='';document.getElementById('fT').value='';document.getElementById('fyM').innerHTML='<span class="lg">&#10003; Saved &amp; persisted securely.</span>';document.getElementById('connBadge').textContent='&#9989; BROKER CONNECTED';}
+function saveD(){const dc=document.getElementById('dC').value.trim();const dt=document.getElementById('dT').value.trim();if(dc)S.cr.dc=dc;if(dt)S.cr.dt=dt;lsSet('cr',S.cr);document.getElementById('dC').value='';document.getElementById('dT').value='';document.getElementById('dhM').innerHTML='<span class="lg">&#10003; Saved &amp; persisted securely.</span>';document.getElementById('dhC').textContent='&#9989; CONNECTED';document.getElementById('connBadge').textContent='&#9989; BROKER CONNECTED';}
+function clrF(){S.cr.fa='';S.cr.ft='';lsSet('cr',S.cr);document.getElementById('fA').value='';document.getElementById('fT').value='';document.getElementById('fyM').innerHTML='<span class="ld">Cleared</span>';}
+function clrD(){S.cr.dc='';S.cr.dt='';lsSet('cr',S.cr);document.getElementById('dC').value='';document.getElementById('dT').value='';document.getElementById('dhM').innerHTML='<span class="ld">Cleared</span>';}
 async function testF(){
   const e=document.getElementById('fyC');e.textContent='Testing...';e.style.color='var(--dim2)';
   const a=document.getElementById('fA').value.trim(),t=document.getElementById('fT').value.trim();
@@ -1343,13 +1353,13 @@ async function testF(){
 }
 async function testD(){
   const e=document.getElementById('dhC');e.textContent='Testing...';e.style.color='var(--dim2)';
-  const c=document.getElementById('dC').value.trim(),t=document.getElementById('dT').value.trim();
-  if(!c||!t){e.textContent='Enter creds first';e.style.color='var(--orange)';return;}
+  const c=document.getElementById('dC').value.trim()||S.cr.dc;
+  const t=document.getElementById('dT').value.trim()||S.cr.dt;
+  if(!c||!t){e.textContent='No saved creds — paste token first';e.style.color='var(--orange)';return;}
   try{const d=await AF('https://api.dhan.co/v2/marketfeed/ltp',{'access-token':t,'client-id':c,'Content-Type':'application/json'},{'IDX_I':['13']});
-    if(d?.data){e.textContent='✓ Connected';e.style.color='var(--green)';}else{e.textContent='❌ Invalid';e.style.color='var(--red)';}}
-  catch(ex){e.textContent='❌ '+ex.message;e.style.color='var(--red)';}
-}
-function savePref(){saveF();saveD();S.pr.br=document.getElementById('pBr').value;S.pr.ll=parseFloat(document.getElementById('pLL').value)||5000;S.pr.snd=document.getElementById('pSn').value==='1';alert('Settings saved ✓');}
+    if(d?.data){e.textContent='✓ Connected — ID:'+c.slice(0,6)+'***';e.style.color='var(--green)';}else{e.textContent='❌ Invalid response';e.style.color='var(--red)';}}
+  catch(ex){e.textContent='❌ '+ex.message;e.style.color='var(--red)';}}
+function savePref(){saveF();saveD();S.pr.br=document.getElementById('pBr').value;S.pr.ll=parseFloat(document.getElementById('pLL').value)||5000;S.pr.snd=document.getElementById('pSn').value==='1';lsSet('pr',S.pr);alert('Settings saved ✓');}
 
 // ═══════ HOME PRICES ═══════
 async function refreshPrices(){
