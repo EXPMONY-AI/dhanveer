@@ -1144,6 +1144,7 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
         <input type="number" id="pLL" value="5000"/>
         <label>Sound Alerts</label>
         <select id="pSn"><option value="1">ON</option><option value="0">OFF</option></select>
+        <div style="margin:4px 0 10px;padding:12px;border-radius:10px;background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.15);"><div style="font-family:Teko,sans-serif;font-size:15px;letter-spacing:2px;color:var(--green);margin-bottom:6px;">🔗 PROXY SERVER (LIVE DATA)</div><div style="font-size:9px;color:var(--dim2);line-height:1.8;margin-bottom:8px;">Run START_DHANVEER.bat on laptop → enter laptop IP here → full live data<br>⚠️ Phone and laptop must be on SAME WiFi</div><label>Laptop IP Address</label><input type="text" id="pProxy" placeholder="e.g. 192.168.1.5"/><div style="display:flex;gap:8px;"><button class="btn btn-ol btn-sm" ontouchend="testProxy()">🔗 TEST PROXY</button><button class="btn btn-red btn-sm" ontouchend="clearProxy()">✕ CLEAR</button></div><div id="proxyStatus" style="margin-top:6px;font-size:10px;color:var(--dim2);">Not configured</div></div>
         <button class="btn btn-gold" ontouchend="savePref()">💾 SAVE ALL SETTINGS</button>
       </div>
 
@@ -1220,6 +1221,11 @@ function fyH(){return{Authorization:`${S.cr.fa}:${S.cr.ft}`,'Content-Type':'appl
 function dhH(){return{'access-token':S.cr.dt,'client-id':S.cr.dc,'Content-Type':'application/json'};}
 function hasCreds(){return (S.cr.dc&&S.cr.dt)||(S.cr.fa&&S.cr.ft);}
 
+// ── PROXY CONFIG ──
+// Proxy runs on your laptop — phone and laptop must be on SAME WiFi
+function getProxyBase(){return S.pr.proxyIP?`http://${S.pr.proxyIP}:7777`:null;}
+function isProxyMode(){return !!S.pr.proxyIP&&S.pr.proxyIP.length>6;}
+
 async function AF(url,hdr={},body=null){
   const opts={method:body?'POST':'GET',headers:{...hdr,'Content-Type':'application/json'}};
   if(body){opts.body=JSON.stringify(body);}
@@ -1228,8 +1234,33 @@ async function AF(url,hdr={},body=null){
   return r.json();
 }
 
+// ── PROXY-AWARE FETCH ──
+async function PF(proxyPath,directUrl,hdr={},body=null){
+  // Try proxy first if configured
+  if(isProxyMode()){
+    try{
+      const base=getProxyBase();
+      const opts={method:'POST',headers:{...hdr,'Content-Type':'application/json'}};
+      if(body)opts.body=JSON.stringify(body);
+      const r=await fetch(base+proxyPath,opts);
+      if(r.ok)return r.json();
+    }catch(e){
+      // Proxy failed — fall through to direct
+      console.log('Proxy failed, trying direct:',e.message);
+    }
+  }
+  // Direct call (may fail with CORS on phone browser)
+  return AF(directUrl,hdr,body);
+}
+
 async function getSpot(sym){
   if(S.pr.br==='fyers'&&S.cr.fa&&S.cr.ft){
+    if(isProxyMode()){
+      const d=await PF('/fyers/quotes?symbols='+encodeURIComponent(FI[sym]),
+        'https://api-t1.fyers.in/data/quotes?symbols='+encodeURIComponent(FI[sym]),
+        {Authorization:`${S.cr.fa}:${S.cr.ft}`});
+      return{ltp:d?.d?.[0]?.v?.lp||0,chg:d?.d?.[0]?.v?.chp||0};
+    }
     const u=new URL('https://api-t1.fyers.in/data/quotes');
     u.searchParams.set('symbols',FI[sym]);
     const d=await AF(u.toString(),fyH());
@@ -1237,26 +1268,27 @@ async function getSpot(sym){
   }
   if(S.cr.dc&&S.cr.dt){
     const{id,seg}=DI[sym]||{id:'13',seg:'IDX_I'};
-    const d=await AF('https://api.dhan.co/v2/marketfeed/ltp',dhH(),{[seg]:[Number(id)]});
+    const d=await PF('/dhan/ltp','https://api.dhan.co/v2/marketfeed/ltp',dhH(),{[seg]:[Number(id)]});
     const ltp=d?.data?.[seg]?.[id]?.last_price||0;
     return{ltp,chg:0};
   }
-  throw new Error('No credentials saved');
+  throw new Error('No credentials saved — go to SETUP tab');
 }
 
 async function getChain(sym,exp){
   if(S.pr.br==='fyers'&&S.cr.fa&&S.cr.ft){
-    const u=new URL('https://api-t1.fyers.in/data/optionchain');
-    u.searchParams.set('symbol',FI[sym]);u.searchParams.set('strikecount','20');u.searchParams.set('timestamp',exp);
-    const d=await AF(u.toString(),fyH());
+    const params=`symbol=${encodeURIComponent(FI[sym])}&strikecount=20&timestamp=${exp}`;
+    const d=await PF('/fyers/optionchain?'+params,
+      'https://api-t1.fyers.in/data/optionchain?'+params,
+      {Authorization:`${S.cr.fa}:${S.cr.ft}`});
     return(d?.data?.optionsChain||[]).map(r=>({strike:r.strikePrice,cLTP:r.CE?.ltp||0,cOI:r.CE?.oi||0,cOIChg:r.CE?.oiChange||0,cIV:r.CE?.iv||0,cVol:r.CE?.volume||0,pLTP:r.PE?.ltp||0,pOI:r.PE?.oi||0,pOIChg:r.PE?.oiChange||0,pIV:r.PE?.iv||0,pVol:r.PE?.volume||0}));
   }
   if(S.cr.dc&&S.cr.dt){
     const{id}=DI[sym]||{id:'13'};
-    const d=await AF('https://api.dhan.co/v2/optionchain',dhH(),{UnderlyingScrip:Number(id),UnderlyingSeg:'IDX_I',Expiry:exp});
+    const d=await PF('/dhan/optionchain','https://api.dhan.co/v2/optionchain',dhH(),{UnderlyingScrip:Number(id),UnderlyingSeg:'IDX_I',Expiry:exp});
     return(d?.data||[]).map(r=>({strike:r.strike_price,cLTP:r.call_ltp||0,cOI:r.call_oi||0,cOIChg:r.call_oi_change||0,cIV:r.call_iv||0,cVol:r.call_volume||0,pLTP:r.put_ltp||0,pOI:r.put_oi||0,pOIChg:r.put_oi_change||0,pIV:r.put_iv||0,pVol:r.put_volume||0}));
   }
-  throw new Error('No credentials saved');
+  throw new Error('No credentials saved — go to SETUP tab');
 }
 
 function getPCR(chain){
@@ -1459,9 +1491,35 @@ function savePref(){
   S.pr.br=document.getElementById('pBr').value;
   S.pr.ll=parseFloat(document.getElementById('pLL').value)||5000;
   S.pr.snd=document.getElementById('pSn').value==='1';
+  const proxyIP=document.getElementById('pProxy')?.value?.trim()||'';
+  S.pr.proxyIP=proxyIP;
   lsSet('pr',S.pr);
   saveF();saveD();
-  alert('✅ All settings saved');
+  if(proxyIP){document.getElementById('proxyStatus').textContent='✅ Proxy IP saved: '+proxyIP+':7777';document.getElementById('proxyStatus').style.color='var(--green)';}
+  alert('✅ All settings saved'+(proxyIP?' — Proxy configured!':' — No proxy (manual mode)'));
+}
+
+async function testProxy(){
+  const ip=document.getElementById('pProxy')?.value?.trim()||S.pr.proxyIP||'';
+  const el=document.getElementById('proxyStatus');
+  if(!ip){el.textContent='Enter laptop IP first';el.style.color='var(--orange)';return;}
+  el.textContent='Testing proxy at '+ip+':7777...';el.style.color='var(--dim2)';
+  try{
+    const r=await fetch('http://'+ip+':7777/health');
+    const d=await r.json();
+    if(d.status==='ok'){
+      el.textContent='✅ PROXY CONNECTED — Live data active!';el.style.color='var(--green)';
+      S.pr.proxyIP=ip;lsSet('pr',S.pr);
+      document.getElementById('connBadge').textContent='✅ PROXY + BROKER LIVE';
+      document.getElementById('connBadge').className='sbadge sbadge-g';
+    }else{el.textContent='❌ Proxy wrong status';el.style.color='var(--red)';}
+  }catch(e){el.textContent='❌ Cannot reach proxy at '+ip+':7777 — Check: 1) Batch file running? 2) Same WiFi? 3) IP correct?';el.style.color='var(--red)';}
+}
+
+function clearProxy(){
+  S.pr.proxyIP='';lsSet('pr',S.pr);
+  const el=document.getElementById('pProxy');if(el)el.value='';
+  const st=document.getElementById('proxyStatus');st.textContent='Proxy cleared';st.style.color='var(--dim2)';
 }
 
 // ── MANUAL PRICE ENTRY ──
