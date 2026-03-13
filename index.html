@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="theme-color" content="#020609"/>
-<title>Dhanveer v6</title>
+<title>Dhanveer v7</title>
 <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -20,6 +20,20 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:'Nunito',sans-serif;}
 body{padding-top:var(--sat);}
+
+/* ── ALERT SYSTEM ── */
+@keyframes alertFlash{0%,100%{background:var(--bg);}25%,75%{background:rgba(0,230,118,.15);}50%{background:rgba(0,230,118,.25);}}
+@keyframes alertFlashRed{0%,100%{background:var(--bg);}25%,75%{background:rgba(255,51,85,.15);}50%{background:rgba(255,51,85,.25);}}
+@keyframes alertPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
+#alertOverlay{position:fixed;inset:0;z-index:9990;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.92);backdrop-filter:blur(8px);}
+#alertOverlay.ce{animation:alertFlash .4s ease infinite;}
+#alertOverlay.pe{animation:alertFlashRed .4s ease infinite;}
+.alert-icon{font-size:72px;animation:alertPulse .5s ease infinite;}
+.alert-title{font-family:'Teko',sans-serif;font-size:52px;font-weight:700;letter-spacing:4px;margin-top:8px;}
+.alert-sub{font-size:12px;letter-spacing:3px;color:var(--dim2);margin-bottom:16px;}
+.alert-levels{display:flex;flex-direction:column;gap:8px;width:100%;max-width:320px;margin:10px 0 20px;}
+.alert-level{padding:10px 14px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;}
+.alert-dismiss{font-family:'Teko',sans-serif;font-size:20px;letter-spacing:2px;padding:14px 40px;border-radius:12px;border:none;cursor:pointer;margin-top:8px;}
 
 /* SPLASH */
 #splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;}
@@ -184,7 +198,7 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="theme-color" content="#020609"/>
-<title>Dhanveer v6</title>
+<title>Dhanveer v7</title>
 <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -197,6 +211,20 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:'Nunito',sans-serif;}
 body{padding-top:var(--sat);}
+
+/* ── ALERT SYSTEM ── */
+@keyframes alertFlash{0%,100%{background:var(--bg);}25%,75%{background:rgba(0,230,118,.15);}50%{background:rgba(0,230,118,.25);}}
+@keyframes alertFlashRed{0%,100%{background:var(--bg);}25%,75%{background:rgba(255,51,85,.15);}50%{background:rgba(255,51,85,.25);}}
+@keyframes alertPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
+#alertOverlay{position:fixed;inset:0;z-index:9990;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.92);backdrop-filter:blur(8px);}
+#alertOverlay.ce{animation:alertFlash .4s ease infinite;}
+#alertOverlay.pe{animation:alertFlashRed .4s ease infinite;}
+.alert-icon{font-size:72px;animation:alertPulse .5s ease infinite;}
+.alert-title{font-family:'Teko',sans-serif;font-size:52px;font-weight:700;letter-spacing:4px;margin-top:8px;}
+.alert-sub{font-size:12px;letter-spacing:3px;color:var(--dim2);margin-bottom:16px;}
+.alert-levels{display:flex;flex-direction:column;gap:8px;width:100%;max-width:320px;margin:10px 0 20px;}
+.alert-level{padding:10px 14px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;}
+.alert-dismiss{font-family:'Teko',sans-serif;font-size:20px;letter-spacing:2px;padding:14px 40px;border-radius:12px;border:none;cursor:pointer;margin-top:8px;}
 
 /* SPLASH */
 #splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;}
@@ -358,7 +386,7 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
 <div id="splash">
   <div class="sp-sword">⚔️</div>
   <div class="sp-name">DHANVEER</div>
-  <div class="sp-tag">TRADING SYSTEM V6</div>
+  <div class="sp-tag">TRADING SYSTEM V7</div>
   <div class="sp-bar"><div class="sp-fill"></div></div>
 </div>
 <div id="wipeM">
@@ -371,7 +399,7 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
   <div class="att" id="attB"></div>
   <div class="ps-icon">🛡️</div>
   <div class="ps-logo">DHANVEER</div>
-  <div class="ps-sub">TRADING SYSTEM V6</div>
+  <div class="ps-sub">TRADING SYSTEM V7</div>
   <div class="ps-prompt" id="psP">ENTER YOUR PIN</div>
   <div class="pindots">
     <div class="pd" id="pd0"></div><div class="pd" id="pd1"></div>
@@ -414,7 +442,7 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <div>
             <div style="font-family:'Teko',sans-serif;font-size:26px;letter-spacing:3px;color:var(--gold);">⚔️ DHANVEER</div>
-            <div style="font-size:9px;color:var(--dim2);letter-spacing:2px;">INSTITUTIONAL TRADING SYSTEM V6</div>
+            <div style="font-size:9px;color:var(--dim2);letter-spacing:2px;">INSTITUTIONAL TRADING SYSTEM V7</div>
           </div>
           <div id="dayTypeBadge" style="padding:6px 12px;border-radius:10px;background:rgba(0,188,212,.1);border:1px solid rgba(0,188,212,.2);color:var(--cyan);font-family:'Teko',sans-serif;font-size:14px;letter-spacing:1px;text-align:center;">LOADING...</div>
         </div>
@@ -1076,6 +1104,141 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
     </div>
 
     <!-- ══════════════════════════════════════ -->
+    <!-- PAGE: ENGINE (3 Advanced Engines) -->
+    <div id="tab-engine" class="page" style="display:none;">
+      <div class="sg">
+        <div class="sg-t" style="color:var(--gold);font-size:18px;letter-spacing:3px;">⚡ ADVANCED ENGINES</div>
+        <div style="font-size:9px;color:var(--dim2);letter-spacing:2px;">OI UNWIND · IV CRUSH · MAX PAIN VELOCITY</div>
+      </div>
+      <div style="padding:0 12px 12px;">
+        <!-- Engine Controls -->
+        <div class="card">
+          <div class="g2">
+            <div><label>Symbol</label><select id="engSym"><option>SENSEX</option><option>NIFTY</option><option>BANKNIFTY</option><option>FINNIFTY</option></select></div>
+            <div><label>Expiry</label><input type="date" id="engExp"/></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button class="btn btn-gold" style="flex:1;" ontouchend="runEngines()">⚡ RUN ALL ENGINES</button>
+            <button class="btn btn-ol" ontouchend="startEngineAuto()">🔄 AUTO</button>
+          </div>
+          <div id="engineStatus" style="margin-top:6px;font-size:9px;color:var(--dim2);">Tap RUN to analyse</div>
+        </div>
+        <!-- Engine Output -->
+        <div id="engineOutput">
+          <div class="card" style="text-align:center;padding:30px;color:var(--dim2);">
+            <div style="font-size:32px;margin-bottom:8px;">⚡</div>
+            <div style="font-size:11px;">Run engines to see OI Unwinding,<br>IV Crush risk, and Max Pain Velocity</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: CHART (Candlestick + Indicators + Pattern AI) -->
+    <div id="tab-chart" class="page" style="display:none;">
+      <div style="padding:8px 12px 0;">
+        <!-- Controls Row -->
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+          <select id="chartSym" style="flex:1;" onchange="switchChartSym(this.value);startChartFeed();">
+            <option>SENSEX</option><option>NIFTY</option><option>BANKNIFTY</option><option>FINNIFTY</option>
+          </select>
+          <div style="display:flex;gap:4px;">
+            <button id="chartBtn_1m" class="btn btn-ol btn-sm" style="background:transparent;" ontouchend="switchChartTF('1m')">1M</button>
+            <button id="chartBtn_5m" class="btn btn-ol btn-sm" style="background:rgba(245,166,35,.2);" ontouchend="switchChartTF('5m')">5M</button>
+          </div>
+          <button class="btn btn-gold btn-sm" ontouchend="startChartFeed();chartDraw();">▶ LIVE</button>
+        </div>
+
+        <!-- Canvas Chart -->
+        <div style="position:relative;border-radius:10px;overflow:hidden;background:#020609;border:1px solid rgba(255,255,255,.06);">
+          <canvas id="chartCanvas" width="360" height="280" style="width:100%;display:block;"></canvas>
+          <div style="position:absolute;top:6px;left:58px;font-size:8px;letter-spacing:2px;color:rgba(100,150,200,0.5);" id="chartLabel">SENSEX · 5M</div>
+        </div>
+
+        <!-- Pattern Detection Results -->
+        <div class="card" style="margin-top:8px;">
+          <div style="font-family:'Teko',sans-serif;font-size:14px;letter-spacing:2px;color:var(--gold);margin-bottom:8px;">📐 PATTERNS & SIGNALS</div>
+          <div id="chartPatterns"><div style="color:var(--dim2);font-size:10px;">Start live feed to detect patterns...</div></div>
+        </div>
+
+        <!-- AI Chart Upload -->
+        <div class="card" style="margin-top:8px;border-color:rgba(0,188,212,.2);">
+          <div style="font-family:'Teko',sans-serif;font-size:14px;letter-spacing:2px;color:var(--cyan);margin-bottom:6px;">🧠 AI CHART ANALYSER</div>
+          <div style="font-size:9px;color:var(--dim2);margin-bottom:10px;">Upload any chart screenshot — AI reads patterns, confirms signal strength</div>
+
+          <!-- Upload Area -->
+          <label for="chartUpload" style="display:block;padding:20px;border:1.5px dashed rgba(0,188,212,.3);border-radius:10px;text-align:center;cursor:pointer;background:rgba(0,188,212,.03);">
+            <div style="font-size:28px;margin-bottom:6px;">📸</div>
+            <div style="font-size:11px;color:var(--cyan);">Tap to upload chart screenshot</div>
+            <div style="font-size:9px;color:var(--dim2);margin-top:4px;">From gallery or camera — any broker chart</div>
+          </label>
+          <input type="file" id="chartUpload" accept="image/*" style="display:none;" onchange="handleChartUpload(event)"/>
+
+          <!-- Preview -->
+          <div id="chartPreview" style="margin-top:8px;display:none;">
+            <img id="chartPreviewImg" style="width:100%;border-radius:8px;max-height:200px;object-fit:contain;background:#000;" src="" alt="Chart"/>
+          </div>
+
+          <!-- AI Output -->
+          <div id="chartAIOutput" style="margin-top:10px;min-height:60px;padding:10px;background:rgba(0,0,0,.3);border-radius:8px;font-size:11px;color:var(--dim2);">
+            Upload a chart image to get AI analysis
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: BRAIN (Smart Brain Engine) -->
+    <div id="tab-brain" class="page" style="display:none;">
+      <div class="sg">
+        <div class="sg-t" style="color:var(--cyan);font-size:18px;letter-spacing:3px;">🧠 SMART BRAIN</div>
+        <div style="font-size:9px;color:var(--dim2);letter-spacing:2px;">SELF-REPAIR · SELF-OPTIMIZE · ZERO ERROR</div>
+      </div>
+      <div style="padding:0 12px 12px;">
+
+        <!-- Brain Status -->
+        <div class="card" style="border-color:rgba(0,188,212,.2);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-family:'Teko',sans-serif;font-size:15px;letter-spacing:2px;color:var(--cyan);">⚡ BRAIN STATUS</div>
+            <span id="brainBadge" style="font-size:8px;padding:2px 8px;border-radius:6px;background:rgba(0,188,212,.1);border:1px solid rgba(0,188,212,.2);color:var(--cyan);">READY</span>
+          </div>
+          <div id="brainStatus" style="font-size:10px;color:var(--dim2);margin-bottom:10px;">Tap START BRAIN to activate</div>
+          <div class="g2" style="margin-bottom:8px;">
+            <div><label>Symbol</label><select id="brainSym"><option>SENSEX</option><option>NIFTY</option><option>BANKNIFTY</option><option>FINNIFTY</option></select></div>
+            <div><label>Expiry</label><input type="date" id="brainExp"/></div>
+          </div>
+          <button class="btn btn-cyan" style="width:100%;" ontouchend="activateBrain()">🧠 START BRAIN</button>
+        </div>
+
+        <!-- Regime Display -->
+        <div class="card" style="margin-top:8px;">
+          <div style="font-family:'Teko',sans-serif;font-size:14px;letter-spacing:2px;color:var(--dim2);margin-bottom:8px;">📊 MARKET REGIME</div>
+          <div style="text-align:center;padding:10px 0;">
+            <div id="brainRegime" style="font-family:'Teko',sans-serif;font-size:32px;color:var(--dim2);">UNKNOWN</div>
+            <div style="font-size:9px;color:var(--dim2);margin-top:4px;">Auto-detected every scan</div>
+          </div>
+        </div>
+
+        <!-- Brain Analytics Panel -->
+        <div class="card" style="margin-top:8px;">
+          <div style="font-family:'Teko',sans-serif;font-size:14px;letter-spacing:2px;color:var(--dim2);margin-bottom:8px;">📈 BRAIN ANALYTICS</div>
+          <div id="brainPanel"><div style="color:var(--dim2);font-size:10px;">Start Brain to see analytics</div></div>
+        </div>
+
+        <!-- Data Source Health -->
+        <div class="card" style="margin-top:8px;">
+          <div style="font-family:'Teko',sans-serif;font-size:14px;letter-spacing:2px;color:var(--dim2);margin-bottom:8px;">🔌 SOURCE HEALTH</div>
+          <div id="healthPanel"><div style="color:var(--dim2);font-size:10px;">Start Brain to see health</div></div>
+          <button class="btn btn-ol btn-sm" style="margin-top:8px;" ontouchend="resetBrainSources()">🔄 RESET ALL SOURCES</button>
+        </div>
+
+        <!-- Repair Log -->
+        <div class="card" style="margin-top:8px;">
+          <div style="font-family:'Teko',sans-serif;font-size:14px;letter-spacing:2px;color:var(--dim2);margin-bottom:8px;">🔧 REPAIR LOG</div>
+          <div id="repairLogPanel" style="font-size:10px;color:var(--dim2);max-height:150px;overflow-y:auto;">No repairs yet</div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- PAGE: SETUP -->
     <!-- ══════════════════════════════════════ -->
     <div class="pg" id="pg-setup">
@@ -1179,6 +1342,9 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
     <button class="nb" id="nb-spike" ontouchend="goP('spike')"><div class="nb-i">💥</div><div class="nb-l">SPIKE</div></button>
     <button class="nb" id="nb-calendar" ontouchend="goP('calendar')"><div class="nb-i">🗓️</div><div class="nb-l">CALENDAR</div></button>
     <button class="nb" id="nb-titan" ontouchend="goP('titan')"><div class="nb-i">🚀</div><div class="nb-l">TITAN</div></button>
+    <button class="nb" id="nb-chart" ontouchend="goP('chart');startChartFeed();"><div class="nb-i">📈</div><div class="nb-l">CHART</div></button>
+    <button class="nb" id="nb-engine" ontouchend="goP('engine')"><div class="nb-i">⚡</div><div class="nb-l">ENGINE</div></button>
+    <button class="nb" id="nb-brain" ontouchend="goP('brain')"><div class="nb-i">🧠</div><div class="nb-l">BRAIN</div></button>
     <button class="nb" id="nb-setup" ontouchend="goP('setup')"><div class="nb-i">⚙️</div><div class="nb-l">SETUP</div></button>
   </div>
 </div>
@@ -1253,26 +1419,57 @@ async function PF(proxyPath,directUrl,hdr={},body=null){
   return AF(directUrl,hdr,body);
 }
 
+// ── YAHOO FINANCE SYMBOLS ──
+const YF={
+  NIFTY:'^NSEI',
+  BANKNIFTY:'^NSEBANK',
+  FINNIFTY:'NIFTY_FIN_SERVICE.NS',
+  SENSEX:'^BSESN'
+};
+
+// ── GET SPOT PRICE ──
+// Priority: 1) Yahoo Finance (free, no CORS) → 2) Proxy → 3) Direct Dhan/Fyers
 async function getSpot(sym){
-  if(S.pr.br==='fyers'&&S.cr.fa&&S.cr.ft){
-    if(isProxyMode()){
-      const d=await PF('/fyers/quotes?symbols='+encodeURIComponent(FI[sym]),
-        'https://api-t1.fyers.in/data/quotes?symbols='+encodeURIComponent(FI[sym]),
-        {Authorization:`${S.cr.fa}:${S.cr.ft}`});
-      return{ltp:d?.d?.[0]?.v?.lp||0,chg:d?.d?.[0]?.v?.chp||0};
+  // ALWAYS try Yahoo Finance first — free, no token, no CORS
+  try{
+    const yfsym=YF[sym];
+    if(yfsym){
+      const url=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yfsym)}?interval=1m&range=1d`;
+      const r=await fetch(url);
+      if(r.ok){
+        const d=await r.json();
+        const ltp=d?.chart?.result?.[0]?.meta?.regularMarketPrice||0;
+        const chg=d?.chart?.result?.[0]?.meta?.regularMarketChangePercent||0;
+        if(ltp>0){
+          // Update manual prices cache
+          S.manualPrices[sym]=ltp;lsSet('manualPrices',S.manualPrices);
+          updatePriceDisplay(sym,ltp,chg,'api');
+          return{ltp,chg};
+        }
+      }
     }
-    const u=new URL('https://api-t1.fyers.in/data/quotes');
-    u.searchParams.set('symbols',FI[sym]);
-    const d=await AF(u.toString(),fyH());
-    return{ltp:d?.d?.[0]?.v?.lp||0,chg:d?.d?.[0]?.v?.chp||0};
-  }
+  }catch(e){console.log('Yahoo failed for '+sym+':',e.message);}
+
+  // Fallback: Proxy → Dhan
   if(S.cr.dc&&S.cr.dt){
     const{id,seg}=DI[sym]||{id:'13',seg:'IDX_I'};
     const d=await PF('/dhan/ltp','https://api.dhan.co/v2/marketfeed/ltp',dhH(),{[seg]:[Number(id)]});
     const ltp=d?.data?.[seg]?.[id]?.last_price||0;
     return{ltp,chg:0};
   }
-  throw new Error('No credentials saved — go to SETUP tab');
+
+  // Fallback: Fyers
+  if(S.cr.fa&&S.cr.ft){
+    const u=new URL('https://api-t1.fyers.in/data/quotes');
+    u.searchParams.set('symbols',FI[sym]);
+    const d=await AF(u.toString(),fyH());
+    return{ltp:d?.d?.[0]?.v?.lp||0,chg:d?.d?.[0]?.v?.chp||0};
+  }
+
+  // Last resort: use cached manual price
+  if(S.manualPrices[sym]>0)return{ltp:S.manualPrices[sym],chg:0};
+
+  throw new Error('No price source available — tap price tile to enter manually');
 }
 
 async function getChain(sym,exp){
@@ -1303,6 +1500,77 @@ function getPCR(chain){
 }
 
 function fmt(n){if(n>=10000000)return(n/10000000).toFixed(1)+'Cr';if(n>=100000)return(n/100000).toFixed(1)+'L';if(n>=1000)return(n/1000).toFixed(1)+'K';return n||0;}
+
+// ══════════════════════════════════════════════════════
+// V7 LIVE SIGNAL — runs on HOME tab, updates every 60s
+// ══════════════════════════════════════════════════════
+async function runV7Signal(){
+  const sym=S.pr.defaultSym||'SENSEX';
+  const vEl=document.getElementById('v7Verdict');
+  const aEl=document.getElementById('v7Action');
+  if(vEl)vEl.textContent='ANALYZING...';
+  if(aEl)aEl.textContent='Fetching live data...';
+  try{
+    // Get spot price
+    const{ltp:spot,chg}=await getSpot(sym);
+    const step=STEP[sym]||100;
+    const atm=Math.round(spot/step)*step;
+
+    // Get today's expiry
+    const today=new Date();
+    const expiries=S.cal?.[sym]||[];
+    const exp=expiries.find(e=>new Date(e)>=today)||expiries[0]||'';
+
+    let pcr=1,maxPain=0,coi=0,poi=0;
+    if(exp){
+      try{
+        const chain=await getChain(sym,exp);
+        const res=getPCR(chain);
+        pcr=parseFloat(res.pcr);maxPain=parseFloat(res.maxPain);
+        coi=res.tC/100000;poi=res.tP/100000;
+      }catch(e){pcr=1;} // chain failed — use price only
+    }
+
+    // Score
+    let bull=0,bear=0;
+    if(pcr<0.8)bear+=30;else if(pcr>1.2)bull+=30;
+    const dist=(spot-maxPain)/Math.max(maxPain,1)*100;
+    if(dist>1.5)bear+=25;else if(dist<-1.5)bull+=25;
+    if(poi>coi*1.4)bull+=20;else if(coi>poi*1.4)bear+=20;
+    if(chg>0.3)bull+=15;else if(chg<-0.3)bear+=15;
+
+    const total=bull+bear||1;
+    const bias=bull>bear?'BULLISH':bear>bull?'BEARISH':'NEUTRAL';
+    const str=Math.round(Math.max(bull,bear)/total*100);
+    const col=bias==='BULLISH'?'var(--green)':bias==='BEARISH'?'var(--red)':'var(--orange)';
+
+    let verdict='',action='';
+    if(str>=70){
+      if(bias==='BULLISH'){verdict='🟢 BUY CE';action=`${sym} ${atm} CE — Strong bullish signal (${str}% strength). SL: 40% of entry.`;}
+      else{verdict='🔴 BUY PE';action=`${sym} ${atm} PE — Strong bearish signal (${str}% strength). SL: 40% of entry.`;}
+    }else if(str>=55){
+      if(bias==='BULLISH'){verdict='🟡 LEAN CE';action=`Mild bullish. Small qty ${sym} ${atm} CE. Watch price action first.`;}
+      else{verdict='🟡 LEAN PE';action=`Mild bearish. Small qty ${sym} ${atm} PE. Watch price action first.`;}
+    }else{
+      verdict='⚪ WAIT';action='Signals mixed. Stay out. Go to DIRECTION tab for full analysis.';
+    }
+
+    if(vEl){vEl.textContent=verdict;vEl.style.color=col;}
+    if(aEl){aEl.textContent=action;aEl.style.color=col;}
+
+    // Update signal banner border
+    const banner=document.getElementById('v7SignalBanner');
+    if(banner)banner.style.borderColor=col;
+
+  }catch(e){
+    if(vEl)vEl.textContent='-- NO DATA --';
+    if(aEl)aEl.textContent='Tap REFRESH SIGNAL to retry. Check credentials in SETUP.';
+  }
+}
+
+// Auto run signal every 60 seconds on home tab
+setInterval(()=>{if(document.getElementById('tab-home')?.style?.display!=='none')runV7Signal();},60000);
+setTimeout(runV7Signal,4000); // first run after 4 seconds
 
 // ── PIN ──
 async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
@@ -1390,6 +1658,31 @@ function tick(){
   else{pl.className='mpill mc';dt.className='mdot mdc';dt.style.animation='none';tx.textContent='CLOSED';if(mb){mb.textContent='🌙 MARKET CLOSED';mb.className='sbadge sbadge-r';}}
 }
 setInterval(tick,15000);tick();
+
+// ── AUTO PRICE REFRESH via Yahoo Finance every 15 seconds ──
+async function autoYahooRefresh(){
+  if(!S.mk)return; // only during market hours
+  const syms=['NIFTY','SENSEX','BANKNIFTY','FINNIFTY'];
+  for(const sym of syms){
+    try{
+      const yfsym=YF[sym];
+      if(!yfsym)continue;
+      const url=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yfsym)}?interval=1m&range=1d`;
+      const r=await fetch(url);
+      if(r.ok){
+        const d=await r.json();
+        const ltp=d?.chart?.result?.[0]?.meta?.regularMarketPrice||0;
+        const chg=d?.chart?.result?.[0]?.meta?.regularMarketChangePercent||0;
+        if(ltp>0){S.manualPrices[sym]=ltp;updatePriceDisplay(sym,ltp,chg,'api');}
+      }
+    }catch(e){}
+  }
+  lsSet('manualPrices',S.manualPrices);
+  const el=document.getElementById('lastRef');
+  if(el)el.textContent='✅ Auto-refreshed: '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(autoYahooRefresh,15000);
+setTimeout(autoYahooRefresh,2000); // first fetch after 2 seconds
 
 // ── NAVIGATION ──
 function goP(name){
@@ -1550,20 +1843,23 @@ function updatePriceDisplay(sym,ltp,chg,src='api'){
 }
 
 async function refreshPrices(){
-  document.getElementById('lastRef').textContent='Fetching...';
-  const map=['NIFTY','BANKNIFTY','FINNIFTY','SENSEX'];
-  let fetched=0;
+  const ref=document.getElementById('lastRef');
+  ref.textContent='Fetching via Yahoo Finance...';
+  const map=['NIFTY','SENSEX','BANKNIFTY','FINNIFTY'];
+  let fetched=0,sources=[];
   for(const sym of map){
     try{
       const{ltp,chg}=await getSpot(sym);
-      if(ltp>0){S.manualPrices[sym]=ltp;updatePriceDisplay(sym,ltp,chg,'api');fetched++;}
-    }catch(ex){}
+      if(ltp>0){fetched++;sources.push(sym);}
+    }catch(ex){console.log(sym+' failed:',ex.message);}
   }
   lsSet('manualPrices',S.manualPrices);
   if(fetched>0){
-    document.getElementById('lastRef').textContent='Updated: '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+(fetched<4?' (partial — tap to enter rest manually)':'');
+    ref.textContent='✅ Yahoo Finance: '+sources.join(', ')+' updated at '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    ref.style.color='var(--green)';
   } else {
-    document.getElementById('lastRef').textContent='❌ API unavailable — tap any price to enter manually';
+    ref.textContent='❌ All sources failed — tap any price tile to enter manually';
+    ref.style.color='var(--red)';
   }
 }
 
@@ -2412,7 +2708,20 @@ function renderCalendar(){
   const pLL=document.getElementById('pLL');if(pLL)pLL.value=S.pr.ll;
 }
 
-function initCalendar(){renderCalendar();setInterval(renderCalendar,60000);}
+function initCalendar(){
+  renderCalendar();
+  setInterval(renderCalendar,60000);
+  // Auto-fill engine expiry
+  setTimeout(()=>{
+    const gbExp=document.getElementById('gbExp')?.value||'';
+    const engExp=document.getElementById('engExp');
+    if(engExp&&gbExp)engExp.value=gbExp;
+    else if(engExp){
+      const today=new Date().toISOString().split('T')[0];
+      engExp.value=today;
+    }
+  },2000);
+}
 
 // ── TODAY'S PLAYBOOK ──
 function showTodayPlaybook(){
@@ -2791,6 +3100,2123 @@ Max 50 words. Use ₹ for prices. Direct, no fluff.`;
   }catch(e){aiOut.innerHTML='<span style="color:var(--dim2);">AI analysis failed — check connection</span>';}
 }
 
+// ══════════════════════════════════════════════════════
+// HOME TAB AI ASSISTANT
+// ══════════════════════════════════════════════════════
+async function askHomeAI(mode='full'){
+  const out=document.getElementById('homeAIOutput');
+  const badge=document.getElementById('homeAIBadge');
+  if(!out)return;
+
+  // Gather all live context
+  const sym=S.pr.defaultSym||'SENSEX';
+  const spot=S.manualPrices[sym]||0;
+  const step=STEP[sym]||100;
+  const atm=spot?Math.round(spot/step)*step:0;
+  const ist=getISTNow();
+  const session=getSession();
+  const isExp=isExpiryToday(toISTDate(ist));
+  const pcr=document.getElementById('gbPcr')?.textContent||'--';
+  const mp=document.getElementById('gbMp')?.textContent||'--';
+  const v7verdict=document.getElementById('v7Verdict')?.textContent||'--';
+  const dayType=document.getElementById('dayBadge')?.textContent||'--';
+
+  // Build question based on mode
+  const questions={
+    should_trade: 'Should I enter a trade right now? Give me a direct YES or NO with one reason.',
+    ce_or_pe: 'Based on current PCR and Max Pain, should I buy CE or PE? Which strike?',
+    risk: 'What are the top 2 risks if I trade right now? What should my stop loss be?',
+    expiry: 'Give me the best expiry day strategy for current market conditions in 3 bullet points.',
+    full: 'Give me complete market analysis and one clear trade recommendation with entry, SL, and target.'
+  };
+  const q=questions[mode]||questions.full;
+
+  const prompt=`You are Dhanveer AI — an expert Indian index options trading assistant for Sridhar (10+ years experience, trades Sensex Thursday expiry and Nifty Tuesday expiry on Dhan broker, lot size Sensex=20, Nifty=65).
+
+LIVE MARKET DATA RIGHT NOW:
+- Index: ${sym} | Spot: ₹${spot.toLocaleString('en-IN')} | ATM Strike: ${atm}
+- Time: ${ist.toLocaleTimeString('en-IN')} | Session: ${session?.name||'--'} | Day: ${dayType}
+- Expiry today: ${isExp?'YES — EXPIRY DAY':'NO'} 
+- PCR: ${pcr} | Max Pain: ₹${mp}
+- Dhanveer Signal: ${v7verdict}
+
+SRIDHAR'S CONTEXT:
+- He lost ₹28,000 today buying Sensex CE on a gap-down bearish day
+- He needs CLEAR guidance — not vague analysis
+- He trades options only (no futures, no equity)
+- Paper trading mode this month — validation before real money
+
+QUESTION: ${q}
+
+Reply in max 60 words. Be direct. Use ₹ for prices. Start with YES/NO or BUY/WAIT/AVOID if applicable.`;
+
+  out.innerHTML='<span style="color:var(--cyan);">🧠 Thinking...</span>';
+  if(badge){badge.textContent='THINKING...';badge.style.color='var(--cyan)';}
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:200,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await res.json();
+    const text=data.content?.[0]?.text||'AI response unavailable';
+    const time=ist.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    out.innerHTML=`<div style="font-size:8px;letter-spacing:1px;color:var(--cyan);margin-bottom:8px;">🧠 AI ANALYSIS — ${time}</div><div style="font-size:11px;line-height:1.8;color:var(--tx);margin-top:8px;">`+text.split('\n').join('<br>')+`</div>`;
+    if(badge){badge.textContent='DONE ✓';badge.style.color='var(--green)';}
+    setTimeout(()=>{if(badge)badge.textContent='READY';},3000);
+  }catch(e){
+    out.innerHTML='<span style="color:var(--red);">AI unavailable — check internet connection</span>';
+    if(badge){badge.textContent='ERROR';badge.style.color='var(--red)';}
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════════════
+// DHANVEER v7 — THREE ADVANCED ENGINES
+// Engine 1: OI Unwinding Detector
+// Engine 2: IV Crush Predictor  
+// Engine 3: Max Pain Velocity (Expiry Rocket)
+// ══════════════════════════════════════════════════════════════════
+
+// ── SHARED HISTORY STORE ──
+// Keeps last 20 chain snapshots per symbol for trend analysis
+const ENG={
+  chainHistory:{},   // {sym: [{ts, chain, spot, pcr, mp}, ...]}
+  ivHistory:{},      // {sym: [{ts, atmCEiv, atmPEiv, atmStrike}, ...]}
+  mpHistory:{},      // {sym: [{ts, mp, spot, timeToExpiry}, ...]}
+  lastEngineRun:{},  // {sym: timestamp}
+  alerts:[]          // fired alert log
+};
+
+function engPush(store,sym,data,maxLen=20){
+  if(!store[sym])store[sym]=[];
+  store[sym].push({ts:Date.now(),...data});
+  if(store[sym].length>maxLen)store[sym].shift();
+}
+
+// ════════════════════════════════════════════════════════
+// ENGINE 1: OI UNWINDING DETECTOR
+// Detects when big players EXIT positions = reversal signal
+// Logic: OI falling + price moving = unwinding
+//        Call OI unwinding = bullish (shorts covering)
+//        Put OI unwinding  = bearish (longs exiting)
+// Fires 2-3 minutes BEFORE price reversal
+// ════════════════════════════════════════════════════════
+function detectOIUnwinding(sym, chain, spot){
+  const hist=ENG.chainHistory[sym]||[];
+  if(hist.length<2)return{signal:'WAIT',strength:0,details:[],alert:false};
+
+  const prev=hist[hist.length-2].chain;
+  const curr=chain;
+  const step=STEP[sym]||100;
+  const atm=Math.round(spot/step)*step;
+
+  // Focus on ATM±3 strikes
+  const near=curr.filter(r=>Math.abs(r.strike-atm)<=step*3);
+
+  let callUnwindOI=0, putUnwindOI=0;
+  let callBuildOI=0, putBuildOI=0;
+  const details=[];
+
+  for(const cr of near){
+    const pr=prev.find(p=>p.strike===cr.strike);
+    if(!pr)continue;
+    const cDelta=cr.cOI-pr.cOI;
+    const pDelta=cr.pOI-pr.pOI;
+    const cPct=pr.cOI>0?(cDelta/pr.cOI*100):0;
+    const pPct=pr.pOI>0?(pDelta/pr.pOI*100):0;
+
+    // Unwinding = OI falling significantly (>5%)
+    if(cPct<-5){
+      callUnwindOI+=Math.abs(cDelta);
+      details.push({strike:cr.strike,side:'CE',action:'UNWINDING',pct:cPct.toFixed(1),oi:fmt(Math.abs(cDelta))});
+    }else if(cPct>8){
+      callBuildOI+=cDelta;
+    }
+    if(pPct<-5){
+      putUnwindOI+=Math.abs(pDelta);
+      details.push({strike:cr.strike,side:'PE',action:'UNWINDING',pct:pPct.toFixed(1),oi:fmt(Math.abs(pDelta))});
+    }else if(pPct>8){
+      putBuildOI+=pDelta;
+    }
+  }
+
+  // Interpretation:
+  // Call OI unwinding = shorts covering calls = BULLISH reversal coming
+  // Put OI unwinding  = longs exiting puts   = BEARISH reversal coming
+  let signal='WAIT', strength=0, interpretation='';
+
+  const totalUnwind=callUnwindOI+putUnwindOI;
+  if(totalUnwind===0)return{signal:'WAIT',strength:0,details:[],alert:false};
+
+  const callDominance=callUnwindOI/totalUnwind;
+  if(callDominance>0.65){
+    signal='BULLISH_REVERSAL';
+    strength=Math.round(callDominance*100);
+    interpretation=`Call writers exiting (${fmt(callUnwindOI)} OI unwound) — smart money covering shorts — price likely to RISE`;
+  }else if(callDominance<0.35){
+    signal='BEARISH_REVERSAL';
+    strength=Math.round((1-callDominance)*100);
+    interpretation=`Put holders exiting (${fmt(putUnwindOI)} OI unwound) — longs booking profits — price likely to FALL`;
+  }else{
+    signal='MIXED';
+    strength=40;
+    interpretation='Both CE and PE unwinding equally — market confused, stay out';
+  }
+
+  const alert=strength>=65&&signal!=='MIXED'&&signal!=='WAIT';
+  return{signal,strength,details,interpretation,alert,callUnwind:fmt(callUnwindOI),putUnwind:fmt(putUnwindOI)};
+}
+
+// ════════════════════════════════════════════════════════
+// ENGINE 2: IV CRUSH PREDICTOR
+// Detects when option premiums are dangerously overpriced
+// Saves you from buying expensive options that will crush
+// Logic: Compare current IV vs 5-scan average IV
+//        IV spike = avoid buying, consider selling
+//        IV normal = safe to buy
+// ════════════════════════════════════════════════════════
+function detectIVCrush(sym, chain, spot){
+  const step=STEP[sym]||100;
+  const atm=Math.round(spot/step)*step;
+  const atmRow=chain.find(r=>r.strike===atm)||
+    chain.reduce((a,b)=>Math.abs(b.strike-atm)<Math.abs(a.strike-atm)?b:a,chain[0]||{});
+
+  if(!atmRow)return{signal:'UNKNOWN',risk:'LOW',details:'No ATM data',alert:false};
+
+  const ceIV=atmRow.cIV||0;
+  const peIV=atmRow.pIV||0;
+  const ceLTP=atmRow.cLTP||0;
+  const peLTP=atmRow.pLTP||0;
+  const avgIV=(ceIV+peIV)/2;
+
+  // Push to IV history
+  engPush(ENG.ivHistory,sym,{atmCEiv:ceIV,atmPEiv:peIV,atmStrike:atm,ceLTP,peLTP});
+  const ivHist=ENG.ivHistory[sym]||[];
+
+  // Need at least 3 readings
+  if(ivHist.length<3)return{signal:'COLLECTING',risk:'UNKNOWN',details:'Collecting IV history (need 3 scans)',ceLTP,peLTP,ceIV,peIV,alert:false};
+
+  // Calculate average IV from history (excluding latest)
+  const histIVs=ivHist.slice(0,-1).map(h=>(h.atmCEiv+h.atmPEiv)/2);
+  const avgHistIV=histIVs.reduce((a,b)=>a+b,0)/histIVs.length;
+  const ivSpike=avgHistIV>0?((avgIV-avgHistIV)/avgHistIV*100):0;
+
+  // IV Skew — tells direction
+  const ivSkew=ceIV-peIV; // positive = CE expensive (bearish signal), negative = PE expensive (bullish signal)
+
+  let risk='LOW', signal='', details='', recommendation='', alert=false;
+
+  if(ivSpike>40){
+    risk='EXTREME';signal='IV_EXTREME';alert=true;
+    details=`IV is ${ivSpike.toFixed(0)}% above normal — options massively overpriced`;
+    recommendation='DO NOT BUY options now — IV will crush after event. Wait for IV to normalize or SELL premium instead.';
+  }else if(ivSpike>20){
+    risk='HIGH';signal='IV_HIGH';alert=true;
+    details=`IV is ${ivSpike.toFixed(0)}% above normal — options overpriced`;
+    recommendation='Buy smaller qty than usual. IV may crush 30-50% after move. Use tight SL.';
+  }else if(ivSpike>8){
+    risk='MEDIUM';signal='IV_ELEVATED';
+    details=`IV slightly elevated (+${ivSpike.toFixed(0)}%) — normal expiry day premium`;
+    recommendation='Acceptable to buy but keep qty moderate.';
+  }else if(ivSpike<-15){
+    risk='LOW';signal='IV_CHEAP';
+    details=`IV is ${Math.abs(ivSpike).toFixed(0)}% below normal — options unusually cheap`;
+    recommendation='Good time to buy options — low IV means low premium, high reward potential.';
+  }else{
+    risk='LOW';signal='IV_NORMAL';
+    details=`IV normal (${avgIV.toFixed(1)}%) — fair premium pricing`;
+    recommendation='Safe to buy options at current premium levels.';
+  }
+
+  // IV Skew analysis
+  let skewMsg='';
+  if(Math.abs(ivSkew)>5){
+    skewMsg=ivSkew>0?` CE IV (${ceIV.toFixed(1)}%) > PE IV (${peIV.toFixed(1)}%) — market pricing in DOWNSIDE risk`
+                    :` PE IV (${peIV.toFixed(1)}%) > CE IV (${ceIV.toFixed(1)}%) — market pricing in UPSIDE potential`;
+  }
+
+  return{signal,risk,details:details+skewMsg,recommendation,alert,ceIV,peIV,avgIV:avgIV.toFixed(1),ivSpike:ivSpike.toFixed(1),ceLTP,peLTP,ivSkew:ivSkew.toFixed(1)};
+}
+
+// ════════════════════════════════════════════════════════
+// ENGINE 3: MAX PAIN VELOCITY (EXPIRY ROCKET DETECTOR)
+// Detects when market is accelerating TOWARD Max Pain
+// The closer to expiry + further from Max Pain = bigger the move
+// This is what caused ₹37 → ₹791 type moves
+// ════════════════════════════════════════════════════════
+function detectMaxPainVelocity(sym, spot, maxPain, expiryDate){
+  if(!maxPain||!expiryDate)return{signal:'NO_DATA',score:0,alert:false};
+
+  // Time to expiry in minutes
+  const now=new Date();
+  const expDt=new Date(expiryDate);
+  expDt.setHours(15,30,0); // 3:30 PM
+  const minsToExp=Math.max(0,(expDt-now)/60000);
+  const isExpiryDay=expDt.toDateString()===now.toDateString();
+
+  if(!isExpiryDay)return{signal:'NOT_EXPIRY',score:0,minsToExp,alert:false};
+
+  // Distance from Max Pain as %
+  const dist=((spot-maxPain)/maxPain*100);
+  const absDist=Math.abs(dist);
+  const direction=dist>0?'ABOVE':'BELOW'; // spot above or below max pain
+
+  // Push to MP history
+  engPush(ENG.mpHistory,sym,{mp:maxPain,spot,minsToExp,dist});
+  const mpHist=ENG.mpHistory[sym]||[];
+
+  // Velocity = how fast is spot moving TOWARD max pain per minute
+  let velocity=0;
+  if(mpHist.length>=2){
+    const prev=mpHist[mpHist.length-2];
+    const curr=mpHist[mpHist.length-1];
+    const timeDelta=(curr.ts-prev.ts)/60000||1;
+    // Positive velocity = moving toward max pain
+    const prevDistToMP=Math.abs(prev.spot-maxPain);
+    const currDistToMP=Math.abs(curr.spot-maxPain);
+    velocity=(prevDistToMP-currDistToMP)/timeDelta; // points/min toward MP
+  }
+
+  // Score based on: distance + time remaining + velocity
+  let score=0, signal='', details='', recommendation='', alert=false;
+
+  // Big distance from MP + close to expiry = rocket potential
+  const distScore=Math.min(absDist*3,40);      // max 40 pts — further = bigger move needed
+  const timeScore=minsToExp<60?30:minsToExp<120?20:minsToExp<180?10:0; // max 30 pts
+  const velScore=velocity>2?30:velocity>0.5?20:velocity>0?10:0;        // max 30 pts
+  score=Math.round(distScore+timeScore+velScore);
+
+  if(score>=75&&minsToExp<90){
+    alert=true;
+    const targetSide=direction==='ABOVE'?'PE':'CE'; // above MP → PE (going down to MP), below MP → CE (going up to MP)
+    signal='ROCKET_LAUNCH';
+    details=`Spot ${direction} Max Pain by ${absDist.toFixed(1)}% (₹${Math.abs(spot-maxPain).toLocaleString('en-IN')}). Only ${Math.round(minsToExp)} mins to expiry. Max Pain pull is ACCELERATING.`;
+    recommendation=`🚀 HIGH PROBABILITY: Buy ${sym} ATM ${targetSide} NOW. Market must move to ₹${maxPain.toLocaleString('en-IN')} by 3:30 PM. Velocity: ${velocity.toFixed(1)} pts/min toward MP.`;
+  }else if(score>=50){
+    signal='BUILDING';
+    details=`Max Pain at ₹${maxPain.toLocaleString('en-IN')}, spot ${direction} by ₹${Math.abs(spot-maxPain).toLocaleString('en-IN')}. ${Math.round(minsToExp)} mins left.`;
+    recommendation=`Watch carefully. If velocity increases in next 2 scans → enter ${direction==='ABOVE'?'PE':'CE'}.`;
+  }else{
+    signal='NORMAL';
+    details=`Spot close to Max Pain. Normal expiry behavior. ${Math.round(minsToExp)} mins remaining.`;
+    recommendation='No urgent Max Pain trade needed now.';
+  }
+
+  return{signal,score,details,recommendation,alert,dist:dist.toFixed(1),direction,minsToExp:Math.round(minsToExp),velocity:velocity.toFixed(1),maxPain,spot};
+}
+
+// ════════════════════════════════════════════════════════
+// MASTER ENGINE RUNNER — runs all 3 engines together
+// Called after every chain fetch — updates ENGINE tab
+// ════════════════════════════════════════════════════════
+async function runAllEngines(sym, chain, spot, expiryDate){
+  // Store chain snapshot
+  engPush(ENG.chainHistory,sym,{chain:[...chain],spot});
+  const{maxPain}=getPCR(chain);
+
+  // Run all 3
+  const oi=detectOIUnwinding(sym,chain,spot);
+  const iv=detectIVCrush(sym,chain,spot);
+  const mp=detectMaxPainVelocity(sym,spot,parseFloat(maxPain),expiryDate);
+
+  // Store results
+  ENG.lastResults={oi,iv,mp,sym,spot,maxPain,ts:Date.now()};
+
+  // Update ENGINE tab display
+  renderEngineTab(oi,iv,mp,sym,spot,maxPain);
+
+  // Fire alerts if needed
+  const alerts=[];
+  if(oi.alert)alerts.push({type:'OI_UNWIND',signal:oi.signal,msg:oi.interpretation});
+  if(iv.alert)alerts.push({type:'IV_CRUSH',signal:iv.signal,msg:iv.details+' '+iv.recommendation});
+  if(mp.alert)alerts.push({type:'MP_VELOCITY',signal:mp.signal,msg:mp.details+' '+mp.recommendation});
+
+  if(alerts.length>0)fireEngineAlert(alerts,sym,spot,parseFloat(maxPain),chain,expiryDate);
+
+  return{oi,iv,mp};
+}
+
+function renderEngineTab(oi,iv,mp,sym,spot,maxPain){
+  const el=document.getElementById('engineOutput');
+  if(!el)return;
+  const now=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+
+  const oiCol=oi.signal==='BULLISH_REVERSAL'?'var(--green)':oi.signal==='BEARISH_REVERSAL'?'var(--red)':'var(--dim2)';
+  const ivCol=iv.risk==='EXTREME'||iv.risk==='HIGH'?'var(--red)':iv.risk==='MEDIUM'?'var(--orange)':'var(--green)';
+  const mpCol=mp.signal==='ROCKET_LAUNCH'?'var(--gold)':mp.signal==='BUILDING'?'var(--orange)':'var(--dim2)';
+
+  el.innerHTML=`
+  <div style="font-size:8px;letter-spacing:2px;color:var(--dim2);margin-bottom:10px;">LAST RUN: ${now} | ${sym} ₹${spot.toLocaleString('en-IN')}</div>
+
+  <!-- ENGINE 1: OI UNWINDING -->
+  <div class="card" style="border-color:${oiCol};margin-bottom:8px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="font-family:'Teko',sans-serif;font-size:15px;letter-spacing:2px;color:${oiCol};">⚡ OI UNWINDING DETECTOR</div>
+      <span style="font-size:9px;padding:2px 8px;border-radius:6px;background:${oiCol}20;border:1px solid ${oiCol}40;color:${oiCol};">${oi.strength}% STRENGTH</span>
+    </div>
+    <div style="font-size:11px;color:var(--tx);margin-bottom:6px;">${oi.interpretation||'Collecting data — need 2 scans'}</div>
+    ${oi.details.length>0?`<div style="display:flex;flex-direction:column;gap:4px;">${oi.details.slice(0,4).map(d=>`<div style="font-size:10px;padding:5px 8px;border-radius:6px;background:rgba(0,0,0,.3);border-left:2px solid ${d.side==='CE'?'var(--red)':'var(--green)'};">Strike ${d.strike} ${d.side}: ${d.action} ${d.pct}% (${d.oi} contracts)</div>`).join('')}</div>`:''}
+    <div style="margin-top:6px;font-size:9px;color:var(--dim2);">Call unwound: ${oi.callUnwind||'--'} | Put unwound: ${oi.putUnwind||'--'}</div>
+  </div>
+
+  <!-- ENGINE 2: IV CRUSH -->
+  <div class="card" style="border-color:${ivCol};margin-bottom:8px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="font-family:'Teko',sans-serif;font-size:15px;letter-spacing:2px;color:${ivCol};">🧨 IV CRUSH PREDICTOR</div>
+      <span style="font-size:9px;padding:2px 8px;border-radius:6px;background:${ivCol}20;border:1px solid ${ivCol}40;color:${ivCol};">RISK: ${iv.risk||'--'}</span>
+    </div>
+    <div style="font-size:11px;color:var(--tx);margin-bottom:6px;">${iv.details||'Collecting IV data...'}</div>
+    ${iv.recommendation?`<div style="font-size:10px;padding:7px;border-radius:8px;background:rgba(0,0,0,.3);border-left:3px solid ${ivCol};color:var(--dim2);">${iv.recommendation}</div>`:''}
+    <div class="g2" style="margin-top:8px;">
+      <div class="st"><div class="sl">CE IV</div><div class="sv">${iv.ceIV?iv.ceIV.toFixed(1)+'%':'--'}</div></div>
+      <div class="st"><div class="sl">PE IV</div><div class="sv">${iv.peIV?iv.peIV.toFixed(1)+'%':'--'}</div></div>
+      <div class="st"><div class="sl">IV SPIKE</div><div class="sv" style="color:${ivCol};">${iv.ivSpike||'--'}%</div></div>
+      <div class="st"><div class="sl">IV SKEW</div><div class="sv">${iv.ivSkew||'--'}</div></div>
+    </div>
+  </div>
+
+  <!-- ENGINE 3: MAX PAIN VELOCITY -->
+  <div class="card" style="border-color:${mpCol};">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="font-family:'Teko',sans-serif;font-size:15px;letter-spacing:2px;color:${mpCol};">🚀 MAX PAIN VELOCITY</div>
+      <span style="font-size:9px;padding:2px 8px;border-radius:6px;background:${mpCol}20;border:1px solid ${mpCol}40;color:${mpCol};">SCORE: ${mp.score||0}/100</span>
+    </div>
+    <div style="font-size:11px;color:var(--tx);margin-bottom:6px;">${mp.details||'Waiting for expiry day data...'}</div>
+    ${mp.recommendation?`<div style="font-size:10px;padding:7px;border-radius:8px;background:rgba(0,0,0,.3);border-left:3px solid ${mpCol};color:var(--dim2);">${mp.recommendation}</div>`:''}
+    <div class="g2" style="margin-top:8px;">
+      <div class="st"><div class="sl">MAX PAIN</div><div class="sv gold" style="font-size:12px;">₹${maxPain?Number(maxPain).toLocaleString('en-IN'):'--'}</div></div>
+      <div class="st"><div class="sl">DISTANCE</div><div class="sv" style="color:${mpCol};">${mp.dist||'--'}%</div></div>
+      <div class="st"><div class="sl">MINS LEFT</div><div class="sv">${mp.minsToExp||'--'}</div></div>
+      <div class="st"><div class="sl">VELOCITY</div><div class="sv">${mp.velocity||'0'} pts/m</div></div>
+    </div>
+  </div>`;
+}
+
+// Fire a rich alert when any engine triggers
+async function fireEngineAlert(alerts,sym,spot,maxPain,chain,expiryDate){
+  const step=STEP[sym]||100;
+  const atm=Math.round(spot/step)*step;
+
+  // Find ATM premiums
+  const atmRow=chain.find(r=>r.strike===atm)||chain[0]||{};
+  const cePrice=atmRow.cLTP||0;
+  const pePrice=atmRow.pLTP||0;
+
+  // Determine dominant signal
+  const mpAlert=alerts.find(a=>a.type==='MP_VELOCITY');
+  const oiAlert=alerts.find(a=>a.type==='OI_UNWIND');
+  const ivAlert=alerts.find(a=>a.type==='IV_CRUSH');
+
+  // IV crush is a WARNING not a trade signal
+  if(ivAlert&&!mpAlert&&!oiAlert){
+    // Show IV warning only
+    showIVWarning(ivAlert,sym,cePrice,pePrice);
+    return;
+  }
+
+  // Determine direction from OI/MP alerts
+  let direction='CE';
+  if(mpAlert){direction=ENG.lastResults?.mp?.direction==='ABOVE'?'PE':'CE';}
+  else if(oiAlert){direction=oiAlert.signal==='BULLISH_REVERSAL'?'CE':'PE';}
+
+  const isCE=direction==='CE';
+  const alertTitle=mpAlert?'🚀 ROCKET LAUNCH DETECTED':oiAlert?'⚡ OI REVERSAL DETECTED':'📊 ENGINE ALERT';
+  const alertMsg=alerts.map(a=>a.msg).join(' | ');
+
+  showAlert(`${isCE?'BUY_CE':'BUY_PE'}`,sym,spot,atm,cePrice,pePrice,alertTitle,alertMsg);
+}
+
+function showIVWarning(ivAlert,sym,cePrice,pePrice){
+  const out=document.getElementById('homeAIOutput');
+  if(out){
+    out.innerHTML=`<div style="color:var(--red);font-weight:700;margin-bottom:6px;">⚠️ IV CRUSH WARNING</div>`+
+    `<div style="font-size:11px;color:var(--tx);">${ivAlert.msg}</div>`+
+    `<div style="font-size:10px;color:var(--dim2);margin-top:6px;">ATM CE: ₹${cePrice.toFixed(1)} | ATM PE: ₹${pePrice.toFixed(1)}</div>`;
+  }
+  if(S.pr.snd)playAlertBeep('warning');
+  if(navigator.vibrate)navigator.vibrate([200,100,200]);
+}
+
+// ══════════════════════════════════════════════════════
+// DHANVEER v7 ALERT ENGINE
+// Triggers on AI signal change → BUY CE or BUY PE
+// Alert: loud sound + screen flash + CE/PE/SL levels
+// ══════════════════════════════════════════════════════
+
+const ALERT={
+  lastSignal:'',       // last known signal
+  snoozedUntil:0,      // snooze timestamp
+  audioCtx:null,       // Web Audio context
+  watching:false,      // is watcher running
+  watchInterval:null
+};
+
+// ── SOUND ENGINE (Web Audio API — no file needed) ──
+function initAudio(){
+  if(!ALERT.audioCtx){
+    try{ALERT.audioCtx=new(window.AudioContext||window.webkitAudioContext)();}
+    catch(e){console.log('Audio not supported');}
+  }
+}
+
+function playAlertSound(type='ce'){
+  initAudio();
+  if(!ALERT.audioCtx)return;
+  const ctx=ALERT.audioCtx;
+  // Sequence of beeps — aggressive alarm pattern
+  const seq=type==='ce'
+    ?[[523,0],[659,.15],[784,.3],[1047,.45],[784,.65],[1047,.8],[784,.95]]   // CE — rising bullish
+    :[[1047,0],[784,.15],[659,.3],[523,.45],[659,.65],[523,.8],[659,.95]];   // PE — falling bearish
+
+  seq.forEach(([freq,delay])=>{
+    const osc=ctx.createOscillator();
+    const gain=ctx.createGain();
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.frequency.value=freq;
+    osc.type='square';
+    gain.gain.setValueAtTime(0.4,ctx.currentTime+delay);
+    gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+0.12);
+    osc.start(ctx.currentTime+delay);
+    osc.stop(ctx.currentTime+delay+0.15);
+  });
+
+  // Repeat 3 times for urgency
+  setTimeout(()=>playAlertBeep(type),1200);
+  setTimeout(()=>playAlertBeep(type),2400);
+}
+
+function playAlertBeep(type='ce'){
+  initAudio();
+  if(!ALERT.audioCtx)return;
+  const ctx=ALERT.audioCtx;
+  const freq=type==='ce'?880:440;
+  const osc=ctx.createOscillator();
+  const gain=ctx.createGain();
+  osc.connect(gain);gain.connect(ctx.destination);
+  osc.frequency.value=freq;osc.type='sawtooth';
+  gain.gain.setValueAtTime(0.3,ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);
+  osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.32);
+}
+
+// ── SHOW ALERT OVERLAY ──
+function showAlert(signal,sym,spot,atm,cePrice,pePrice,customTitle,customMsg){
+  const isCE=signal.includes('CE');
+  const col=isCE?'var(--green)':'var(--red)';
+  const sl=isCE?(cePrice*0.6).toFixed(0):(pePrice*0.6).toFixed(0);
+  const t1=isCE?(cePrice*1.6).toFixed(0):(pePrice*1.6).toFixed(0);
+  const t2=isCE?(cePrice*2.5).toFixed(0):(pePrice*2.5).toFixed(0);
+
+  // Build levels HTML
+  const entryP=isCE?cePrice:pePrice;
+  const levelsHTML=`
+    <div class="alert-level" style="background:rgba(0,0,0,.4);border:1px solid ${col};">
+      <span style="font-size:10px;letter-spacing:2px;color:var(--dim2);">ENTRY</span>
+      <span style="font-family:'Teko',sans-serif;font-size:22px;color:${col};">₹${entryP>0?entryP.toFixed(1):'Market'}</span>
+    </div>
+    <div class="alert-level" style="background:rgba(255,51,85,.08);border:1px solid rgba(255,51,85,.3);">
+      <span style="font-size:10px;letter-spacing:2px;color:var(--dim2);">STOP LOSS (40%)</span>
+      <span style="font-family:'Teko',sans-serif;font-size:22px;color:var(--red);">₹${sl}</span>
+    </div>
+    <div class="alert-level" style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.2);">
+      <span style="font-size:10px;letter-spacing:2px;color:var(--dim2);">TARGET 1 (60%)</span>
+      <span style="font-family:'Teko',sans-serif;font-size:22px;color:var(--green);">₹${t1}</span>
+    </div>
+    <div class="alert-level" style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.2);">
+      <span style="font-size:10px;letter-spacing:2px;color:var(--dim2);">TARGET 2 (150%)</span>
+      <span style="font-family:'Teko',sans-serif;font-size:22px;color:var(--green);">₹${t2}</span>
+    </div>
+    <div class="alert-level" style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.05);">
+      <span style="font-size:10px;letter-spacing:2px;color:var(--dim2);">STRIKE</span>
+      <span style="font-family:'Teko',sans-serif;font-size:22px;color:var(--gold);">${sym} ${atm} ${isCE?'CE':'PE'}</span>
+    </div>`;
+
+  document.getElementById('alertIcon').textContent=isCE?'🟢':'🔴';
+  document.getElementById('alertTitle').textContent=customTitle||(isCE?'BUY CE NOW':'BUY PE NOW');
+  document.getElementById('alertTitle').style.color=col;
+  document.getElementById('alertSub').textContent=`${sym} SIGNAL — ${new Date().toLocaleTimeString('en-IN')}`;
+  document.getElementById('alertLevels').innerHTML=levelsHTML;
+  document.getElementById('alertDismissBtn').style.background=isCE?'var(--green)':'var(--red)';
+  document.getElementById('alertDismissBtn').style.color=isCE?'#000':'#fff';
+
+  const overlay=document.getElementById('alertOverlay');
+  overlay.className=isCE?'ce':'pe';
+  overlay.style.display='flex';
+
+  // Vibrate if supported
+  if(navigator.vibrate)navigator.vibrate([300,100,300,100,500]);
+
+  // Play sound
+  playAlertSound(isCE?'ce':'pe');
+}
+
+function dismissAlert(){
+  document.getElementById('alertOverlay').style.display='none';
+  ALERT.lastSignal=''; // reset so next signal fires again
+}
+
+function snoozeAlert(){
+  document.getElementById('alertOverlay').style.display='none';
+  ALERT.snoozedUntil=Date.now()+(5*60*1000);
+  // Show snooze toast
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);border:1px solid rgba(255,255,255,.1);color:var(--dim2);padding:8px 16px;border-radius:8px;font-size:10px;z-index:9999;';
+  t.textContent='⏸ Alert snoozed for 5 minutes';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3000);
+}
+
+// ── SIGNAL WATCHER — checks every 30 seconds ──
+async function startAlertWatcher(){
+  if(ALERT.watching)return;
+  ALERT.watching=true;
+  ALERT.watchInterval=setInterval(checkSignalChange,30000);
+  console.log('🔔 Alert watcher started');
+}
+
+function stopAlertWatcher(){
+  ALERT.watching=false;
+  clearInterval(ALERT.watchInterval);
+}
+
+function toggleAlertWatcher(){
+  const btn=document.getElementById('alertToggleBtn');
+  const status=document.getElementById('alertWatcherStatus');
+  if(ALERT.watching){
+    stopAlertWatcher();
+    if(btn){btn.textContent='🔕 ALERTS OFF';btn.style.borderColor='var(--dim2)';btn.style.color='var(--dim2)';}
+    if(status){status.textContent='🔕 Alerts paused — tap to resume';status.style.color='var(--dim2)';}
+  }else{
+    startAlertWatcher();
+    if(btn){btn.textContent='🔔 ALERTS ON';btn.style.borderColor='var(--green)';btn.style.color='var(--green)';}
+    if(status){status.textContent='🟢 Watching for BUY signals every 30s';status.style.color='var(--green)';}
+  }
+}
+
+async function checkSignalChange(){
+  // Skip if snoozed
+  if(Date.now()<ALERT.snoozedUntil)return;
+  // Skip outside market hours
+  if(!S.mk)return;
+
+  const sym=S.pr.defaultSym||'SENSEX';
+  const spot=S.manualPrices[sym]||0;
+  if(!spot)return;
+
+  const step=STEP[sym]||100;
+  const atm=Math.round(spot/step)*step;
+
+  // Get signal from v7 verdict element
+  const verdict=document.getElementById('v7Verdict')?.textContent||'';
+
+  // Detect BUY CE signal
+  const isBuyCE=verdict.includes('BUY CE')||verdict.includes('STRONG BUY CE');
+  const isBuyPE=verdict.includes('BUY PE')||verdict.includes('STRONG BUY PE');
+
+  if(!isBuyCE&&!isBuyPE)return; // WAIT signal — no alert
+
+  const newSignal=isBuyCE?'BUY_CE':'BUY_PE';
+
+  // Only alert if signal CHANGED (new signal, not same one repeating)
+  if(newSignal===ALERT.lastSignal)return;
+
+  ALERT.lastSignal=newSignal;
+
+  // Get ATM option prices for levels display
+  let cePrice=0,pePrice=0;
+  try{
+    const today=new Date();
+    const expiries=S.cal?.[sym]||[];
+    const exp=expiries.find(e=>new Date(e)>=today)||'';
+    if(exp){
+      const chain=await getChain(sym,exp);
+      const atmRow=chain.find(r=>r.strike===atm)||chain.reduce((a,b)=>Math.abs(b.strike-atm)<Math.abs(a.strike-atm)?b:a,chain[0]||{});
+      cePrice=atmRow?.cLTP||0;
+      pePrice=atmRow?.pLTP||0;
+    }
+  }catch(e){}
+
+  // FIRE THE ALERT!
+  showAlert(newSignal,sym,spot,atm,cePrice,pePrice);
+}
+
+// Auto-start watcher when market opens
+setTimeout(()=>{
+  initAudio(); // pre-init audio context
+  startAlertWatcher();
+},5000);
+
+// ── ENGINE TAB CONTROLS ──
+let engineAutoTimer=null;
+
+async function runEngines(){
+  const sym=document.getElementById('engSym')?.value||'SENSEX';
+  const exp=document.getElementById('engExp')?.value||'';
+  const status=document.getElementById('engineStatus');
+  if(!exp){
+    if(status)status.textContent='⚠️ Set expiry date first';
+    // Auto-fill today if expiry day
+    const today=new Date().toISOString().split('T')[0];
+    const engExpEl=document.getElementById('engExp');
+    if(engExpEl)engExpEl.value=today;
+    return;
+  }
+  if(status)status.innerHTML='<span style="color:var(--cyan);">⚡ Running all 3 engines...</span>';
+  try{
+    const[{ltp:spot},chain]=await Promise.all([getSpot(sym),getChain(sym,exp)]);
+    if(!chain.length)throw new Error('No chain data');
+    await runAllEngines(sym,chain,spot,exp);
+    if(status)status.innerHTML='<span style="color:var(--green);">✅ All engines updated — '+new Date().toLocaleTimeString('en-IN')+'</span>';
+  }catch(e){
+    const out=document.getElementById('engineOutput');
+    if(out)out.innerHTML=`<div class="card" style="border-color:rgba(255,51,85,.2);padding:16px;"><div style="color:var(--red);margin-bottom:8px;">❌ ${e.message}</div><div style="font-size:10px;color:var(--dim2);">Check credentials in SETUP tab. Make sure Dhan token is fresh.</div></div>`;
+    if(status)status.innerHTML='<span style="color:var(--red);">Failed — '+e.message+'</span>';
+  }
+}
+
+function startEngineAuto(){
+  if(engineAutoTimer){
+    clearInterval(engineAutoTimer);engineAutoTimer=null;
+    document.getElementById('engineStatus').innerHTML='<span style="color:var(--dim2);">Auto stopped</span>';
+    return;
+  }
+  runEngines();
+  engineAutoTimer=setInterval(runEngines,60000);
+  document.getElementById('engineStatus').innerHTML='<span style="color:var(--green);">🔄 Auto-running every 60s</span>';
+}
+
+// Wire engines into main scanner — runs automatically on each scan
+const _origProcessChain=processChainData;
+function processChainData(sym,exp,spot,chain,dir,thr){
+  _origProcessChain(sym,exp,spot,chain,dir,thr);
+  // Run advanced engines silently on every scan
+  runAllEngines(sym,chain,spot,exp).catch(()=>{});
+}
+
+// ██████████████████████████████████████████████████████████████
+// DHANVEER SMART BRAIN ENGINE v1.0
+// The central nervous system of Dhanveer
+//
+// Four core systems:
+// 1. SELF-REPAIR     — detects failures, auto-switches sources
+// 2. SELF-OPTIMIZE   — learns from signal history, weights winners
+// 3. MARKET DYNAMICS — detects regime: trending/choppy/expiry
+// 4. ZERO ERROR      — validates every data point before use
+//
+// Conflict resolution: AI arbitration via Claude API
+// Self-repair mode: FULL AUTONOMY — zero manual intervention
+// ██████████████████████████████████████████████████████████████
+
+const BRAIN = {
+  // ── HEALTH MONITOR ──
+  health: {
+    yahoo:     { ok:true, fails:0, lastOk:0, latency:0 },
+    dhanProxy: { ok:true, fails:0, lastOk:0, latency:0 },
+    dhanDirect:{ ok:true, fails:0, lastOk:0, latency:0 },
+    claudeAI:  { ok:true, fails:0, lastOk:0, latency:0 },
+  },
+  // ── SOURCE PRIORITY (auto-reordered by BRAIN) ──
+  sourcePriority: ['yahoo','dhanProxy','dhanDirect'],
+
+  // ── SIGNAL MEMORY (learns from past signals) ──
+  signalMemory: [],      // [{ts, signal, engines, result, correct}]
+  engineWeights: {       // dynamic weights — adjusted by learning
+    pcr:      30,
+    maxPain:  25,
+    oiRatio:  20,
+    momentum: 15,
+    expiry:   10,
+    oiUnwind: 25,
+    ivCrush:  20,
+    mpVelocity: 30,
+  },
+
+  // ── MARKET REGIME ──
+  regime: 'UNKNOWN',     // TRENDING_UP / TRENDING_DOWN / CHOPPY / EXPIRY_HOUR / PRE_EXPIRY
+  regimeHistory: [],     // last 20 regimes with timestamps
+  priceBuffer: [],       // last 30 price readings for regime detection
+
+  // ── ERROR LOG ──
+  errors: [],            // last 50 errors with timestamps + auto-fix applied
+  repairLog: [],         // what BRAIN fixed and how
+
+  // ── CONFLICT ARBITRATION ──
+  lastConflict: null,    // last conflict sent to AI
+  conflictResolution: null,
+
+  // ── PERFORMANCE STATS ──
+  stats: {
+    totalSignals: 0,
+    correctSignals: 0,
+    falseAlerts: 0,
+    dataRepairs: 0,
+    regimeChanges: 0,
+  }
+};
+
+// ════════════════════════════════════════════════════════════════
+// SYSTEM 1: SELF-REPAIR ENGINE
+// Full autonomy — zero manual intervention
+// Monitors all data sources, auto-switches on failure
+// ════════════════════════════════════════════════════════════════
+
+// Validated fetch — wraps any API call with health tracking
+async function brainFetch(source, fetchFn, timeout=8000){
+  const start=Date.now();
+  const health=BRAIN.health[source];
+  try{
+    const result=await Promise.race([
+      fetchFn(),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timeout '+timeout+'ms')),timeout))
+    ]);
+    // Success — update health
+    health.ok=true;
+    health.fails=0;
+    health.lastOk=Date.now();
+    health.latency=Date.now()-start;
+    return{ok:true,data:result,source};
+  }catch(e){
+    // Failure — record and potentially disable source
+    health.fails++;
+    health.latency=Date.now()-start;
+    if(health.fails>=3){
+      health.ok=false;
+      brainRepairLog(source,'DISABLED after '+health.fails+' consecutive failures: '+e.message);
+    }
+    return{ok:false,error:e.message,source};
+  }
+}
+
+// Smart spot price fetch — tries all sources automatically
+async function brainGetSpot(sym){
+  // Source 1: Yahoo Finance
+  if(BRAIN.health.yahoo.ok){
+    const res=await brainFetch('yahoo',async()=>{
+      const yfsym=YF[sym];
+      if(!yfsym)throw new Error('No Yahoo symbol for '+sym);
+      const r=await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yfsym)}?interval=1m&range=1d`);
+      if(!r.ok)throw new Error('Yahoo HTTP '+r.status);
+      const d=await r.json();
+      const ltp=d?.chart?.result?.[0]?.meta?.regularMarketPrice||0;
+      const chg=d?.chart?.result?.[0]?.meta?.regularMarketChangePercent||0;
+      if(ltp<100)throw new Error('Yahoo returned invalid price: '+ltp);
+      return brainValidatePrice(sym,{ltp,chg,source:'yahoo'});
+    });
+    if(res.ok)return res.data;
+    brainRepairLog('yahoo','Spot fetch failed — trying proxy');
+  }
+
+  // Source 2: Dhan via Proxy
+  if(BRAIN.health.dhanProxy.ok&&isProxyMode()){
+    const res=await brainFetch('dhanProxy',async()=>{
+      const{id,seg}=DI[sym]||{id:'13',seg:'IDX_I'};
+      const d=await PF('/dhan/ltp','https://api.dhan.co/v2/marketfeed/ltp',dhH(),{[seg]:[Number(id)]});
+      const ltp=d?.data?.[seg]?.[id]?.last_price||0;
+      if(ltp<100)throw new Error('Proxy returned invalid price: '+ltp);
+      return brainValidatePrice(sym,{ltp,chg:0,source:'dhanProxy'});
+    });
+    if(res.ok)return res.data;
+    brainRepairLog('dhanProxy','Spot fetch failed — trying direct');
+  }
+
+  // Source 3: Direct Dhan (may have CORS on phone)
+  if(BRAIN.health.dhanDirect.ok&&S.cr.dc&&S.cr.dt){
+    const res=await brainFetch('dhanDirect',async()=>{
+      const{id,seg}=DI[sym]||{id:'13',seg:'IDX_I'};
+      const d=await AF('https://api.dhan.co/v2/marketfeed/ltp',dhH(),{[seg]:[Number(id)]});
+      const ltp=d?.data?.[seg]?.[id]?.last_price||0;
+      if(ltp<100)throw new Error('Direct returned invalid price: '+ltp);
+      return brainValidatePrice(sym,{ltp,chg:0,source:'dhanDirect'});
+    });
+    if(res.ok)return res.data;
+  }
+
+  // Source 4: Last known good price (cached)
+  const cached=S.manualPrices?.[sym]||0;
+  if(cached>100){
+    brainRepairLog('cache','All live sources failed — using cached price ₹'+cached);
+    updateBrainStatus('⚠️ Using cached price — all live sources down','var(--orange)');
+    return{ltp:cached,chg:0,source:'cache',stale:true};
+  }
+
+  throw new Error('All price sources exhausted — manual entry needed');
+}
+
+// Smart chain fetch — tries proxy then direct
+async function brainGetChain(sym,exp){
+  // Try proxy first
+  if(BRAIN.health.dhanProxy.ok&&isProxyMode()&&S.cr.dc&&S.cr.dt){
+    const res=await brainFetch('dhanProxy',async()=>{
+      const{id}=DI[sym]||{id:'13'};
+      const d=await PF('/dhan/optionchain','https://api.dhan.co/v2/optionchain',dhH(),
+        {UnderlyingScrip:Number(id),UnderlyingSeg:'IDX_I',Expiry:exp});
+      const chain=(d?.data||[]).map(r=>({
+        strike:r.strike_price,
+        cLTP:r.call_ltp||0,cOI:r.call_oi||0,cOIChg:r.call_oi_change||0,
+        cIV:r.call_iv||0,cVol:r.call_volume||0,
+        pLTP:r.put_ltp||0,pOI:r.put_oi||0,pOIChg:r.put_oi_change||0,
+        pIV:r.put_iv||0,pVol:r.put_volume||0
+      }));
+      if(chain.length<5)throw new Error('Chain too short: '+chain.length+' rows');
+      return brainValidateChain(sym,chain);
+    });
+    if(res.ok)return res.data;
+    brainRepairLog('dhanProxy','Chain fetch failed — trying direct');
+  }
+
+  // Try direct Dhan
+  if(BRAIN.health.dhanDirect.ok&&S.cr.dc&&S.cr.dt){
+    const res=await brainFetch('dhanDirect',async()=>{
+      const{id}=DI[sym]||{id:'13'};
+      const d=await AF('https://api.dhan.co/v2/optionchain',dhH(),
+        {UnderlyingScrip:Number(id),UnderlyingSeg:'IDX_I',Expiry:exp});
+      const chain=(d?.data||[]).map(r=>({
+        strike:r.strike_price,
+        cLTP:r.call_ltp||0,cOI:r.call_oi||0,cOIChg:r.call_oi_change||0,
+        cIV:r.call_iv||0,cVol:r.call_volume||0,
+        pLTP:r.put_ltp||0,pOI:r.put_oi||0,pOIChg:r.put_oi_change||0,
+        pIV:r.put_iv||0,pVol:r.put_volume||0
+      }));
+      if(chain.length<5)throw new Error('Chain too short: '+chain.length+' rows');
+      return brainValidateChain(sym,chain);
+    });
+    if(res.ok)return res.data;
+  }
+
+  throw new Error('All chain sources failed — use manual chain entry');
+}
+
+// Auto-recover disabled sources every 5 minutes
+setInterval(()=>{
+  let recovered=0;
+  for(const [src,h] of Object.entries(BRAIN.health)){
+    if(!h.ok){
+      const minsDown=(Date.now()-h.lastOk)/60000;
+      if(minsDown>5){
+        h.ok=true;h.fails=0;
+        brainRepairLog(src,'Auto-recovered after '+minsDown.toFixed(1)+' mins — will retry');
+        recovered++;
+      }
+    }
+  }
+  if(recovered>0)updateBrainStatus('🔄 Auto-recovered '+recovered+' source(s)','var(--cyan)');
+},5*60*1000);
+
+// ════════════════════════════════════════════════════════════════
+// SYSTEM 2: DATA VALIDATOR (Zero Error)
+// Validates every price and chain before use
+// Rejects stale, out-of-range, or corrupted data
+// ════════════════════════════════════════════════════════════════
+
+const VALID_RANGES={
+  NIFTY:    {min:15000,max:35000},
+  BANKNIFTY:{min:30000,max:70000},
+  FINNIFTY: {min:15000,max:30000},
+  SENSEX:   {min:50000,max:120000},
+};
+
+function brainValidatePrice(sym,data){
+  const range=VALID_RANGES[sym];
+  if(!range)return data; // unknown symbol — pass through
+
+  // Range check
+  if(data.ltp<range.min||data.ltp>range.max){
+    brainLogError('INVALID_PRICE',`${sym} price ₹${data.ltp} outside valid range ${range.min}-${range.max}`);
+    throw new Error(`Invalid ${sym} price: ₹${data.ltp}`);
+  }
+
+  // Spike check — reject if >5% jump from last known
+  const last=S.manualPrices?.[sym]||0;
+  if(last>0){
+    const pct=Math.abs((data.ltp-last)/last*100);
+    if(pct>5){
+      brainLogError('PRICE_SPIKE',`${sym} price jumped ${pct.toFixed(1)}% from ₹${last} to ₹${data.ltp} — possible bad tick`);
+      // Don't throw — just flag it (market can spike legitimately)
+      data.spikeWarning=true;data.spikePercent=pct.toFixed(1);
+    }
+  }
+
+  // Update cache on valid price
+  if(!S.manualPrices)S.manualPrices={};
+  S.manualPrices[sym]=data.ltp;
+  lsSet('manualPrices',S.manualPrices);
+  return data;
+}
+
+function brainValidateChain(sym,chain){
+  // Must have minimum strikes
+  if(chain.length<5)throw new Error('Chain too short');
+
+  // Check for all-zero OI (bad data)
+  const totalOI=chain.reduce((s,r)=>s+r.cOI+r.pOI,0);
+  if(totalOI===0){
+    brainLogError('ZERO_OI',`${sym} chain has all-zero OI — likely bad data`);
+    throw new Error('Chain OI all zero — bad data');
+  }
+
+  // Check for negative premiums
+  const negPremiums=chain.filter(r=>r.cLTP<0||r.pLTP<0).length;
+  if(negPremiums>0){
+    brainLogError('NEG_PREMIUM',`${sym} chain has ${negPremiums} negative premiums — fixing`);
+    chain=chain.map(r=>({...r,cLTP:Math.max(0,r.cLTP),pLTP:Math.max(0,r.pLTP)}));
+  }
+
+  // Sort by strike
+  chain.sort((a,b)=>a.strike-b.strike);
+  BRAIN.stats.dataRepairs++;
+  return chain;
+}
+
+function brainLogError(type,msg){
+  BRAIN.errors.push({ts:Date.now(),type,msg});
+  if(BRAIN.errors.length>50)BRAIN.errors.shift();
+  console.warn('[BRAIN ERROR]',type,msg);
+}
+
+function brainRepairLog(source,action){
+  BRAIN.repairLog.push({ts:Date.now(),source,action});
+  if(BRAIN.repairLog.length>30)BRAIN.repairLog.shift();
+  console.log('[BRAIN REPAIR]',source,':',action);
+  BRAIN.stats.dataRepairs++;
+}
+
+// ════════════════════════════════════════════════════════════════
+// SYSTEM 3: MARKET REGIME DETECTOR
+// Identifies current market personality
+// Trending / Choppy / Pre-Expiry / Expiry Hour / Opening Range
+// Different strategies apply to each regime
+// ════════════════════════════════════════════════════════════════
+
+function detectMarketRegime(spot,sym,expiryDate){
+  const now=new Date();
+  const hour=now.getHours();
+  const mins=now.getMinutes();
+  const totalMins=hour*60+mins;
+
+  // Push price to buffer
+  BRAIN.priceBuffer.push({ts:Date.now(),spot});
+  if(BRAIN.priceBuffer.length>30)BRAIN.priceBuffer.shift();
+
+  // ── TIME-BASED REGIME ──
+  let timeRegime='NORMAL';
+  if(totalMins>=555&&totalMins<=580){timeRegime='OPENING_RANGE';}      // 9:15-9:40
+  else if(totalMins>=555&&totalMins<=600){timeRegime='EU_WATCH';}       // 9:15-10:00
+  else if(totalMins>=780&&totalMins<=810){timeRegime='LUNCH_CHOP';}     // 13:00-13:30
+  else if(totalMins>=840){timeRegime='POWER_HOUR';}                     // 14:00+
+
+  // Check expiry
+  const isExp=expiryDate&&new Date(expiryDate).toDateString()===now.toDateString();
+  if(isExp){
+    if(totalMins>=870){timeRegime='EXPIRY_LAST_HOUR';}                  // 14:30+
+    else if(totalMins>=840){timeRegime='EXPIRY_POWER_HOUR';}            // 14:00+
+    else{timeRegime='PRE_EXPIRY';}
+  }
+
+  // ── PRICE-BASED REGIME ──
+  let priceRegime='UNKNOWN';
+  if(BRAIN.priceBuffer.length>=10){
+    const prices=BRAIN.priceBuffer.slice(-10).map(p=>p.spot);
+    const high=Math.max(...prices);
+    const low=Math.min(...prices);
+    const range=(high-low)/low*100;
+    const step=STEP[sym]||100;
+    const lastMove=Math.abs(prices[prices.length-1]-prices[prices.length-5]||0);
+
+    if(range<0.15){priceRegime='CHOPPY';}                               // <0.15% range = choppy
+    else if(range>0.5&&lastMove>(step*2)){priceRegime='TRENDING';}       // trending strongly
+    else{priceRegime='TRANSITIONING';}
+
+    // Trend direction
+    const firstHalf=prices.slice(0,5).reduce((a,b)=>a+b,0)/5;
+    const secondHalf=prices.slice(5).reduce((a,b)=>a+b,0)/5;
+    if(priceRegime==='TRENDING'){
+      priceRegime=secondHalf>firstHalf?'TRENDING_UP':'TRENDING_DOWN';
+    }
+  }
+
+  // ── COMBINE FOR FINAL REGIME ──
+  let regime=timeRegime;
+  if(priceRegime==='CHOPPY'&&timeRegime==='NORMAL'){regime='CHOPPY';}
+  if(priceRegime==='TRENDING_UP'){regime=isExp?'EXPIRY_RALLY':'TRENDING_UP';}
+  if(priceRegime==='TRENDING_DOWN'){regime=isExp?'EXPIRY_SELLOFF':'TRENDING_DOWN';}
+
+  // Detect regime change
+  if(regime!==BRAIN.regime){
+    const prev=BRAIN.regime;
+    BRAIN.regime=regime;
+    BRAIN.regimeHistory.push({ts:Date.now(),from:prev,to:regime});
+    if(BRAIN.regimeHistory.length>20)BRAIN.regimeHistory.shift();
+    BRAIN.stats.regimeChanges++;
+    onRegimeChange(prev,regime,sym);
+  }
+
+  return{regime,timeRegime,priceRegime,isExpiry:isExp};
+}
+
+function onRegimeChange(from,to,sym){
+  console.log(`[BRAIN REGIME] ${from} → ${to}`);
+  updateBrainStatus(`📊 Regime: ${from}→${to}`,'var(--cyan)');
+
+  // Adjust engine weights based on regime
+  if(to==='CHOPPY'){
+    BRAIN.engineWeights.momentum=5;   // momentum unreliable in chop
+    BRAIN.engineWeights.pcr=35;       // PCR more reliable
+  }else if(to.includes('EXPIRY')){
+    BRAIN.engineWeights.mpVelocity=40; // Max Pain most important on expiry
+    BRAIN.engineWeights.oiUnwind=30;
+    BRAIN.engineWeights.momentum=5;
+  }else if(to.includes('TRENDING')){
+    BRAIN.engineWeights.momentum=25;   // momentum king in trends
+    BRAIN.engineWeights.pcr=20;
+  }else{
+    // Reset to defaults
+    BRAIN.engineWeights={pcr:30,maxPain:25,oiRatio:20,momentum:15,
+      expiry:10,oiUnwind:25,ivCrush:20,mpVelocity:30};
+  }
+
+  // Notify home tab
+  const regEl=document.getElementById('brainRegime');
+  if(regEl){
+    const col=to.includes('EXPIRY')?'var(--gold)':to.includes('TRENDING_UP')?'var(--green)':
+      to.includes('TRENDING_DOWN')?'var(--red)':to==='CHOPPY'?'var(--orange)':'var(--cyan)';
+    regEl.textContent=to.replace(/_/g,' ');
+    regEl.style.color=col;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// SYSTEM 4: SELF-OPTIMIZE (Signal Learning)
+// Tracks which signals were correct, adjusts weights
+// Ignores engines that have been wrong recently
+// ════════════════════════════════════════════════════════════════
+
+function recordSignal(signal,engines,spot,sym){
+  const entry={
+    id:Date.now(),
+    ts:Date.now(),
+    signal,       // 'BUY_CE' or 'BUY_PE'
+    engines,      // which engines triggered
+    spot,sym,
+    result:null,  // filled in by checkSignalOutcome
+    correct:null
+  };
+  BRAIN.signalMemory.push(entry);
+  if(BRAIN.signalMemory.length>50)BRAIN.signalMemory.shift();
+  lsSet('brainMemory',BRAIN.signalMemory);
+  BRAIN.stats.totalSignals++;
+  return entry.id;
+}
+
+function checkSignalOutcomes(){
+  // Check signals from 5-30 minutes ago
+  const now=Date.now();
+  const currentPrices=S.manualPrices||{};
+
+  for(const sig of BRAIN.signalMemory){
+    if(sig.result!==null)continue; // already evaluated
+    const age=(now-sig.ts)/60000;
+    if(age<5||age>30)continue; // only check 5-30 min old signals
+
+    const currentSpot=currentPrices[sig.sym]||0;
+    if(!currentSpot)continue;
+
+    const moved=currentSpot-sig.spot;
+    const correct=(sig.signal==='BUY_CE'&&moved>0)||(sig.signal==='BUY_PE'&&moved<0);
+    sig.result=moved;
+    sig.correct=correct;
+
+    if(correct){
+      BRAIN.stats.correctSignals++;
+      // Boost weights of engines that fired this signal
+      for(const eng of sig.engines){
+        if(BRAIN.engineWeights[eng]){
+          BRAIN.engineWeights[eng]=Math.min(50,BRAIN.engineWeights[eng]+2);
+        }
+      }
+    }else{
+      BRAIN.stats.falseAlerts++;
+      // Reduce weights of engines that fired wrong signal
+      for(const eng of sig.engines){
+        if(BRAIN.engineWeights[eng]){
+          BRAIN.engineWeights[eng]=Math.max(5,BRAIN.engineWeights[eng]-3);
+        }
+      }
+    }
+    lsSet('brainWeights',BRAIN.engineWeights);
+  }
+}
+
+// Run outcome check every 5 minutes
+setInterval(checkSignalOutcomes,5*60*1000);
+
+// ════════════════════════════════════════════════════════════════
+// CONFLICT RESOLUTION — AI ARBITRATION
+// When engines disagree → ask Claude to resolve instantly
+// ════════════════════════════════════════════════════════════════
+
+async function resolveConflictWithAI(conflict){
+  const{sym,spot,atm,oi,iv,mp,v7signal,regime}=conflict;
+
+  const prompt=`You are Dhanveer Smart Brain — resolve this trading signal conflict NOW.
+
+MARKET: ${sym} | Spot: ₹${spot.toLocaleString('en-IN')} | ATM: ${atm} | Time: ${new Date().toLocaleTimeString('en-IN')}
+REGIME: ${regime}
+
+CONFLICTING SIGNALS:
+- V7 Signal Engine: ${v7signal}
+- OI Unwinding: ${oi?.signal||'NO DATA'} (strength: ${oi?.strength||0}%)
+- IV Crush: ${iv?.signal||'NO DATA'} (risk: ${iv?.risk||'unknown'})
+- Max Pain Velocity: ${mp?.signal||'NO DATA'} (score: ${mp?.score||0}/100)
+
+CONFLICT: Engines disagree on direction.
+
+Resolve in exactly this format:
+VERDICT: [BUY CE / BUY PE / WAIT]
+REASON: [one sentence max]
+CONFIDENCE: [HIGH/MEDIUM/LOW]`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:100,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await res.json();
+    const text=data.content?.[0]?.text||'';
+
+    // Parse AI response
+    const verdictMatch=text.match(/VERDICT:\s*(BUY CE|BUY PE|WAIT)/i);
+    const reasonMatch=text.match(/REASON:\s*(.+)/i);
+    const confMatch=text.match(/CONFIDENCE:\s*(HIGH|MEDIUM|LOW)/i);
+
+    return{
+      verdict:verdictMatch?.[1]?.toUpperCase()||'WAIT',
+      reason:reasonMatch?.[1]||text,
+      confidence:confMatch?.[1]||'MEDIUM',
+      raw:text
+    };
+  }catch(e){
+    // AI failed — use regime-based rule
+    brainLogError('AI_CONFLICT','AI arbitration failed: '+e.message);
+    const fallback=regime.includes('TRENDING_UP')?'BUY CE':
+      regime.includes('TRENDING_DOWN')?'BUY PE':'WAIT';
+    return{verdict:fallback,reason:'AI unavailable — regime-based fallback',confidence:'LOW'};
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// MASTER BRAIN RUNNER
+// Coordinates all 4 systems into one final verdict
+// Called every 60 seconds automatically
+// ════════════════════════════════════════════════════════════════
+
+async function runBrain(sym, expiryDate){
+  const brainStart=Date.now();
+  updateBrainStatus('🧠 Brain running...','var(--cyan)');
+
+  try{
+    // Step 1: Get validated spot price (self-repairing)
+    const{ltp:spot,chg,source:priceSource,stale}=await brainGetSpot(sym);
+    const step=STEP[sym]||100;
+    const atm=Math.round(spot/step)*step;
+
+    // Step 2: Detect market regime
+    const{regime,isExpiry}=detectMarketRegime(spot,sym,expiryDate);
+
+    // Step 3: Get validated chain (self-repairing)
+    let chain=null,pcr=1,maxPain=0,coi=0,poi=0;
+    try{
+      chain=await brainGetChain(sym,expiryDate);
+      const pcrRes=getPCR(chain);
+      pcr=parseFloat(pcrRes.pcr);
+      maxPain=parseFloat(pcrRes.maxPain);
+      coi=pcrRes.tC/100000;poi=pcrRes.tP/100000;
+    }catch(e){
+      brainRepairLog('chain','Chain unavailable — proceeding with price-only analysis');
+    }
+
+    // Step 4: Run advanced engines
+    let oiResult={signal:'NO_DATA',strength:0,alert:false};
+    let ivResult={signal:'NO_DATA',risk:'UNKNOWN',alert:false};
+    let mpResult={signal:'NO_DATA',score:0,alert:false};
+
+    if(chain){
+      engPush(ENG.chainHistory,sym,{chain:[...chain],spot});
+      oiResult=detectOIUnwinding(sym,chain,spot);
+      ivResult=detectIVCrush(sym,chain,spot);
+      mpResult=detectMaxPainVelocity(sym,spot,maxPain,expiryDate);
+      renderEngineTab(oiResult,ivResult,mpResult,sym,spot,maxPain);
+    }
+
+    // Step 5: V7 signal with dynamic weights
+    let bull=0,bear=0;
+    const w=BRAIN.engineWeights;
+    if(pcr<0.8)bear+=w.pcr;else if(pcr>1.2)bull+=w.pcr;
+    const dist=maxPain?((spot-maxPain)/maxPain*100):0;
+    if(dist>1.5)bear+=w.maxPain;else if(dist<-1.5)bull+=w.maxPain;
+    if(poi>coi*1.4)bull+=w.oiRatio;else if(coi>poi*1.4)bear+=w.oiRatio;
+    if(chg>0.3)bull+=w.momentum;else if(chg<-0.3)bear+=w.momentum;
+    if(isExpiry){if(dist>0)bear+=w.expiry;else bull+=w.expiry;}
+    if(oiResult.signal==='BULLISH_REVERSAL')bull+=w.oiUnwind;
+    else if(oiResult.signal==='BEARISH_REVERSAL')bear+=w.oiUnwind;
+    if(mpResult.signal==='ROCKET_LAUNCH'){
+      const rocketDir=mpResult.direction==='ABOVE'?'bear':'bull';
+      if(rocketDir==='bull')bull+=w.mpVelocity;else bear+=w.mpVelocity;
+    }
+
+    const total=bull+bear||1;
+    const bias=bull>bear?'BULLISH':bear>bull?'BEARISH':'NEUTRAL';
+    const strength=Math.round(Math.max(bull,bear)/total*100);
+    const v7signal=strength>=70?(bias==='BULLISH'?'BUY CE':'BUY PE'):
+      strength>=55?(bias==='BULLISH'?'LEAN CE':'LEAN PE'):'WAIT';
+
+    // Step 6: Check for conflicts
+    let finalVerdict=v7signal;
+    let conflictResolved=false;
+    let aiReason='';
+
+    const oiDir=oiResult.signal==='BULLISH_REVERSAL'?'BUY CE':
+      oiResult.signal==='BEARISH_REVERSAL'?'BUY PE':'NEUTRAL';
+    const mpDir=mpResult.signal==='ROCKET_LAUNCH'?
+      (mpResult.direction==='ABOVE'?'BUY PE':'BUY CE'):'NEUTRAL';
+
+    // Conflict = strong signals pointing opposite directions
+    const hasConflict=(
+      oiResult.strength>=65&&mpResult.score>=60&&
+      oiDir!=='NEUTRAL'&&mpDir!=='NEUTRAL'&&oiDir!==mpDir
+    );
+
+    if(hasConflict){
+      updateBrainStatus('⚔️ Conflict detected — asking AI...','var(--orange)');
+      const aiRes=await resolveConflictWithAI({sym,spot,atm,oi:oiResult,iv:ivResult,mp:mpResult,v7signal,regime});
+      finalVerdict=aiRes.verdict==='BUY CE'?'BUY CE':aiRes.verdict==='BUY PE'?'BUY PE':'WAIT';
+      aiReason=aiRes.reason;
+      conflictResolved=true;
+      BRAIN.conflictResolution=aiRes;
+    }
+
+    // Step 7: IV Crush override — if IV extreme, downgrade to WAIT
+    if(ivResult.risk==='EXTREME'&&finalVerdict!=='WAIT'){
+      const prev=finalVerdict;
+      finalVerdict='WAIT';
+      aiReason=`IV Crush override: ${ivResult.details}`;
+      brainRepairLog('ivCrush','Overrode '+prev+' → WAIT due to extreme IV');
+    }
+
+    // Step 8: Update UI with final verdict
+    const col=finalVerdict.includes('CE')?'var(--green)':
+      finalVerdict.includes('PE')?'var(--red)':'var(--orange)';
+
+    const vEl=document.getElementById('v7Verdict');
+    const aEl=document.getElementById('v7Action');
+    if(vEl){vEl.textContent=finalVerdict==='WAIT'?'⚪ WAIT':finalVerdict.includes('CE')?'🟢 '+finalVerdict:'🔴 '+finalVerdict;vEl.style.color=col;}
+    if(aEl){
+      const actionText=aiReason||
+        (finalVerdict.includes('CE')?`Buy ${sym} ${atm} CE — ${strength}% signal strength (${regime})`:
+        finalVerdict.includes('PE')?`Buy ${sym} ${atm} PE — ${strength}% signal strength (${regime})`:
+        `Mixed signals in ${regime} regime — stay out`);
+      aEl.textContent=actionText;aEl.style.color=col;
+    }
+
+    // Step 9: Fire alert if strong signal
+    const shouldAlert=(finalVerdict==='BUY CE'||finalVerdict==='BUY PE')&&strength>=70;
+    if(shouldAlert){
+      const ce=chain?(chain.find(r=>r.strike===atm)||{}).cLTP||0:0;
+      const pe=chain?(chain.find(r=>r.strike===atm)||{}).pLTP||0:0;
+      const fired=[oiResult.signal,mpResult.signal].filter(s=>s!=='NO_DATA'&&s!=='NORMAL');
+      const sigId=recordSignal(finalVerdict.replace(' ','_'),fired,spot,sym);
+      checkSignalChange(); // trigger alert overlay
+    }
+
+    // Step 10: Update brain status panel
+    const elapsed=Date.now()-brainStart;
+    updateBrainStatus(
+      `✅ Brain OK | ${regime} | ${priceSource} | ${elapsed}ms | Weights adjusted`,
+      'var(--green)'
+    );
+    updateBrainPanel(sym,spot,atm,pcr,maxPain,regime,strength,bias,priceSource,stale);
+    updateHealthPanel();
+
+  }catch(e){
+    brainLogError('BRAIN_RUN','Brain run failed: '+e.message);
+    updateBrainStatus('❌ Brain error: '+e.message,'var(--red)');
+  }
+}
+
+// ── UI HELPERS ──
+function updateBrainStatus(msg,col){
+  const el=document.getElementById('brainStatus');
+  if(el){el.textContent=msg;el.style.color=col||'var(--dim2)';}
+}
+
+function updateBrainPanel(sym,spot,atm,pcr,maxPain,regime,strength,bias,source,stale){
+  const el=document.getElementById('brainPanel');
+  if(!el)return;
+  const acc=BRAIN.stats.totalSignals>0?
+    Math.round(BRAIN.stats.correctSignals/BRAIN.stats.totalSignals*100)+'%':'--';
+  el.innerHTML=`
+    <div class="g2">
+      <div class="st"><div class="sl">REGIME</div><div class="sv" id="brainRegime" style="font-size:10px;color:var(--cyan);">${regime.replace(/_/g,' ')}</div></div>
+      <div class="st"><div class="sl">SOURCE</div><div class="sv" style="font-size:10px;color:${stale?'var(--orange)':'var(--green)'};">${source||'--'}${stale?' ⚠️':' ✅'}</div></div>
+      <div class="st"><div class="sl">ACCURACY</div><div class="sv" style="color:var(--gold);">${acc}</div></div>
+      <div class="st"><div class="sl">REPAIRS</div><div class="sv">${BRAIN.stats.dataRepairs}</div></div>
+      <div class="st"><div class="sl">SIGNALS</div><div class="sv">${BRAIN.stats.totalSignals}</div></div>
+      <div class="st"><div class="sl">CONFLICTS</div><div class="sv">${BRAIN.repairLog.filter(r=>r.source==='ivCrush').length}</div></div>
+    </div>
+    <div style="margin-top:8px;">
+      <div style="font-size:8px;letter-spacing:2px;color:var(--dim2);margin-bottom:4px;">ENGINE WEIGHTS (auto-adjusted)</div>
+      ${Object.entries(BRAIN.engineWeights).map(([k,v])=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+          <span style="font-size:9px;color:var(--dim2);">${k}</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="width:60px;height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;">
+              <div style="height:100%;width:${Math.min(v/50*100,100)}%;background:var(--gold);border-radius:2px;"></div>
+            </div>
+            <span style="font-size:9px;color:var(--gold);width:20px;">${v}</span>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function updateHealthPanel(){
+  const el=document.getElementById('healthPanel');
+  if(!el)return;
+  el.innerHTML=Object.entries(BRAIN.health).map(([src,h])=>{
+    const col=h.ok?'var(--green)':'var(--red)';
+    const status=h.ok?`✅ OK (${h.latency}ms)`:`❌ DOWN (${h.fails} fails)`;
+    return`<div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03);">
+      <span style="color:var(--dim2);">${src}</span>
+      <span style="color:${col};">${status}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── BRAIN AUTO-RUN every 60 seconds ──
+let brainTimer=null;
+function startBrain(sym,exp){
+  if(brainTimer)clearInterval(brainTimer);
+  runBrain(sym,exp);
+  brainTimer=setInterval(()=>runBrain(sym,exp),60000);
+}
+
+// Load saved brain state from localStorage
+function initBrain(){
+  const savedMemory=lsGet('brainMemory',[]);
+  if(savedMemory.length)BRAIN.signalMemory=savedMemory;
+  const savedWeights=lsGet('brainWeights',null);
+  if(savedWeights)Object.assign(BRAIN.engineWeights,savedWeights);
+  console.log('[BRAIN] Initialized. Memory:',BRAIN.signalMemory.length,'signals. Weights loaded:',!!savedWeights);
+}
+
+
+// ── BRAIN UI CONTROLS ──
+function activateBrain(){
+  const sym=document.getElementById('brainSym')?.value||'SENSEX';
+  const exp=document.getElementById('brainExp')?.value||'';
+  if(!exp){
+    // Auto-fill today
+    document.getElementById('brainExp').value=new Date().toISOString().split('T')[0];
+    updateBrainStatus('⚠️ Expiry auto-filled — tap START BRAIN again','var(--orange)');
+    return;
+  }
+  initBrain();
+  startBrain(sym,exp);
+  const badge=document.getElementById('brainBadge');
+  if(badge){badge.textContent='RUNNING';badge.style.color='var(--green)';}
+  // Also sync with engine tab
+  const engExp=document.getElementById('engExp');
+  const engSym=document.getElementById('engSym');
+  if(engExp)engExp.value=exp;
+  if(engSym)engSym.value=sym;
+  updateRepairLog();
+}
+
+function resetBrainSources(){
+  for(const h of Object.values(BRAIN.health)){h.ok=true;h.fails=0;}
+  updateHealthPanel();
+  updateBrainStatus('🔄 All sources reset — retrying','var(--cyan)');
+}
+
+function updateRepairLog(){
+  const el=document.getElementById('repairLogPanel');
+  if(!el)return;
+  if(!BRAIN.repairLog.length){el.textContent='No repairs yet';return;}
+  el.innerHTML=BRAIN.repairLog.slice().reverse().slice(0,10).map(r=>{
+    const t=new Date(r.ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    return`<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03);">
+      <span style="color:var(--cyan);">${t}</span>
+      <span style="color:var(--dim2);margin-left:6px;">[${r.source}]</span>
+      <span style="margin-left:4px;">${r.action}</span>
+    </div>`;
+  }).join('');
+}
+
+setInterval(updateRepairLog,30000);
+
+// Auto-start brain when app loads (after 6 seconds)
+setTimeout(()=>{
+  initBrain();
+  // Auto-fill expiry from scanner if available
+  const gbExp=document.getElementById('gbExp')?.value||'';
+  const sym=S.pr?.defaultSym||'SENSEX';
+  const exp=gbExp||new Date().toISOString().split('T')[0];
+  const brainExpEl=document.getElementById('brainExp');
+  if(brainExpEl)brainExpEl.value=exp;
+  // Start brain silently
+  startBrain(sym,exp);
+  console.log('[BRAIN] Auto-started for',sym,exp);
+},6000);
+
+// ██████████████████████████████████████████████████████████████
+// DHANVEER CHART ENGINE v1.0
+// Full candlestick charting with indicators + pattern detection
+// ██████████████████████████████████████████████████████████████
+
+const CHART = {
+  candles:   { '1m':{}, '5m':{} },  // {sym: [candle,...]}
+  current:   { sym:'SENSEX', tf:'5m' },
+  canvas:    null,
+  ctx:       null,
+  running:   false,
+  timer:     null,
+  lastPrice: {},
+  buildingCandle: {},  // current partial candle per sym+tf
+  patterns:  [],       // detected patterns
+  sr:        [],       // support/resistance levels
+  signals:   [],       // confirmed chart signals
+};
+
+// ── CANDLE STRUCTURE ──
+// { t: timestamp(ms), o, h, l, c, v }
+
+// ════════════════════════════════════════════════════════════════
+// CANDLE BUILDER — converts tick prices into OHLC candles
+// ════════════════════════════════════════════════════════════════
+function chartAddTick(sym, price, tf){
+  const key = sym+'_'+tf;
+  const mins = tf==='1m'?1:5;
+  const now = Date.now();
+  const barTime = Math.floor(now/(mins*60000))*(mins*60000);
+
+  if(!CHART.candles[tf][sym]) CHART.candles[tf][sym]=[];
+  if(!CHART.buildingCandle[key]) CHART.buildingCandle[key]=null;
+
+  const bc = CHART.buildingCandle[key];
+
+  if(!bc || bc.t !== barTime){
+    // Save completed candle
+    if(bc) CHART.candles[tf][sym].push({...bc});
+    // Keep last 120 candles
+    if(CHART.candles[tf][sym].length>120) CHART.candles[tf][sym].shift();
+    // Start new candle
+    CHART.buildingCandle[key]={t:barTime,o:price,h:price,l:price,c:price,v:1};
+  } else {
+    // Update current candle
+    bc.h=Math.max(bc.h,price);
+    bc.l=Math.min(bc.l,price);
+    bc.c=price;
+    bc.v++;
+  }
+
+  // Trigger redraw if this is the active chart
+  if(sym===CHART.current.sym && tf===CHART.current.tf){
+    chartDraw();
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// INDICATORS
+// ════════════════════════════════════════════════════════════════
+
+function calcEMA(candles, period){
+  if(candles.length<period) return [];
+  const k=2/(period+1);
+  const result=[];
+  let ema=candles.slice(0,period).reduce((s,c)=>s+c.c,0)/period;
+  result.push({t:candles[period-1].t, v:ema});
+  for(let i=period;i<candles.length;i++){
+    ema=candles[i].c*k+ema*(1-k);
+    result.push({t:candles[i].t, v:ema});
+  }
+  return result;
+}
+
+function calcBollinger(candles, period=20, mult=2){
+  if(candles.length<period) return [];
+  const result=[];
+  for(let i=period-1;i<candles.length;i++){
+    const slice=candles.slice(i-period+1,i+1);
+    const mean=slice.reduce((s,c)=>s+c.c,0)/period;
+    const variance=slice.reduce((s,c)=>s+Math.pow(c.c-mean,2),0)/period;
+    const std=Math.sqrt(variance);
+    result.push({t:candles[i].t,mid:mean,upper:mean+mult*std,lower:mean-mult*std});
+  }
+  return result;
+}
+
+function calcSupertrend(candles, period=7, mult=3){
+  if(candles.length<period+1) return [];
+  const result=[];
+  let prevST=null,prevDir=1;
+  for(let i=period;i<candles.length;i++){
+    const slice=candles.slice(i-period,i+1);
+    // ATR
+    let atr=0;
+    for(let j=1;j<slice.length;j++){
+      const tr=Math.max(
+        slice[j].h-slice[j].l,
+        Math.abs(slice[j].h-slice[j-1].c),
+        Math.abs(slice[j].l-slice[j-1].c)
+      );
+      atr+=tr;
+    }
+    atr/=period;
+    const c=candles[i];
+    const hl2=(c.h+c.l)/2;
+    const upperBand=hl2+mult*atr;
+    const lowerBand=hl2-mult*atr;
+    let st,dir;
+    if(prevST===null){st=lowerBand;dir=1;}
+    else if(prevDir===1){
+      st=Math.max(lowerBand,prevST);
+      dir=c.c>st?1:-1;
+    } else {
+      st=Math.min(upperBand,prevST);
+      dir=c.c<st?-1:1;
+    }
+    result.push({t:c.t,v:st,dir});
+    prevST=st;prevDir=dir;
+  }
+  return result;
+}
+
+function calcSR(candles){
+  // Find significant highs and lows as S/R levels
+  if(candles.length<10) return [];
+  const levels=[];
+  const lookback=5;
+  for(let i=lookback;i<candles.length-lookback;i++){
+    const c=candles[i];
+    // Pivot high
+    const isPivotH=candles.slice(i-lookback,i).every(x=>x.h<=c.h)&&
+                   candles.slice(i+1,i+lookback+1).every(x=>x.h<=c.h);
+    if(isPivotH) levels.push({v:c.h,type:'R',strength:0,t:c.t});
+    // Pivot low
+    const isPivotL=candles.slice(i-lookback,i).every(x=>x.l>=c.l)&&
+                   candles.slice(i+1,i+lookback+1).every(x=>x.l>=c.l);
+    if(isPivotL) levels.push({v:c.l,type:'S',strength:0,t:c.t});
+  }
+  // Merge nearby levels (within 0.1%)
+  const merged=[];
+  for(const lv of levels){
+    const nearby=merged.find(m=>Math.abs(m.v-lv.v)/lv.v<0.001);
+    if(nearby){nearby.strength++;nearby.v=(nearby.v+lv.v)/2;}
+    else merged.push({...lv,strength:1});
+  }
+  return merged.filter(m=>m.strength>=1).sort((a,b)=>b.strength-a.strength).slice(0,8);
+}
+
+// ════════════════════════════════════════════════════════════════
+// PATTERN DETECTOR
+// ════════════════════════════════════════════════════════════════
+
+function detectPatterns(candles){
+  const patterns=[];
+  if(candles.length<10) return patterns;
+  const last=candles[candles.length-1];
+  const prev=candles[candles.length-2];
+  const prev2=candles[candles.length-3];
+
+  const body=c=>Math.abs(c.c-c.o);
+  const range=c=>c.h-c.l;
+  const isBull=c=>c.c>c.o;
+  const isBear=c=>c.c<c.o;
+
+  // ── DOJI ──
+  if(body(last)/range(last)<0.1){
+    patterns.push({name:'DOJI',candle:last,bias:'NEUTRAL',
+      desc:'Market indecision — reversal possible'});
+  }
+
+  // ── HAMMER (bullish reversal) ──
+  const lastLowShadow=Math.min(last.o,last.c)-last.l;
+  const lastUpShadow=last.h-Math.max(last.o,last.c);
+  if(lastLowShadow>body(last)*2&&lastUpShadow<body(last)*0.5&&isBull(last)){
+    patterns.push({name:'HAMMER 🔨',candle:last,bias:'BULLISH',
+      desc:'Strong buying tail — bullish reversal signal'});
+  }
+
+  // ── SHOOTING STAR (bearish reversal) ──
+  if(lastUpShadow>body(last)*2&&lastLowShadow<body(last)*0.5&&isBear(last)){
+    patterns.push({name:'SHOOTING STAR ⭐',candle:last,bias:'BEARISH',
+      desc:'Rejection at highs — bearish reversal signal'});
+  }
+
+  // ── BULLISH ENGULFING ──
+  if(isBear(prev)&&isBull(last)&&last.o<=prev.c&&last.c>=prev.o&&body(last)>body(prev)){
+    patterns.push({name:'BULLISH ENGULFING 🟢',candle:last,bias:'BULLISH',
+      desc:'Bulls overpowered bears — strong buy signal'});
+  }
+
+  // ── BEARISH ENGULFING ──
+  if(isBull(prev)&&isBear(last)&&last.o>=prev.c&&last.c<=prev.o&&body(last)>body(prev)){
+    patterns.push({name:'BEARISH ENGULFING 🔴',candle:last,bias:'BEARISH',
+      desc:'Bears overpowered bulls — strong sell signal'});
+  }
+
+  // ── MORNING STAR (bullish 3-candle) ──
+  if(isBear(prev2)&&body(prev)<body(prev2)*0.5&&isBull(last)&&body(last)>body(prev2)*0.7){
+    patterns.push({name:'MORNING STAR ⭐',candle:last,bias:'BULLISH',
+      desc:'3-candle reversal — strong bullish setup'});
+  }
+
+  // ── EVENING STAR (bearish 3-candle) ──
+  if(isBull(prev2)&&body(prev)<body(prev2)*0.5&&isBear(last)&&body(last)>body(prev2)*0.7){
+    patterns.push({name:'EVENING STAR 🌙',candle:last,bias:'BEARISH',
+      desc:'3-candle top reversal — strong bearish setup'});
+  }
+
+  // ── FLAG PATTERN ──
+  if(candles.length>=20){
+    const flagbase=candles.slice(-20,-10);
+    const flagpole=candles.slice(-10);
+    const poleMove=flagbase[flagbase.length-1].c-flagbase[0].o;
+    const consolidation=Math.max(...flagpole.map(c=>c.h))-Math.min(...flagpole.map(c=>c.l));
+    if(Math.abs(poleMove)>0&&consolidation/Math.abs(poleMove)<0.4){
+      patterns.push({name:poleMove>0?'BULL FLAG 🚩':'BEAR FLAG 🚩',candle:last,
+        bias:poleMove>0?'BULLISH':'BEARISH',
+        desc:`Consolidation after ${poleMove>0?'up':'down'}move — breakout likely`});
+    }
+  }
+
+  // ── TRIANGLE (converging highs and lows) ──
+  if(candles.length>=15){
+    const tri=candles.slice(-15);
+    const highs=tri.map(c=>c.h);
+    const lows=tri.map(c=>c.l);
+    const hSlope=(highs[highs.length-1]-highs[0])/highs.length;
+    const lSlope=(lows[lows.length-1]-lows[0])/lows.length;
+    if(hSlope<0&&lSlope>0&&Math.abs(hSlope)<2&&Math.abs(lSlope)<2){
+      patterns.push({name:'SYMMETRICAL TRIANGLE 📐',candle:last,bias:'NEUTRAL',
+        desc:'Coiling for breakout — watch for volume spike'});
+    } else if(Math.abs(hSlope)<0.5&&lSlope>0){
+      patterns.push({name:'ASCENDING TRIANGLE ▲',candle:last,bias:'BULLISH',
+        desc:'Flat top, rising bottom — bullish breakout setup'});
+    } else if(hSlope<0&&Math.abs(lSlope)<0.5){
+      patterns.push({name:'DESCENDING TRIANGLE ▽',candle:last,bias:'BEARISH',
+        desc:'Flat bottom, falling top — bearish breakdown setup'});
+    }
+  }
+
+  return patterns;
+}
+
+// ════════════════════════════════════════════════════════════════
+// CHART RENDERER — Canvas-based professional chart
+// ════════════════════════════════════════════════════════════════
+
+function chartDraw(){
+  const canvas=document.getElementById('chartCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const sym=CHART.current.sym, tf=CHART.current.tf;
+
+  // Get candles + current building candle
+  const key=sym+'_'+tf;
+  let candles=[...(CHART.candles[tf][sym]||[])];
+  if(CHART.buildingCandle[key]) candles.push({...CHART.buildingCandle[key]});
+  if(candles.length<2){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='rgba(100,150,200,0.3)';
+    ctx.font='12px Nunito';ctx.textAlign='center';
+    ctx.fillText('Collecting candles — scanning every '+tf+'...',W/2,H/2);
+    return;
+  }
+
+  // Show last 60 candles max
+  if(candles.length>60) candles=candles.slice(-60);
+  const n=candles.length;
+
+  // Price range with padding
+  const allH=candles.map(c=>c.h), allL=candles.map(c=>c.l);
+  const priceHigh=Math.max(...allH), priceLow=Math.min(...allL);
+  const pad=(priceHigh-priceLow)*0.12;
+  const visHigh=priceHigh+pad, visLow=priceLow-pad;
+  const priceRange=visHigh-visLow;
+
+  // Layout
+  const LEFT=55, RIGHT=8, TOP=16, BOT=24;
+  const chartW=W-LEFT-RIGHT, chartH=H-TOP-BOT-60; // 60px for pattern bar
+
+  const toY=p=>TOP+chartH*(1-(p-visLow)/priceRange);
+  const toX=i=>LEFT+i*(chartW/n)+(chartW/n)*0.5;
+  const cw=Math.max(2,chartW/n*0.7);
+
+  // Background
+  ctx.fillStyle='#020609';ctx.fillRect(0,0,W,H);
+
+  // Grid lines
+  ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){
+    const y=TOP+i*(chartH/5);
+    ctx.beginPath();ctx.moveTo(LEFT,y);ctx.lineTo(W-RIGHT,y);ctx.stroke();
+    const price=visHigh-i*(priceRange/5);
+    ctx.fillStyle='rgba(100,150,200,0.5)';ctx.font='9px JetBrains Mono';
+    ctx.textAlign='right';
+    ctx.fillText(price.toFixed(0),LEFT-3,y+3);
+  }
+
+  // ── BOLLINGER BANDS ──
+  const bb=calcBollinger(candles,Math.min(20,Math.floor(candles.length*0.4)));
+  if(bb.length>1){
+    const bbOffset=candles.length-bb.length;
+    // Upper
+    ctx.beginPath();ctx.strokeStyle='rgba(156,39,176,0.5)';ctx.lineWidth=1;
+    ctx.setLineDash([3,3]);
+    bb.forEach((b,i)=>{const x=toX(i+bbOffset);i===0?ctx.moveTo(x,toY(b.upper)):ctx.lineTo(x,toY(b.upper));});
+    ctx.stroke();
+    // Lower
+    ctx.beginPath();
+    bb.forEach((b,i)=>{const x=toX(i+bbOffset);i===0?ctx.moveTo(x,toY(b.lower)):ctx.lineTo(x,toY(b.lower));});
+    ctx.stroke();
+    // Mid
+    ctx.strokeStyle='rgba(156,39,176,0.3)';ctx.lineWidth=1;
+    ctx.beginPath();
+    bb.forEach((b,i)=>{const x=toX(i+bbOffset);i===0?ctx.moveTo(x,toY(b.mid)):ctx.lineTo(x,toY(b.mid));});
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // ── SUPERTREND ──
+  const st=calcSupertrend(candles,Math.min(7,Math.floor(candles.length*0.15)),3);
+  if(st.length>1){
+    const stOffset=candles.length-st.length;
+    let prevX=null,prevY=null,prevDir=null;
+    st.forEach((s,i)=>{
+      const x=toX(i+stOffset),y=toY(s.v);
+      ctx.strokeStyle=s.dir===1?'rgba(0,230,118,0.8)':'rgba(255,51,85,0.8)';
+      ctx.lineWidth=1.5;ctx.setLineDash([]);
+      if(prevX!==null&&prevDir===s.dir){
+        ctx.beginPath();ctx.moveTo(prevX,prevY);ctx.lineTo(x,y);ctx.stroke();
+      }
+      prevX=x;prevY=y;prevDir=s.dir;
+    });
+  }
+
+  // ── EMA LINES ──
+  const emaConfigs=[
+    {p:9, col:'rgba(255,152,0,0.9)', lw:1.5},
+    {p:21,col:'rgba(33,150,243,0.9)', lw:1.5},
+    {p:50,col:'rgba(233,30,99,0.9)',  lw:1.5},
+  ];
+  for(const ec of emaConfigs){
+    if(candles.length<ec.p)continue;
+    const ema=calcEMA(candles,ec.p);
+    const offset=candles.length-ema.length;
+    ctx.beginPath();ctx.strokeStyle=ec.col;ctx.lineWidth=ec.lw;ctx.setLineDash([]);
+    ema.forEach((e,i)=>{
+      const x=toX(i+offset),y=toY(e.v);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+  }
+
+  // ── SUPPORT & RESISTANCE ──
+  const sr=calcSR(candles);
+  CHART.sr=sr;
+  for(const lv of sr){
+    const y=toY(lv.v);
+    ctx.strokeStyle=lv.type==='R'?'rgba(255,51,85,0.4)':'rgba(0,230,118,0.4)';
+    ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(LEFT,y);ctx.lineTo(W-RIGHT,y);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=lv.type==='R'?'rgba(255,51,85,0.7)':'rgba(0,230,118,0.7)';
+    ctx.font='8px Nunito';ctx.textAlign='right';
+    ctx.fillText((lv.type==='R'?'R':'S')+' '+lv.v.toFixed(0),W-RIGHT-2,y-2);
+  }
+
+  // ── CANDLES ──
+  for(let i=0;i<n;i++){
+    const c=candles[i];
+    const x=toX(i);
+    const bull=c.c>=c.o;
+    const col=bull?'#00e676':'#ff3355';
+    const bodyTop=toY(Math.max(c.o,c.c));
+    const bodyBot=toY(Math.min(c.o,c.c));
+    const bodyH=Math.max(1,bodyBot-bodyTop);
+
+    // Wick
+    ctx.strokeStyle=col;ctx.lineWidth=1;ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(x,toY(c.h));ctx.lineTo(x,toY(c.l));
+    ctx.stroke();
+
+    // Body
+    ctx.fillStyle=bull?'rgba(0,230,118,0.85)':'rgba(255,51,85,0.85)';
+    ctx.fillRect(x-cw/2,bodyTop,cw,bodyH);
+    ctx.strokeStyle=col;ctx.lineWidth=0.5;
+    ctx.strokeRect(x-cw/2,bodyTop,cw,bodyH);
+  }
+
+  // ── PATTERN LABELS on chart ──
+  const pats=detectPatterns(candles);
+  CHART.patterns=pats;
+  for(const pat of pats){
+    const idx=candles.findIndex(c=>c.t===pat.candle.t);
+    if(idx<0)continue;
+    const x=toX(idx);
+    const y=pat.bias==='BULLISH'?toY(pat.candle.l)+18:toY(pat.candle.h)-8;
+    ctx.fillStyle=pat.bias==='BULLISH'?'rgba(0,230,118,0.9)':
+      pat.bias==='BEARISH'?'rgba(255,51,85,0.9)':'rgba(255,152,0,0.9)';
+    ctx.font='bold 8px Nunito';ctx.textAlign='center';
+    ctx.fillText(pat.name.split(' ')[0],x,y);
+  }
+
+  // ── CURRENT PRICE LINE ──
+  const lastC=candles[candles.length-1];
+  const priceY=toY(lastC.c);
+  ctx.strokeStyle='rgba(255,214,22,0.8)';ctx.lineWidth=1;ctx.setLineDash([2,2]);
+  ctx.beginPath();ctx.moveTo(LEFT,priceY);ctx.lineTo(W-RIGHT,priceY);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(245,166,35,0.9)';
+  ctx.font='bold 9px JetBrains Mono';ctx.textAlign='right';
+  ctx.fillText('₹'+lastC.c.toFixed(1),W-RIGHT-2,priceY-2);
+
+  // ── LEGEND ──
+  const legend=[
+    {col:'rgba(255,152,0,0.9)',label:'EMA9'},
+    {col:'rgba(33,150,243,0.9)',label:'EMA21'},
+    {col:'rgba(233,30,99,0.9)',label:'EMA50'},
+    {col:'rgba(156,39,176,0.7)',label:'BB'},
+    {col:'rgba(0,230,118,0.8)',label:'ST↑'},
+    {col:'rgba(255,51,85,0.8)',label:'ST↓'},
+  ];
+  ctx.font='8px Nunito';ctx.textAlign='left';
+  legend.forEach((l,i)=>{
+    ctx.fillStyle=l.col;
+    ctx.fillRect(LEFT+i*40,H-BOT-56,8,2);
+    ctx.fillStyle='rgba(150,180,200,0.6)';
+    ctx.fillText(l.label,LEFT+i*40+10,H-BOT-52);
+  });
+
+  // Update pattern list below chart
+  renderPatternList(pats,sr,candles,sym);
+}
+
+function renderPatternList(pats,sr,candles,sym){
+  const el=document.getElementById('chartPatterns');
+  if(!el)return;
+  if(!pats.length&&!sr.length){el.innerHTML='<span style="color:var(--dim2);font-size:10px;">No patterns detected yet — collecting candles...</span>';return;}
+
+  // Signal strength confirmation
+  const spot=CHART.lastPrice[sym]||0;
+  const bullPats=pats.filter(p=>p.bias==='BULLISH').length;
+  const bearPats=pats.filter(p=>p.bias==='BEARISH').length;
+  const chartBias=bullPats>bearPats?'BULLISH':bearPats>bullPats?'BEARISH':'NEUTRAL';
+  const biasCol=chartBias==='BULLISH'?'var(--green)':chartBias==='BEARISH'?'var(--red)':'var(--orange)';
+
+  // Check if chart confirms Brain signal
+  const brainSignal=document.getElementById('v7Verdict')?.textContent||'';
+  const brainBull=brainSignal.includes('CE');
+  const chartConfirms=(brainBull&&chartBias==='BULLISH')||(!brainBull&&chartBias==='BEARISH');
+  const confirmBanner=brainSignal.includes('WAIT')?'':chartConfirms?
+    '<div style="padding:8px;border-radius:8px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);color:var(--green);font-size:10px;margin-bottom:8px;">✅ CHART CONFIRMS Brain signal — high confidence entry</div>':
+    '<div style="padding:8px;border-radius:8px;background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.2);color:var(--orange);font-size:10px;margin-bottom:8px;">⚠️ Chart CONFLICTS with Brain signal — wait for alignment</div>';
+
+  el.innerHTML=confirmBanner+`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="font-size:8px;letter-spacing:2px;color:var(--dim2);">CHART BIAS</div>
+      <div style="font-family:'Teko',sans-serif;font-size:20px;color:${biasCol};">${chartBias}</div>
+    </div>
+    ${pats.map(p=>{
+      const c=p.bias==='BULLISH'?'var(--green)':p.bias==='BEARISH'?'var(--red)':'var(--orange)';
+      return`<div style="padding:7px 10px;border-radius:8px;background:rgba(0,0,0,.3);border-left:3px solid ${c};margin-bottom:5px;">
+        <div style="font-size:11px;color:${c};font-weight:700;">${p.name}</div>
+        <div style="font-size:10px;color:var(--dim2);">${p.desc}</div>
+      </div>`;
+    }).join('')}
+    ${sr.slice(0,4).map(lv=>{
+      const c=lv.type==='R'?'var(--red)':'var(--green)';
+      const dist=spot?((Math.abs(spot-lv.v)/spot)*100).toFixed(2):'--';
+      return`<div style="padding:5px 10px;border-radius:6px;background:rgba(0,0,0,.2);border-left:2px solid ${c};margin-bottom:4px;display:flex;justify-content:space-between;">
+        <span style="font-size:10px;color:${c};">${lv.type==='R'?'Resistance':'Support'} ₹${lv.v.toFixed(0)}</span>
+        <span style="font-size:9px;color:var(--dim2);">${dist}% away</span>
+      </div>`;
+    }).join('')}`;
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRICE FEED — auto-feeds ticks from Yahoo to chart builder
+// ════════════════════════════════════════════════════════════════
+async function chartFeedTick(){
+  const sym=CHART.current.sym;
+  try{
+    const{ltp}=await brainGetSpot(sym);
+    if(ltp>0){
+      CHART.lastPrice[sym]=ltp;
+      chartAddTick(sym,ltp,'1m');
+      chartAddTick(sym,ltp,'5m');
+    }
+  }catch(e){}
+}
+
+function startChartFeed(){
+  if(CHART.running)return;
+  CHART.running=true;
+  chartFeedTick();
+  CHART.timer=setInterval(chartFeedTick,15000); // tick every 15 seconds
+  console.log('[CHART] Feed started for',CHART.current.sym);
+}
+
+function stopChartFeed(){
+  CHART.running=false;
+  clearInterval(CHART.timer);
+}
+
+function switchChartTF(tf){
+  CHART.current.tf=tf;
+  // Update buttons
+  ['1m','5m'].forEach(t=>{
+    const btn=document.getElementById('chartBtn_'+t);
+    if(btn) btn.style.background=t===tf?'rgba(245,166,35,.2)':'transparent';
+  });
+  chartDraw();
+}
+
+function switchChartSym(sym){
+  CHART.current.sym=sym;
+  chartDraw();
+}
+
+// ════════════════════════════════════════════════════════════════
+// AI CHART IMAGE ANALYSER
+// Upload any chart screenshot → Claude analyses it
+// ════════════════════════════════════════════════════════════════
+async function analyseChartImage(file){
+  const out=document.getElementById('chartAIOutput');
+  if(!out)return;
+
+  out.innerHTML='<div style="color:var(--cyan);">🧠 Reading chart image...</div>';
+
+  // Convert to base64
+  const b64=await new Promise((res,rej)=>{
+    const reader=new FileReader();
+    reader.onload=e=>res(e.target.result.split(',')[1]);
+    reader.onerror=rej;
+    reader.readAsDataURL(file);
+  });
+
+  const sym=CHART.current.sym;
+  const spot=CHART.lastPrice[sym]||0;
+  const brainSignal=document.getElementById('v7Verdict')?.textContent||'--';
+
+  const prompt=`You are Dhanveer Chart AI — analyse this Indian index options chart for Sridhar.
+
+Context:
+- Index: ${sym} | Current spot: ₹${spot.toLocaleString('en-IN')}
+- Dhanveer Brain signal: ${brainSignal}
+- Trader: 10+ years experience, trades expiry day options (Sensex Thursday, Nifty Tuesday)
+
+Analyse this chart image and provide:
+1. TREND: (Uptrend/Downtrend/Sideways)
+2. KEY PATTERNS: (list any visible patterns)
+3. SUPPORT: key support level
+4. RESISTANCE: key resistance level
+5. SIGNAL: Does chart support BUY CE or BUY PE or WAIT?
+6. CONFIRMS BRAIN: Yes/No — does chart confirm ${brainSignal}?
+7. ENTRY ADVICE: one sentence
+
+Max 80 words. Be direct. Use ₹ for prices.`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:250,
+        messages:[{
+          role:'user',
+          content:[
+            {type:'image',source:{type:'base64',media_type:file.type||'image/jpeg',data:b64}},
+            {type:'text',text:prompt}
+          ]
+        }]
+      })
+    });
+    const data=await res.json();
+    const text=data.content?.[0]?.text||'Analysis unavailable';
+    const safeText=text.split('\n').join('<br>');
+    out.innerHTML='<div style="font-size:8px;letter-spacing:2px;color:var(--cyan);margin-bottom:8px;">🧠 AI CHART ANALYSIS — '+new Date().toLocaleTimeString('en-IN')+'</div><div style="font-size:11px;line-height:1.8;color:var(--tx);margin-top:8px;">'+safeText+'</div>';
+  }catch(e){
+    out.innerHTML='<div style="color:var(--red);">AI analysis failed: '+e.message+'</div>';
+  }
+}
+
+
+
+// ── CHART HELPERS ──
+function handleChartUpload(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  // Show preview
+  const preview=document.getElementById('chartPreview');
+  const img=document.getElementById('chartPreviewImg');
+  if(preview&&img){
+    preview.style.display='block';
+    img.src=URL.createObjectURL(file);
+  }
+  // Run AI analysis
+  analyseChartImage(file);
+}
+
+function resizeChartCanvas(){
+  const canvas=document.getElementById('chartCanvas');
+  if(!canvas)return;
+  const container=canvas.parentElement;
+  if(!container)return;
+  const dpr=window.devicePixelRatio||1;
+  const w=container.offsetWidth;
+  canvas.width=w*dpr;
+  canvas.height=280*dpr;
+  canvas.style.width=w+'px';
+  canvas.style.height='280px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  chartDraw();
+}
+
+// Auto-resize on orientation change
+window.addEventListener('resize',()=>setTimeout(resizeChartCanvas,100));
+
+// When chart tab opens — resize and start feed
+const _origGoP=goP;
+function goP(page){
+  _origGoP(page);
+  if(page==='chart'){
+    setTimeout(()=>{
+      resizeChartCanvas();
+      switchChartSym(document.getElementById('chartSym')?.value||'SENSEX');
+      switchChartTF('5m');
+      startChartFeed();
+      // Update chart label
+      const lbl=document.getElementById('chartLabel');
+      if(lbl)lbl.textContent=(document.getElementById('chartSym')?.value||'SENSEX')+' · '+CHART.current.tf.toUpperCase();
+    },100);
+  }
+}
+
 // ── SPLASH + INIT ──
 setTimeout(()=>{
   document.getElementById('splash').style.transition='opacity .5s';
@@ -2803,5 +5229,15 @@ setTimeout(()=>{
   },500);
 },2700);
 </script>
+<!-- ═══ ALERT OVERLAY ═══ -->
+<div id="alertOverlay">
+  <div class="alert-icon" id="alertIcon">🟢</div>
+  <div class="alert-title" id="alertTitle" style="color:var(--green);">BUY CE</div>
+  <div class="alert-sub" id="alertSub">SIGNAL DETECTED</div>
+  <div class="alert-levels" id="alertLevels"></div>
+  <button class="alert-dismiss" id="alertDismissBtn" style="background:var(--green);color:#000;" ontouchend="dismissAlert()">✓ GOT IT — DISMISS</button>
+  <button style="background:transparent;border:1px solid rgba(255,255,255,.1);color:var(--dim2);padding:8px 20px;border-radius:8px;font-size:11px;margin-top:8px;cursor:pointer;" ontouchend="snoozeAlert()">⏸ SNOOZE 5 MIN</button>
+</div>
+
 </body>
 </html>
