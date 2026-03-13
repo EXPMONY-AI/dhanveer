@@ -1105,7 +1105,7 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
 
     <!-- ══════════════════════════════════════ -->
     <!-- PAGE: ENGINE (3 Advanced Engines) -->
-    <div id="tab-engine" class="page" style="display:none;">
+    <div id="pg-engine" class="pg">
       <div class="sg">
         <div class="sg-t" style="color:var(--gold);font-size:18px;letter-spacing:3px;">⚡ ADVANCED ENGINES</div>
         <div style="font-size:9px;color:var(--dim2);letter-spacing:2px;">OI UNWIND · IV CRUSH · MAX PAIN VELOCITY</div>
@@ -1134,7 +1134,7 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
     </div>
 
     <!-- PAGE: CHART (Candlestick + Indicators + Pattern AI) -->
-    <div id="tab-chart" class="page" style="display:none;">
+    <div id="pg-chart" class="pg">
       <div style="padding:8px 12px 0;">
         <!-- Controls Row -->
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
@@ -1187,7 +1187,7 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
     </div>
 
     <!-- PAGE: BRAIN (Smart Brain Engine) -->
-    <div id="tab-brain" class="page" style="display:none;">
+    <div id="pg-brain" class="pg">
       <div class="sg">
         <div class="sg-t" style="color:var(--cyan);font-size:18px;letter-spacing:3px;">🧠 SMART BRAIN</div>
         <div style="font-size:9px;color:var(--dim2);letter-spacing:2px;">SELF-REPAIR · SELF-OPTIMIZE · ZERO ERROR</div>
@@ -1342,7 +1342,7 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
     <button class="nb" id="nb-spike" ontouchend="goP('spike')"><div class="nb-i">💥</div><div class="nb-l">SPIKE</div></button>
     <button class="nb" id="nb-calendar" ontouchend="goP('calendar')"><div class="nb-i">🗓️</div><div class="nb-l">CALENDAR</div></button>
     <button class="nb" id="nb-titan" ontouchend="goP('titan')"><div class="nb-i">🚀</div><div class="nb-l">TITAN</div></button>
-    <button class="nb" id="nb-chart" ontouchend="goP('chart');startChartFeed();"><div class="nb-i">📈</div><div class="nb-l">CHART</div></button>
+    <button class="nb" id="nb-chart" ontouchend="goP('chart')"><div class="nb-i">📈</div><div class="nb-l">CHART</div></button>
     <button class="nb" id="nb-engine" ontouchend="goP('engine')"><div class="nb-i">⚡</div><div class="nb-l">ENGINE</div></button>
     <button class="nb" id="nb-brain" ontouchend="goP('brain')"><div class="nb-i">🧠</div><div class="nb-l">BRAIN</div></button>
     <button class="nb" id="nb-setup" ontouchend="goP('setup')"><div class="nb-i">⚙️</div><div class="nb-l">SETUP</div></button>
@@ -1696,6 +1696,8 @@ function goP(name){
   document.getElementById('scrl').scrollTop=0;
   // Lazy init on tab open
   if(name==='calendar')renderCalendar();
+  if(name==='chart'){setTimeout(()=>{resizeChartCanvas();startChartFeed();},100);}
+  if(name==='brain'){updateHealthPanel();updateRepairLog();}
 }
 
 // ── SETUP FUNCTIONS ──
@@ -5201,21 +5203,7 @@ function resizeChartCanvas(){
 window.addEventListener('resize',()=>setTimeout(resizeChartCanvas,100));
 
 // When chart tab opens — resize and start feed
-const _origGoP=goP;
-function goP(page){
-  _origGoP(page);
-  if(page==='chart'){
-    setTimeout(()=>{
-      resizeChartCanvas();
-      switchChartSym(document.getElementById('chartSym')?.value||'SENSEX');
-      switchChartTF('5m');
-      startChartFeed();
-      // Update chart label
-      const lbl=document.getElementById('chartLabel');
-      if(lbl)lbl.textContent=(document.getElementById('chartSym')?.value||'SENSEX')+' · '+CHART.current.tf.toUpperCase();
-    },100);
-  }
-}
+// Chart tab init — called from goP via inline ontouchend
 
 // ── SPLASH + INIT ──
 setTimeout(()=>{
