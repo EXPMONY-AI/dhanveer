@@ -1144,12 +1144,16 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
         <input type="number" id="pLL" value="5000"/>
         <label>Sound Alerts</label>
         <select id="pSn"><option value="1">ON</option><option value="0">OFF</option></select>
-        <div style="margin:4px 0 10px;padding:12px;border-radius:10px;background:rgba(0,188,212,.04);border:1px solid rgba(0,188,212,.2);">
-          <div style="font-family:Teko,sans-serif;font-size:15px;letter-spacing:2px;color:var(--cyan);margin-bottom:6px;">☁️ CLOUDFLARE PROXY (AUTO)</div>
-          <div style="font-size:9px;color:var(--dim2);line-height:1.8;margin-bottom:8px;">Live Dhan API data via Cloudflare Worker — no laptop needed, works anywhere<br>Free: 100,000 requests/day. Deploy once at workers.cloudflare.com</div>
-          <div id="cfProxyStatus" style="padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.3);font-size:10px;color:var(--dim2);margin-bottom:8px;">⏳ Checking proxy status...</div>
-          <button class="btn btn-ol btn-sm" ontouchend="testCFProxy()">🔗 TEST PROXY</button>
-          <input type="hidden" id="pProxy" value=""/>
+        <div style="margin:4px 0 10px;padding:12px;border-radius:10px;background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.2);">
+          <div style="font-family:Teko,sans-serif;font-size:15px;letter-spacing:2px;color:var(--green);margin-bottom:6px;">🖥️ LAPTOP PROXY (LIVE DATA)</div>
+          <div style="font-size:9px;color:var(--dim2);line-height:1.8;margin-bottom:8px;">Run DHANVEER_PROXY.bat on laptop → enter laptop IP here → live data on phone<br>⚠️ Phone and laptop must be on same WiFi</div>
+          <label>Laptop IP Address</label>
+          <input type="text" id="pProxy" placeholder="e.g. 192.168.1.5" style="margin-bottom:8px;"/>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ol btn-sm" ontouchend="testCFProxy()">🔗 TEST PROXY</button>
+            <button class="btn btn-red btn-sm" ontouchend="clearProxyIP()">✕ CLEAR</button>
+          </div>
+          <div id="cfProxyStatus" style="margin-top:8px;font-size:10px;color:var(--dim2);">Enter IP above and tap TEST PROXY</div>
           <div id="proxyStatus" style="display:none;"></div>
         </div>
         <button class="btn btn-gold" ontouchend="savePref()">💾 SAVE ALL SETTINGS</button>
@@ -1353,7 +1357,10 @@ function unlock(){
   buildChecklist();initHomeDashboard();initCalendar();initSpikeEngine();
   startV4Monitor();updateV4HomeStatus();showTodayPlaybook();renderPaperTrades();
   startAutoPing();
-  // Auto-check Cloudflare proxy on unlock
+  // Load saved proxy IP into field
+  const proxyEl=document.getElementById('pProxy');
+  if(proxyEl&&S.pr.proxyIP)proxyEl.value=S.pr.proxyIP;
+  // Auto-check proxy on unlock
   setTimeout(testCFProxy,1500);
 }
 
@@ -1516,6 +1523,13 @@ function savePref(){
 
 async function testProxy(){} // legacy — replaced by CF proxy
 function clearProxy(){} // legacy
+
+function clearProxyIP(){
+  S.pr.proxyIP='';lsSet('pr',S.pr);
+  const el=document.getElementById('pProxy');if(el)el.value='';
+  const st=document.getElementById('cfProxyStatus');
+  if(st){st.textContent='Cleared — enter IP and test again';st.style.color='var(--dim2)';}
+}
 
 async function testCFProxy(){
   const el=document.getElementById('cfProxyStatus');
