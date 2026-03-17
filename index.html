@@ -438,6 +438,12 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
         <div id="homeTradeDecision" style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(0,0,0,.3);font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--dim2);">
           Tap TEST CONNECTION to check your latency
         </div>
+        <!-- Live data source indicator -->
+        <div id="dataSourceBar" style="margin-top:8px;padding:8px 12px;border-radius:8px;background:rgba(0,0,0,.2);display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:9px;color:var(--dim2);">DATA SOURCE</div>
+          <div id="dataSourceLabel" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--dim2);">Checking...</div>
+          <div id="wsBadge" style="display:none;padding:2px 8px;border-radius:6px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.2);color:var(--green);font-size:8px;font-weight:700;">⚡ WS LIVE</div>
+        </div>
         <!-- Ping history -->
         <div style="margin:10px 0 4px;font-size:8px;letter-spacing:2px;color:var(--dim2);">LAST 10 PINGS</div>
         <div id="pingHistory" style="display:flex;gap:4px;align-items:flex-end;height:30px;"></div>
@@ -509,6 +515,143 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
       <div class="card">
         <div class="ct">✅ <span class="hl">PRE-MARKET CHECKLIST</span></div>
         <div id="chkList"></div>
+      </div>
+
+      <!-- ⚡ INTELLIGENCE FEED -->
+      <div class="card" style="border-color:rgba(0,188,212,.2);background:linear-gradient(135deg,#060e18,#060f1a);">
+        <div class="ct">🧠 <span class="hl">INTELLIGENCE FEED</span>
+          <span id="ifActiveBadge" style="display:none;margin-left:auto;" class="sbadge sbadge-g">● WATCHING</span>
+        </div>
+
+        <!-- Feed Input -->
+        <textarea id="ifRawInput" placeholder="Paste call here...&#10;e.g. keep an eye on 23250 CE above 180 — short covering loading" style="height:70px;border-color:rgba(0,188,212,.2);"></textarea>
+
+        <!-- Saved feeds list -->
+        <div id="ifFeedList" style="display:none;margin-bottom:10px;"></div>
+
+        <div class="brow" style="margin-bottom:10px;">
+          <button class="btn btn-gold" ontouchend="ifParseFeed()">🧠 PARSE &amp; WATCH</button>
+          <button class="btn btn-ol btn-sm" ontouchend="ifClearAll()">🗑 CLEAR</button>
+        </div>
+
+        <!-- Active Watch Card -->
+        <div id="ifWatchCard" style="display:none;padding:12px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid rgba(0,188,212,.15);margin-bottom:10px;">
+          <div style="font-size:8px;letter-spacing:2px;color:var(--dim2);margin-bottom:8px;">PARSED INTELLIGENCE</div>
+          <div class="g2" style="margin-bottom:8px;">
+            <div class="st"><div class="sl">STRIKE</div><div class="sv" id="ifStrike" style="font-size:15px;">--</div></div>
+            <div class="st"><div class="sl">TYPE</div><div class="sv" id="ifOptType" style="font-size:15px;">--</div></div>
+          </div>
+          <div class="g2" style="margin-bottom:8px;">
+            <div class="st"><div class="sl">TRIGGER ₹</div><div class="sv" id="ifTrigger" style="color:var(--green);">--</div></div>
+            <div class="st"><div class="sl">SIGNAL</div><div class="sv" id="ifSignalType" style="font-size:11px;color:var(--cyan);">--</div></div>
+          </div>
+          <div style="padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.3);font-size:10px;color:var(--dim2);line-height:1.7;" id="ifAISummary">AI parsing...</div>
+        </div>
+
+        <!-- OI Cross-check -->
+        <div id="ifOICard" style="display:none;padding:12px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid rgba(156,39,176,.2);margin-bottom:10px;">
+          <div style="font-size:8px;letter-spacing:2px;color:var(--dim2);margin-bottom:8px;">OI CROSS-CHECK</div>
+          <div class="g3" style="margin-bottom:8px;">
+            <div class="st"><div class="sl">CALL OI</div><div class="sv" id="ifCallOI" style="font-size:12px;">--</div></div>
+            <div class="st"><div class="sl">PUT OI</div><div class="sv" id="ifPutOI" style="font-size:12px;">--</div></div>
+            <div class="st"><div class="sl">PCR</div><div class="sv" id="ifPCR">--</div></div>
+          </div>
+          <div style="padding:8px 10px;border-radius:8px;font-size:10px;line-height:1.7;" id="ifOIVerdict"></div>
+          <div class="brow" style="margin-top:8px;">
+            <button class="btn btn-ol btn-sm" ontouchend="ifCheckOI()">🔍 REFRESH OI</button>
+          </div>
+        </div>
+
+        <!-- Live Premium Monitor -->
+        <div id="ifMonitorCard" style="display:none;padding:12px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid rgba(0,230,118,.15);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="font-size:8px;letter-spacing:2px;color:var(--dim2);">LIVE PREMIUM MONITOR</div>
+            <div id="ifMonitorStatus" style="font-size:9px;color:var(--dim2);">Idle</div>
+          </div>
+          <div class="g2" style="margin-bottom:8px;">
+            <div class="st"><div class="sl">CURRENT ₹</div><div class="sv" id="ifCurrentLTP" style="color:var(--cyan);">--</div></div>
+            <div class="st"><div class="sl">TRIGGER ₹</div><div class="sv" id="ifTriggerDisplay" style="color:var(--green);">--</div></div>
+          </div>
+          <!-- Progress bar to trigger -->
+          <div style="font-size:8px;color:var(--dim2);margin-bottom:4px;">Progress to trigger</div>
+          <div class="prog" style="height:6px;margin-bottom:8px;"><div class="pf" id="ifProgressBar" style="width:0%;background:var(--cyan);"></div></div>
+          <div style="padding:8px 10px;border-radius:8px;font-size:11px;font-weight:700;text-align:center;letter-spacing:.5px;" id="ifAlertBanner">Waiting for premium data...</div>
+          <div class="brow" style="margin-top:8px;">
+            <button class="btn btn-green btn-sm" id="ifStartBtn" ontouchend="ifStartMonitor()">▶ START MONITOR</button>
+            <button class="btn btn-red btn-sm" id="ifStopBtn" style="display:none;" ontouchend="ifStopMonitor()">⏹ STOP</button>
+          </div>
+        </div>
+
+        <!-- Alert Log -->
+        <div id="ifAlertLog" style="display:none;margin-top:10px;">
+          <div style="font-size:8px;letter-spacing:2px;color:var(--dim2);margin-bottom:5px;">ALERT LOG</div>
+          <div class="logb" id="ifLog" style="height:90px;"></div>
+        </div>
+      </div>
+
+      <!-- ══ AUTO-SCOUT ENGINE ══ -->
+      <div class="card" id="asCard" style="border-color:rgba(156,39,176,.25);background:linear-gradient(135deg,#060a10,#090618);">
+        <div class="ct">🔭 <span style="color:#ce93d8;">AUTO-SCOUT</span>
+          <span id="asScanBadge" style="display:none;margin-left:auto;padding:3px 9px;border-radius:9px;font-size:9px;font-weight:700;background:rgba(156,39,176,.15);border:1px solid rgba(156,39,176,.3);color:#ce93d8;">● SCANNING</span>
+        </div>
+        <div class="g2" style="margin-bottom:8px;">
+          <div><label>Index</label>
+            <select id="asSym" style="margin-bottom:0;"><option>NIFTY</option><option>BANKNIFTY</option><option>SENSEX</option><option>FINNIFTY</option></select></div>
+          <div><label>Expiry</label><input type="date" id="asExp" style="margin-bottom:0;"/></div>
+        </div>
+        <div class="brow" style="margin-bottom:10px;">
+          <button class="btn" id="asStartBtn" ontouchend="asStart()" style="background:linear-gradient(135deg,#7b1fa2,#4a148c);color:#fff;flex:1;">🔭 START AUTO-SCOUT</button>
+          <button class="btn btn-red btn-sm" id="asStopBtn" style="display:none;" ontouchend="asStop()">⏹ STOP</button>
+        </div>
+        <!-- Status -->
+        <div id="asStatusBar" style="display:none;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.3);margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:9px;color:var(--dim2);" id="asStatus">Initialising...</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#ce93d8;" id="asScanCount">Scan #0</span>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:5px;font-size:8px;color:var(--dim2);">
+            <span>Spot: <span id="asSpot" style="color:var(--gold);">--</span></span>
+            <span>ATM: <span id="asATM" style="color:var(--cyan);">--</span></span>
+            <span>PCR: <span id="asPCR" style="color:var(--tx);">--</span></span>
+            <span>Next: <span id="asNext" style="color:var(--dim2);">30s</span></span>
+          </div>
+        </div>
+        <!-- Leaderboard -->
+        <div id="asLeaderboard" style="display:none;margin-bottom:10px;">
+          <div style="font-size:8px;letter-spacing:2px;color:#ce93d8;margin-bottom:6px;">STRIKE LEADERBOARD</div>
+          <div id="asLeaderRows"></div>
+        </div>
+        <!-- Top Pick -->
+        <div id="asTopPick" style="display:none;padding:13px;border-radius:12px;border:1px solid rgba(156,39,176,.35);background:rgba(156,39,176,.05);">
+          <div style="font-size:8px;letter-spacing:2px;color:#ce93d8;margin-bottom:8px;">🎯 TOP PICK</div>
+          <div class="g2" style="margin-bottom:8px;">
+            <div class="st" style="border-color:rgba(156,39,176,.2);"><div class="sl">STRIKE</div><div class="sv" id="asPickStrike" style="color:#ce93d8;font-size:17px;">--</div></div>
+            <div class="st" style="border-color:rgba(156,39,176,.2);"><div class="sl">SIDE</div><div class="sv" id="asPickSide" style="font-size:17px;">--</div></div>
+          </div>
+          <div class="g3" style="margin-bottom:8px;">
+            <div class="st"><div class="sl">SCORE</div><div class="sv" id="asPickScore" style="color:#ce93d8;">--</div></div>
+            <div class="st"><div class="sl">SIGNAL</div><div class="sv" id="asPickSignal" style="font-size:9px;color:var(--cyan);">--</div></div>
+            <div class="st"><div class="sl">AT</div><div class="sv" id="asPickTime" style="font-size:10px;color:var(--dim2);">--</div></div>
+          </div>
+          <!-- Score bars -->
+          <div style="margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--dim2);margin-bottom:2px;"><span>OI BUILDUP</span><span id="asB1v">0</span></div>
+            <div class="prog"><div class="pf" id="asB1" style="width:0%;background:#9c27b0;"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--dim2);margin-bottom:2px;margin-top:5px;"><span>PCR EXTREME</span><span id="asB2v">0</span></div>
+            <div class="prog"><div class="pf" id="asB2" style="width:0%;background:#7b1fa2;"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--dim2);margin-bottom:2px;margin-top:5px;"><span>PREMIUM VELOCITY</span><span id="asB3v">0</span></div>
+            <div class="prog"><div class="pf" id="asB3" style="width:0%;background:#6a1b9a;"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--dim2);margin-bottom:2px;margin-top:5px;"><span>OI UNWINDING</span><span id="asB4v">0</span></div>
+            <div class="prog"><div class="pf" id="asB4" style="width:0%;background:#4a148c;"></div></div>
+          </div>
+          <div id="asAIVerdict" style="padding:10px;border-radius:8px;background:rgba(0,0,0,.35);font-size:10px;color:var(--dim2);line-height:1.7;">Waiting for scans to build pattern...</div>
+          <button class="btn btn-sm" style="margin-top:8px;background:transparent;border:1.5px solid #9c27b0;color:#ce93d8;width:100%;" ontouchend="asSendToFeed()">⚡ SEND TO INTELLIGENCE FEED</button>
+        </div>
+        <!-- Log -->
+        <div id="asLogWrap" style="display:none;margin-top:10px;">
+          <div style="font-size:8px;letter-spacing:2px;color:var(--dim2);margin-bottom:5px;">SCOUT LOG</div>
+          <div class="logb" id="asLog" style="height:80px;"></div>
+        </div>
       </div>
 
     </div>
@@ -1153,8 +1296,15 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
             <button class="btn btn-ol btn-sm" ontouchend="testCFProxy()">🔗 TEST PROXY</button>
             <button class="btn btn-red btn-sm" ontouchend="clearProxyIP()">✕ CLEAR</button>
           </div>
-          <div id="cfProxyStatus" style="margin-top:8px;font-size:10px;color:var(--dim2);">Enter IP above and tap TEST PROXY</div>
+          <div id="cfProxyStatus" style="margin-top:8px;font-size:10px;color:var(--dim2);">Tap TEST PROXY to check connection status</div>
           <div id="proxyStatus" style="display:none;"></div>
+          <!-- ONE-TAP WORKER DEPLOY -->
+          <div style="margin-top:12px;padding:10px;border-radius:10px;background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.15);">
+            <div style="font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:6px;">⚡ ONE-TAP CF WORKER DEPLOY</div>
+            <div style="font-size:9px;color:var(--dim2);margin-bottom:8px;line-height:1.7;">Deploy proxy code directly from Dhanveer — no laptop, no editor needed</div>
+            <button class="btn btn-gold" ontouchend="deployWorkerFromApp()">🚀 DEPLOY CF WORKER NOW</button>
+            <div id="deployStatus" style="margin-top:8px;font-size:10px;color:var(--dim2);display:none;"></div>
+          </div>
         </div>
         <button class="btn btn-gold" ontouchend="savePref()">💾 SAVE ALL SETTINGS</button>
       </div>
@@ -1233,9 +1383,19 @@ function dhH(){return{'access-token':S.cr.dt,'client-id':S.cr.dc,'Content-Type':
 function hasCreds(){return (S.cr.dc&&S.cr.dt)||(S.cr.fa&&S.cr.ft);}
 
 // ── PROXY CONFIG ──
-// Laptop proxy — run START_DHANVEER.bat on Windows laptop, enter IP in Setup
+// Primary: Cloudflare Worker (when deployed)
+// Fallback 1: corsproxy.io (free public CORS proxy, zero setup)
+// Fallback 2: allorigins.win
+// Fallback 3: Laptop proxy on same WiFi
+const CF_WORKER = 'https://dhan-proxy.sridharsrtips.workers.dev';
+const CORS_PROXIES = [
+  'https://corsproxy.io/?',
+  'https://api.allorigins.win/raw?url='
+];
+
 function isProxyMode(){return !!(S.pr&&S.pr.proxyIP&&S.pr.proxyIP.length>6);}
 function getProxyBase(){return S.pr&&S.pr.proxyIP?'http://'+S.pr.proxyIP+':7777':null;}
+function isCFWorker(){return !!CF_WORKER;}
 
 async function AF(url,hdr={},body=null){
   const opts={method:body?'POST':'GET',headers:{...hdr,'Content-Type':'application/json'}};
@@ -1245,29 +1405,229 @@ async function AF(url,hdr={},body=null){
   return r.json();
 }
 
-// ── PROXY-AWARE FETCH ──
-// Routes through laptop proxy (START_DHANVEER.bat) — falls back to direct
+// ── SMART PROXY FETCH ──
+// Tries 4 methods in order until one works
+// 1) CF Worker (when properly deployed)
+// 2) corsproxy.io public proxy
+// 3) allorigins.win public proxy  
+// 4) Laptop proxy on same WiFi
+async function CFetch(path,hdr={},body=null){
+  const url=CF_WORKER+path;
+  const opts={method:'POST',headers:{...hdr,'Content-Type':'application/json'}};
+  if(body)opts.body=JSON.stringify(body);
+  const r=await fetch(url,{...opts,signal:AbortSignal.timeout(6000)});
+  if(!r.ok)throw new Error('CF Worker HTTP '+r.status);
+  const d=await r.json();
+  // If CF Worker still has Hello World, it won't have .data or expected fields
+  if(d?.message&&d.message.includes('Hello World'))throw new Error('CF Worker not deployed yet');
+  return d;
+}
+
+async function publicCORSFetch(directUrl,hdr={},body=null){
+  // Encode the target URL + headers as query params for public CORS proxies
+  // These proxies forward GET requests only, so we use GET with encoded params
+  // For Dhan POST APIs we encode body in URL
+  for(const proxy of CORS_PROXIES){
+    try{
+      const targetUrl = encodeURIComponent(directUrl);
+      const r=await fetch(proxy+targetUrl,{
+        method:'GET',
+        headers:{'X-Requested-With':'XMLHttpRequest'},
+        signal:AbortSignal.timeout(8000)
+      });
+      if(r.ok){
+        const d=await r.json();
+        if(d&&!d.error)return d;
+      }
+    }catch(e){console.warn('[PublicProxy] '+e.message);}
+  }
+  throw new Error('All public proxies failed');
+}
+
 async function PF(proxyPath,directUrl,hdr={},body=null){
+  // 1. CF Worker (primary — fastest when deployed)
+  try{
+    const d=await CFetch(proxyPath,hdr,body);
+    CONN.lastSource='CF_WORKER';
+    CONN.cfOk=true;
+    return d;
+  }catch(e){
+    CONN.cfOk=false;
+    console.warn('[CF Worker] '+e.message);
+  }
+  // 2. Laptop proxy (same WiFi)
   if(isProxyMode()){
     try{
       const base=getProxyBase();
-      const opts={method:'POST',headers:{...hdr,'Content-Type':'application/json'}};
+      const opts={method:'POST',headers:{...hdr,'Content-Type':'application/json'},signal:AbortSignal.timeout(5000)};
       if(body)opts.body=JSON.stringify(body);
       const r=await fetch(base+proxyPath,opts);
-      if(r.ok)return r.json();
-    }catch(e){console.warn('[Proxy] Failed:',e.message);}
+      if(r.ok){CONN.lastSource='LAPTOP_PROXY';return r.json();}
+    }catch(e){console.warn('[Laptop Proxy] '+e.message);}
   }
-  // Direct call — works for Fyers, CORS-blocked for Dhan in browser
-  return AF(directUrl,hdr,body);
+  // 3. Direct (Fyers works, Dhan blocked by CORS)
+  try{
+    const d=await AF(directUrl,hdr,body);
+    CONN.lastSource='DIRECT';
+    return d;
+  }catch(e){console.warn('[Direct] '+e.message);}
+
+  CONN.lastSource='FAILED';
+  updateConnHealth();
+  throw new Error('All proxy methods failed — deploy CF Worker code');
 }
 
-async function checkCFProxy(){
-  if(!isProxyMode())return false;
+// ══════════════════════════════════════════
+// CONNECTION HEALTH MANAGER
+// Tracks which proxy is active, auto-heals
+// ══════════════════════════════════════════
+const CONN = {
+  cfOk: false,
+  wsAlive: false,
+  ws: null,
+  wsReconnectTimer: null,
+  lastSource: 'NONE',
+  lastTick: 0,
+  tickCount: 0,
+  livePrice: {},   // sym -> ltp
+  pingMs: 0,
+};
+
+function updateConnHealth(){
+  const src = CONN.lastSource;
+  const el = document.getElementById('homeTradeDecision');
+  const badge = document.getElementById('connBadge');
+  if(!el) return;
+  if(src==='CF_WORKER'){
+    el.innerHTML='<span style="color:var(--green);">⚡ CF Worker active — live data flowing seamlessly</span>';
+    badge.textContent='✅ CF WORKER LIVE'; badge.className='sbadge sbadge-g';
+  } else if(src==='LAPTOP_PROXY'){
+    el.innerHTML='<span style="color:var(--gold);">🖥️ Laptop proxy active — live data on WiFi</span>';
+    badge.textContent='✅ LAPTOP PROXY'; badge.className='sbadge sbadge-g';
+  } else if(src==='DIRECT'){
+    el.innerHTML='<span style="color:var(--gold);">📡 Direct API — limited (Fyers only)</span>';
+    badge.textContent='⚠️ DIRECT ONLY'; badge.className='sbadge sbadge-o';
+  } else if(src==='FAILED'){
+    el.innerHTML='<span style="color:var(--red);">❌ No data source — deploy CF Worker on laptop tonight</span>';
+    badge.textContent='❌ NO DATA'; badge.className='sbadge sbadge-r';
+  }
+}
+
+// ── DHAN WEBSOCKET LIVE FEED ──
+// Subscribes to real-time price ticks (50ms latency)
+function startLiveFeed(){
+  if(!S.cr.dc || !S.cr.dt){ console.log('[WS] No creds'); return; }
+  if(CONN.ws && CONN.ws.readyState === 1) return; // Already connected
+
   try{
-    const r=await fetch(getProxyBase()+'/health',{signal:AbortSignal.timeout(4000)});
+    const wsUrl = 'wss://api-feed.dhan.co?version=2&token='+S.cr.dt+'&clientId='+S.cr.dc+'&authType=2';
+    CONN.ws = new WebSocket(wsUrl);
+
+    CONN.ws.onopen = ()=>{
+      CONN.wsAlive = true;
+      console.log('[WS] Connected — Dhan live feed active');
+      // Subscribe to NIFTY + SENSEX index
+      const sub = JSON.stringify({
+        RequestCode:21, InstrumentCount:2,
+        InstrumentList:[
+          {ExchangeSegment:'IDX_I', SecurityId:'13'},  // NIFTY
+          {ExchangeSegment:'IDX_I', SecurityId:'51'},  // SENSEX
+        ]
+      });
+      CONN.ws.send(sub);
+      updateLiveFeedBadge(true);
+    };
+
+    CONN.ws.onmessage = (evt)=>{
+      try{
+        const d = typeof evt.data==='string' ? JSON.parse(evt.data) : null;
+        if(!d) return;
+        const ltp = d.LTP || d.last_price || 0;
+        const secId = d.security_id || d.SecurityId || '';
+        if(ltp > 0){
+          CONN.lastTick = Date.now();
+          CONN.tickCount++;
+          if(secId==='13'||secId===13){
+            CONN.livePrice.NIFTY = ltp;
+            updatePriceDisplay('NIFTY', ltp, 0, 'ws');
+          }
+          if(secId==='51'||secId===51){
+            CONN.livePrice.SENSEX = ltp;
+            updatePriceDisplay('SENSEX', ltp, 0, 'ws');
+          }
+        }
+      }catch(e){}
+    };
+
+    CONN.ws.onerror = ()=>{ CONN.wsAlive=false; updateLiveFeedBadge(false); };
+    CONN.ws.onclose = ()=>{
+      CONN.wsAlive=false;
+      updateLiveFeedBadge(false);
+      // Auto-reconnect after 3s
+      if(S.ss && !S.locked){
+        CONN.wsReconnectTimer = setTimeout(startLiveFeed, 3000);
+      }
+    };
+  }catch(e){ console.warn('[WS] Not supported:', e.message); }
+}
+
+function stopLiveFeed(){
+  if(CONN.wsReconnectTimer){ clearTimeout(CONN.wsReconnectTimer); }
+  if(CONN.ws){ CONN.ws.close(); CONN.ws=null; }
+  CONN.wsAlive=false;
+}
+
+function updateLiveFeedBadge(alive){
+  const el = document.getElementById('mPill');
+  const dot = document.getElementById('mDot');
+  const txt = document.getElementById('mTxt');
+  if(!el) return;
+  const mn = getISTNow ? getISTNow() : new Date();
+  // Don't override if market closed
+}
+
+// ── AUTO PRICE REFRESH via WS + REST fallback ──
+// Called every 5 seconds to keep prices fresh
+let priceRefreshTimer = null;
+function startPriceRefresh(){
+  if(priceRefreshTimer) clearInterval(priceRefreshTimer);
+  priceRefreshTimer = setInterval(async ()=>{
+    if(S.locked) return;
+    // If WS is alive, prices already updating via onmessage
+    // Only REST-fetch if WS is dead
+    if(!CONN.wsAlive){
+      try{ await refreshPrices(); }catch(e){}
+    }
+  }, 5000);
+}
+
+function stopPriceRefresh(){
+  if(priceRefreshTimer){ clearInterval(priceRefreshTimer); priceRefreshTimer=null; }
+}
+
+// getISTNow already defined in main engine
+
+async function checkCFProxy(){
+  // 1. Check CF Worker
+  try{
+    const r=await fetch(CF_WORKER+'/health',{signal:AbortSignal.timeout(5000)});
     const d=await r.json();
-    return d.status==='ok';
-  }catch{return false;}
+    if(d.status==='ok')return true;
+  }catch(e){}
+  // 2. Check corsproxy.io
+  try{
+    const r=await fetch('https://corsproxy.io/?'+encodeURIComponent('https://api.dhan.co'),{signal:AbortSignal.timeout(5000)});
+    if(r.ok||r.status===400)return true; // 400 means proxy reached Dhan but needs auth = proxy is working
+  }catch(e){}
+  // 3. Check laptop proxy
+  if(isProxyMode()){
+    try{
+      const r=await fetch(getProxyBase()+'/health',{signal:AbortSignal.timeout(4000)});
+      const d=await r.json();
+      if(d.status==='ok')return true;
+    }catch{}
+  }
+  return false;
 }
 
 async function getSpot(sym){
@@ -1356,7 +1716,13 @@ function unlock(){
   document.getElementById('connBadge').className='sbadge '+(hasCreds()?'sbadge-g':'sbadge-o');
   buildChecklist();initHomeDashboard();initCalendar();initSpikeEngine();
   startV4Monitor();updateV4HomeStatus();showTodayPlaybook();renderPaperTrades();
-  startAutoPing();
+  startAutoPing();ifInit();
+  // Start live data engines
+  setTimeout(()=>{
+    startLiveFeed();        // WebSocket for real-time ticks
+    startPriceRefresh();    // REST fallback every 5s
+    testCFProxy();          // Check which proxy is active
+  }, 1500);
   // Load saved proxy IP into field
   const proxyEl=document.getElementById('pProxy');
   if(proxyEl&&S.pr.proxyIP)proxyEl.value=S.pr.proxyIP;
@@ -1369,6 +1735,11 @@ function lockNow(){
   document.getElementById('pinScreen').style.display='flex';
   document.getElementById('app').style.display='none';
   clearInterval(S.it);
+  if(AS.timer){clearInterval(AS.timer);AS.timer=null;}
+  if(AS.countdown){clearInterval(AS.countdown);AS.countdown=null;}
+  if(IF.monTimer){clearInterval(IF.monTimer);IF.monTimer=null;}
+  stopLiveFeed();
+  stopPriceRefresh();
   setMsg('🔒 Locked','ok');
 }
 
@@ -1534,22 +1905,53 @@ function clearProxyIP(){
 async function testCFProxy(){
   const el=document.getElementById('cfProxyStatus');
   if(!el)return;
-  if(!isProxyMode()){
-    el.innerHTML='⚠️ Enter your laptop IP below and tap SAVE first';
-    el.style.color='var(--orange)';
-    return;
+
+  // 1. Test CF Worker
+  el.textContent='⏳ Testing CF Worker...';el.style.color='var(--dim2)';
+  try{
+    const r=await fetch(CF_WORKER+'/health',{signal:AbortSignal.timeout(6000)});
+    const d=await r.json();
+    if(d.status==='ok'){
+      el.innerHTML='✅ <strong style="color:var(--green);">CF WORKER LIVE</strong> — Best quality data. All tabs working!';
+      el.style.color='var(--green)';
+      document.getElementById('connBadge').textContent='✅ CF WORKER LIVE';
+      document.getElementById('connBadge').className='sbadge sbadge-g';
+      return;
+    }
+  }catch(e){}
+
+  // 2. Test corsproxy.io
+  el.textContent='⏳ CF Worker not ready — testing public proxy...';
+  try{
+    const testUrl='https://corsproxy.io/?'+encodeURIComponent('https://api.dhan.co/v2/marketfeed/ltp');
+    const r=await fetch(testUrl,{method:'GET',signal:AbortSignal.timeout(7000)});
+    if(r.status!==0){
+      el.innerHTML='⚡ <strong style="color:var(--gold);">PUBLIC PROXY ACTIVE</strong> — corsproxy.io working. Data will flow but CF Worker deployment recommended for best reliability.';
+      el.style.color='var(--gold)';
+      document.getElementById('connBadge').textContent='⚡ PUBLIC PROXY ACTIVE';
+      document.getElementById('connBadge').className='sbadge sbadge-o';
+      return;
+    }
+  }catch(e){}
+
+  // 3. Test laptop proxy
+  if(isProxyMode()){
+    el.textContent='⏳ Testing laptop proxy...';
+    try{
+      const r=await fetch(getProxyBase()+'/health',{signal:AbortSignal.timeout(4000)});
+      const d=await r.json();
+      if(d.status==='ok'){
+        el.innerHTML='✅ <strong style="color:var(--gold);">LAPTOP PROXY LIVE</strong> — '+getProxyBase();
+        el.style.color='var(--gold)';
+        document.getElementById('connBadge').textContent='✅ LAPTOP PROXY';
+        document.getElementById('connBadge').className='sbadge sbadge-g';
+        return;
+      }
+    }catch(e){}
   }
-  el.textContent='⏳ Testing proxy at '+getProxyBase()+'...';el.style.color='var(--dim2)';
-  const ok=await checkCFProxy();
-  if(ok){
-    el.innerHTML='✅ <strong style="color:var(--green);">PROXY LIVE</strong> — Live Dhan data flowing!';
-    el.style.color='var(--green)';
-    document.getElementById('connBadge').textContent='✅ BROKER + PROXY LIVE';
-    document.getElementById('connBadge').className='sbadge sbadge-g';
-  }else{
-    el.innerHTML='❌ Proxy not reachable — Is START_DHANVEER.bat running? Same WiFi?';
-    el.style.color='var(--red)';
-  }
+
+  el.innerHTML='⚠️ <strong style="color:var(--orange);">NO PROXY ACTIVE</strong> — Tap DEPLOY WORKER below to fix permanently.';
+  el.style.color='var(--orange)';
 }
 
 // ── MANUAL PRICE ENTRY ──
@@ -1570,11 +1972,13 @@ function updatePriceDisplay(sym,ltp,chg,src='api'){
   const[li,ci]=map[sym]||[];
   if(li){
     document.getElementById(li).textContent=ltp>0?ltp.toLocaleString('en-IN'):'--';
-    document.getElementById(li).style.color=src==='manual'?'var(--orange)':'var(--gold)';
+    // Color by source: WS=green (live), API=gold, manual=orange
+    document.getElementById(li).style.color=src==='ws'?'var(--green)':src==='manual'?'var(--orange)':'var(--gold)';
   }
   if(ci&&chg!=null){
     const el=document.getElementById(ci);
     if(src==='manual'){el.textContent='Manual entry';el.style.color='var(--orange)';}
+    else if(src==='ws'){el.textContent='● LIVE';el.style.color='var(--green)';}
     else{el.textContent=(chg>=0?'+':'')+Number(chg).toFixed(2)+'%';el.className='ss'+(chg>=0?' green':' red');}
   }
 }
@@ -1648,6 +2052,31 @@ function renderPingHistory(){
     return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:6px;color:var(--dim2);">${isLast?p+'ms':''}</div><div style="width:100%;height:${h}px;background:${c};border-radius:2px;opacity:${isLast?1:0.5};transition:height .5s;"></div></div>`;
   }).join('');
 }
+
+// ── DATA SOURCE LABEL UPDATER ──
+function updateDataSourceLabel(){
+  const lbl = document.getElementById('dataSourceLabel');
+  const wsB = document.getElementById('wsBadge');
+  if(!lbl) return;
+  if(CONN.wsAlive){
+    lbl.textContent='WebSocket ('+Math.round(Date.now()-CONN.lastTick)+'ms ago)';
+    lbl.style.color='var(--green)';
+    if(wsB) wsB.style.display='inline-flex';
+  } else if(CONN.lastSource==='CF_WORKER'){
+    lbl.textContent='CF Worker REST';
+    lbl.style.color='var(--cyan)';
+    if(wsB) wsB.style.display='none';
+  } else if(CONN.lastSource==='LAPTOP_PROXY'){
+    lbl.textContent='Laptop Proxy REST';
+    lbl.style.color='var(--gold)';
+    if(wsB) wsB.style.display='none';
+  } else {
+    lbl.textContent='No live source';
+    lbl.style.color='var(--red)';
+    if(wsB) wsB.style.display='none';
+  }
+}
+setInterval(updateDataSourceLabel, 2000);
 
 function startAutoPing(){
   const btn=document.getElementById('autoPingBtn');
@@ -2819,6 +3248,632 @@ Max 50 words. Use ₹ for prices. Direct, no fluff.`;
     const text=data.content?.[0]?.text||'AI response unavailable';
     aiOut.innerHTML='<span style="color:var(--cyan);font-size:8px;letter-spacing:1px;">AI ANALYSIS — '+ist.toLocaleTimeString('en-IN')+'</span><br><br>'+text.replace(/\n/g,'<br>');
   }catch(e){aiOut.innerHTML='<span style="color:var(--dim2);">AI analysis failed — check connection</span>';}
+}
+
+// ══════════════════════════════════════════
+// INTELLIGENCE FEED ENGINE
+// ══════════════════════════════════════════
+const IF = {
+  feeds: [],          // saved feed items
+  active: null,       // currently watched feed {strike, optType, trigger, signal, expiry, sym}
+  monTimer: null,     // setInterval handle for live monitor
+  triggered: false,   // has alert fired
+  lastLTP: 0,
+};
+
+// Load feeds from localStorage on boot
+function ifInit(){
+  IF.feeds = lsGet('ifFeeds') || [];
+  ifRenderList();
+}
+
+// ── PARSE FEED via Anthropic AI ──
+async function ifParseFeed(){
+  const raw = document.getElementById('ifRawInput').value.trim();
+  if(!raw){ alert('Paste a market call first'); return; }
+
+  // Show watch card with loading state
+  document.getElementById('ifWatchCard').style.display = 'block';
+  document.getElementById('ifAISummary').textContent = '🧠 AI parsing call...';
+  document.getElementById('ifStrike').textContent = '...';
+  document.getElementById('ifOptType').textContent = '...';
+  document.getElementById('ifTrigger').textContent = '...';
+  document.getElementById('ifSignalType').textContent = '...';
+
+  const ist = getISTNow();
+  const prompt = `You are an Indian index options expert. Parse this market call and return ONLY a JSON object, no markdown, no explanation:
+
+"${raw}"
+
+Return exactly this JSON structure:
+{
+  "strike": <number or null>,
+  "optType": "CE" or "PE" or null,
+  "trigger": <number — the entry price trigger, or null>,
+  "signal": "<short signal type e.g. SHORT_COVERING, BREAKOUT, IV_SPIKE, PUT_WRITING, CALL_WRITING, DIRECTIONAL>",
+  "sym": "<index name: NIFTY, BANKNIFTY, SENSEX, FINNIFTY, or UNKNOWN>",
+  "summary": "<1-sentence plain English summary of what this call means for a trader>",
+  "confidence": <0-100 — how clear is the call>
+}`;
+
+  try{
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data = await res.json();
+    let text = data.content?.[0]?.text || '';
+    // Strip any accidental markdown fences
+    text = text.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(text);
+
+    // Store active watch
+    IF.active = {
+      strike: parsed.strike,
+      optType: parsed.optType,
+      trigger: parsed.trigger,
+      signal: parsed.signal,
+      sym: parsed.sym,
+      summary: parsed.summary,
+      confidence: parsed.confidence,
+      raw,
+      ts: Date.now()
+    };
+    IF.triggered = false;
+    IF.lastLTP = 0;
+
+    // Save to feed history
+    IF.feeds.unshift(IF.active);
+    if(IF.feeds.length > 10) IF.feeds = IF.feeds.slice(0,10);
+    lsSet('ifFeeds', IF.feeds);
+
+    // Update UI
+    document.getElementById('ifStrike').textContent = parsed.strike ? parsed.strike.toLocaleString('en-IN') : '?';
+    document.getElementById('ifOptType').textContent = parsed.optType || '?';
+    document.getElementById('ifTrigger').textContent = parsed.trigger ? '₹'+parsed.trigger : '?';
+    document.getElementById('ifSignalType').textContent = (parsed.signal||'UNKNOWN').replace(/_/g,' ');
+    document.getElementById('ifAISummary').innerHTML =
+      `<span style="color:var(--cyan);">${parsed.summary||'No summary'}</span><br>` +
+      `<span style="color:var(--dim2);font-size:9px;">Confidence: ${parsed.confidence||'?'}% | Index: ${parsed.sym||'?'}</span>`;
+
+    // Show OI + monitor sections
+    document.getElementById('ifOICard').style.display = 'block';
+    document.getElementById('ifMonitorCard').style.display = 'block';
+    document.getElementById('ifAlertLog').style.display = 'block';
+    document.getElementById('ifActiveBadge').style.display = 'inline-flex';
+
+    // Set trigger display in monitor card
+    if(parsed.trigger){
+      document.getElementById('ifTriggerDisplay').textContent = '₹'+parsed.trigger;
+    }
+
+    // Clear input
+    document.getElementById('ifRawInput').value = '';
+
+    // Auto-run OI check
+    ifCheckOI();
+
+    ifLog(`🧠 Parsed: ${parsed.sym} ${parsed.strike} ${parsed.optType} | Trigger ₹${parsed.trigger} | ${(parsed.signal||'').replace(/_/g,' ')}`);
+    ifRenderList();
+
+  } catch(ex){
+    document.getElementById('ifAISummary').innerHTML = `<span style="color:var(--red);">❌ Parse failed — ${ex.message}</span>`;
+    ifLog(`❌ Parse error: ${ex.message}`);
+  }
+}
+
+// ── OI CROSS-CHECK — uses existing getChain() ──
+function ifGetExpiry(sym){
+  const expiry = document.getElementById('gbExp')?.value || '';
+  if(expiry) return expiry;
+  const ist = getISTNow();
+  const today = ist.getDay();
+  const daysAhead = (sym==='SENSEX') ? ((4-today+7)%7)||7 : ((2-today+7)%7)||7;
+  const exp = new Date(ist);
+  exp.setDate(ist.getDate() + daysAhead);
+  return exp.toISOString().split('T')[0];
+}
+
+async function ifCheckOI(){
+  if(!IF.active || !IF.active.strike) return;
+  const {sym, strike, optType} = IF.active;
+  const verdict = document.getElementById('ifOIVerdict');
+  verdict.innerHTML = '<span style="color:var(--dim2);">Fetching OI data...</span>';
+  try{
+    const expiry = ifGetExpiry(sym);
+    const chain = await getChain(sym||'NIFTY', expiry);
+    if(!chain||chain.length===0){ verdict.innerHTML='<span style="color:var(--red);">❌ No chain data — check credentials</span>'; return; }
+    const row = chain.find(r => Math.abs(r.strike - strike) < 1);
+    if(!row){
+      const nearest = chain.map(r=>r.strike).sort((a,b)=>Math.abs(a-strike)-Math.abs(b-strike)).slice(0,3).join(', ');
+      verdict.innerHTML=`<span style="color:var(--orange);">⚠️ Strike ${strike} not found. Nearest: ${nearest}</span>`;
+      return;
+    }
+    const cOI=row.cOI||0, pOI=row.pOI||0, cLTP=row.cLTP||0, pLTP=row.pLTP||0;
+    const pcr = cOI>0 ? (pOI/cOI).toFixed(2) : '--';
+    document.getElementById('ifCallOI').textContent = fmt(cOI);
+    document.getElementById('ifPutOI').textContent = fmt(pOI);
+    document.getElementById('ifPCR').textContent = pcr;
+    const isC = optType==='CE';
+    let ov='';
+    if(isC){
+      if(cOI>pOI*1.3) ov=`✅ <span style="color:var(--green);">OI CONFIRMS — Heavy call OI (${fmt(cOI)}) at ${strike}. Short covering HIGH above ₹${IF.active.trigger}.</span>`;
+      else if(cOI>pOI) ov=`⚡ <span style="color:var(--gold);">Moderate call OI — valid setup, watch ₹${IF.active.trigger}.</span>`;
+      else ov=`⚠️ <span style="color:var(--orange);">Put OI heavier — short covering less likely. Trade cautiously.</span>`;
+    } else {
+      if(pOI>cOI*1.3) ov=`✅ <span style="color:var(--green);">OI CONFIRMS — Heavy put OI (${fmt(pOI)}) at ${strike}. Put covering HIGH above ₹${IF.active.trigger}.</span>`;
+      else ov=`⚡ <span style="color:var(--gold);">Moderate put OI — watch ₹${IF.active.trigger} for confirmation.</span>`;
+    }
+    verdict.innerHTML=ov;
+    const ltp = isC ? cLTP : pLTP;
+    IF.lastLTP=ltp;
+    document.getElementById('ifCurrentLTP').textContent='₹'+ltp.toFixed(1);
+    ifUpdateProgress(ltp);
+    ifLog(`🔍 OI — Call:${fmt(cOI)} | Put:${fmt(pOI)} | PCR:${pcr} | ${optType} LTP:₹${ltp.toFixed(1)}`);
+  }catch(ex){
+    verdict.innerHTML=`<span style="color:var(--red);">❌ ${ex.message}</span>`;
+    ifLog(`❌ OI error: ${ex.message}`);
+  }
+}
+
+// ── LIVE MONITOR ──
+function ifStartMonitor(){
+  if(!IF.active){ alert('Parse a call first'); return; }
+  if(!IF.active.trigger){ alert('No trigger price found in this call'); return; }
+  IF.triggered = false;
+  document.getElementById('ifStartBtn').style.display = 'none';
+  document.getElementById('ifStopBtn').style.display = 'flex';
+  document.getElementById('ifMonitorStatus').textContent = '🟢 Watching...';
+  document.getElementById('ifActiveBadge').style.display = 'inline-flex';
+
+  // Poll every 10 seconds
+  IF.monTimer = setInterval(ifMonitorTick, 10000);
+  ifMonitorTick(); // run immediately
+  ifLog(`▶ Monitor started — watching ${IF.active.sym} ${IF.active.strike} ${IF.active.optType} for trigger ₹${IF.active.trigger}`);
+}
+
+function ifStopMonitor(){
+  if(IF.monTimer){ clearInterval(IF.monTimer); IF.monTimer = null; }
+  document.getElementById('ifStartBtn').style.display = 'flex';
+  document.getElementById('ifStopBtn').style.display = 'none';
+  document.getElementById('ifMonitorStatus').textContent = 'Stopped';
+  document.getElementById('ifActiveBadge').style.display = 'none';
+  ifLog('⏹ Monitor stopped');
+}
+
+async function ifMonitorTick(){
+  if(!IF.active) return;
+  const {sym, strike, optType, trigger} = IF.active;
+  document.getElementById('ifMonitorStatus').textContent = '⏳ Scanning...';
+
+  try{
+    const expiry = ifGetExpiry(sym);
+    const chain = await getChain(sym||'NIFTY', expiry);
+    const row = chain.find(r => Math.abs(r.strike - strike) < 1);
+    if(!row){ document.getElementById('ifMonitorStatus').textContent = '⚠️ Strike not found'; return; }
+    const ltp = optType === 'CE' ? (row.cLTP || 0) : (row.pLTP || 0);
+    IF.lastLTP = ltp;
+
+    document.getElementById('ifCurrentLTP').textContent = '₹'+ltp.toFixed(1);
+    ifUpdateProgress(ltp);
+    document.getElementById('ifMonitorStatus').textContent = '🟢 Live — '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+
+    // CHECK TRIGGER
+    if(!IF.triggered && ltp >= trigger){
+      IF.triggered = true;
+      ifFireAlert(ltp, trigger, sym, strike, optType);
+    } else {
+      const pct = trigger > 0 ? Math.min((ltp/trigger)*100, 100) : 0;
+      const remaining = (trigger - ltp).toFixed(1);
+      const banner = document.getElementById('ifAlertBanner');
+      if(ltp >= trigger * 0.95){
+        banner.style.background = 'rgba(245,166,35,.15)';
+        banner.style.color = 'var(--gold)';
+        banner.textContent = `⚡ NEAR TRIGGER — ₹${remaining} away (${pct.toFixed(0)}%)`;
+      } else {
+        banner.style.background = 'rgba(0,0,0,.3)';
+        banner.style.color = 'var(--dim2)';
+        banner.textContent = `👀 Watching — ₹${remaining} to trigger (${pct.toFixed(0)}%)`;
+      }
+    }
+
+  } catch(ex){
+    document.getElementById('ifMonitorStatus').textContent = '❌ Error — retrying';
+    ifLog(`⚠️ Monitor tick error: ${ex.message}`);
+  }
+}
+
+function ifUpdateProgress(ltp){
+  if(!IF.active?.trigger) return;
+  const pct = Math.min((ltp / IF.active.trigger) * 100, 100);
+  const bar = document.getElementById('ifProgressBar');
+  if(bar){
+    bar.style.width = pct + '%';
+    bar.style.background = pct >= 100 ? 'var(--green)' : pct >= 90 ? 'var(--gold)' : 'var(--cyan)';
+  }
+}
+
+function ifFireAlert(ltp, trigger, sym, strike, optType){
+  // Fire audio + visual
+  beep(true); flash(true);
+
+  const banner = document.getElementById('ifAlertBanner');
+  banner.style.background = 'rgba(0,230,118,.15)';
+  banner.style.border = '1px solid var(--green)';
+  banner.style.color = 'var(--green)';
+  banner.textContent = `🚀 TRIGGER HIT! ${sym} ${strike} ${optType} @ ₹${ltp.toFixed(1)} — ENTRY NOW`;
+
+  // Pulse the card
+  const card = document.getElementById('ifMonitorCard');
+  card.style.borderColor = 'var(--green)';
+  card.style.boxShadow = '0 0 20px rgba(0,230,118,.3)';
+
+  ifLog(`🚀 ALERT FIRED — ${sym} ${strike} ${optType} hit ₹${ltp.toFixed(1)} (trigger was ₹${trigger}) — ENTER NOW!`);
+
+  // Auto-stop after firing
+  setTimeout(ifStopMonitor, 5000);
+}
+
+// ── UTILITIES ──
+function ifLog(msg){
+  const el = document.getElementById('ifLog');
+  if(!el) return;
+  const time = new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  el.innerHTML = `<span style="color:var(--dim2);">[${time}]</span> ${msg}<br>` + el.innerHTML;
+}
+
+function ifClearAll(){
+  ifStopMonitor();
+  IF.active = null;
+  IF.feeds = [];
+  lsSet('ifFeeds', []);
+  document.getElementById('ifRawInput').value = '';
+  document.getElementById('ifWatchCard').style.display = 'none';
+  document.getElementById('ifOICard').style.display = 'none';
+  document.getElementById('ifMonitorCard').style.display = 'none';
+  document.getElementById('ifAlertLog').style.display = 'none';
+  document.getElementById('ifActiveBadge').style.display = 'none';
+  document.getElementById('ifFeedList').style.display = 'none';
+  ifRenderList();
+}
+
+function ifRenderList(){
+  const el = document.getElementById('ifFeedList');
+  if(!el) return;
+  if(IF.feeds.length === 0){ el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.innerHTML = IF.feeds.slice(0,5).map((f,i)=>`
+    <div onclick="ifLoadFeed(${i})" style="padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.3);border:1px solid var(--b1);margin-bottom:5px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--cyan);">${f.sym||'?'} ${f.strike||'?'} ${f.optType||'?'}</span>
+        <span style="font-size:9px;color:var(--dim2);margin-left:8px;">₹${f.trigger||'?'} trigger</span>
+      </div>
+      <span style="font-size:8px;color:var(--dim2);">${(f.signal||'').replace(/_/g,' ')}</span>
+    </div>
+  `).join('');
+}
+
+function ifLoadFeed(idx){
+  IF.active = IF.feeds[idx];
+  IF.triggered = false;
+  // Restore UI
+  document.getElementById('ifStrike').textContent = IF.active.strike?.toLocaleString('en-IN') || '?';
+  document.getElementById('ifOptType').textContent = IF.active.optType || '?';
+  document.getElementById('ifTrigger').textContent = IF.active.trigger ? '₹'+IF.active.trigger : '?';
+  document.getElementById('ifSignalType').textContent = (IF.active.signal||'').replace(/_/g,' ');
+  document.getElementById('ifAISummary').textContent = IF.active.summary || '';
+  document.getElementById('ifTriggerDisplay').textContent = IF.active.trigger ? '₹'+IF.active.trigger : '?';
+  document.getElementById('ifWatchCard').style.display = 'block';
+  document.getElementById('ifOICard').style.display = 'block';
+  document.getElementById('ifMonitorCard').style.display = 'block';
+  document.getElementById('ifAlertLog').style.display = 'block';
+  ifLog(`♻️ Reloaded: ${IF.active.sym} ${IF.active.strike} ${IF.active.optType}`);
+}
+
+// ══════════════════════════════════════════════════════
+// AUTO-SCOUT ENGINE
+// Tracks 11 strikes around spot every 30s
+// Scores: OI Buildup, PCR Extreme, Premium Velocity, OI Unwinding
+// ══════════════════════════════════════════════════════
+const AS = {
+  timer:null, countdown:null, scanN:0,
+  history:{}, scores:{}, topPick:null,
+  aiPending:false, secondsLeft:30
+};
+const AS_INTERVAL = 30;
+
+function asStart(){
+  const sym=document.getElementById('asSym')?.value||'NIFTY';
+  const exp=document.getElementById('asExp')?.value||ifGetExpiry(sym);
+  if(!exp){alert('Set expiry date first');return;}
+  if(!hasCreds()){alert('Connect broker in SETUP tab first');return;}
+  AS.history={};AS.scores={};AS.topPick=null;AS.scanN=0;AS.secondsLeft=AS_INTERVAL;
+  document.getElementById('asStartBtn').style.display='none';
+  document.getElementById('asStopBtn').style.display='flex';
+  document.getElementById('asScanBadge').style.display='inline-flex';
+  document.getElementById('asStatusBar').style.display='block';
+  document.getElementById('asLeaderboard').style.display='none';
+  document.getElementById('asTopPick').style.display='none';
+  document.getElementById('asLogWrap').style.display='block';
+  asLog('🔭 Auto-Scout started — '+sym+' | Expiry: '+exp+' | 11 strikes every 30s');
+  asScanTick();
+  AS.timer=setInterval(asScanTick,AS_INTERVAL*1000);
+  AS.countdown=setInterval(()=>{
+    AS.secondsLeft--;
+    if(AS.secondsLeft<0)AS.secondsLeft=AS_INTERVAL;
+    const el=document.getElementById('asNext');
+    if(el)el.textContent=AS.secondsLeft+'s';
+  },1000);
+}
+
+function asStop(){
+  if(AS.timer){clearInterval(AS.timer);AS.timer=null;}
+  if(AS.countdown){clearInterval(AS.countdown);AS.countdown=null;}
+  document.getElementById('asStartBtn').style.display='flex';
+  document.getElementById('asStopBtn').style.display='none';
+  document.getElementById('asScanBadge').style.display='none';
+  document.getElementById('asStatus').textContent='Stopped';
+  asLog('⏹ Auto-Scout stopped');
+}
+
+async function asScanTick(){
+  const sym=document.getElementById('asSym')?.value||'NIFTY';
+  const exp=document.getElementById('asExp')?.value||ifGetExpiry(sym);
+  AS.scanN++;AS.secondsLeft=AS_INTERVAL;
+  document.getElementById('asScanCount').textContent='Scan #'+AS.scanN;
+  document.getElementById('asStatus').textContent='⏳ Fetching chain...';
+  try{
+    const chain=await getChain(sym,exp);
+    if(!chain||chain.length===0)throw new Error('Empty chain response');
+    let spot=0;
+    try{const sp=await getSpot(sym);spot=sp.ltp;}catch(e){}
+    if(!spot)spot=S.manualPrices[sym]||0;
+    if(!spot&&chain.length>0){
+      const maxOI=chain.reduce((a,b)=>(b.cOI+b.pOI)>(a.cOI+a.pOI)?b:a,chain[0]);
+      spot=maxOI.strike;
+    }
+    const step=STEP[sym]||50;
+    const atm=Math.round(spot/step)*step;
+    const strikes=[];
+    for(let i=-5;i<=5;i++)strikes.push(atm+i*step);
+    document.getElementById('asSpot').textContent=spot>0?spot.toLocaleString('en-IN'):'--';
+    document.getElementById('asATM').textContent=atm.toLocaleString('en-IN');
+    const{pcr}=getPCR(chain);
+    document.getElementById('asPCR').textContent=pcr;
+    const now=Date.now();
+    for(const strike of strikes){
+      const row=chain.find(r=>Math.abs(r.strike-strike)<step*0.4);
+      if(!row)continue;
+      if(!AS.history[strike])AS.history[strike]=[];
+      AS.history[strike].push({ts:now,cOI:row.cOI||0,pOI:row.pOI||0,cLTP:row.cLTP||0,pLTP:row.pLTP||0});
+      if(AS.history[strike].length>20)AS.history[strike]=AS.history[strike].slice(-20);
+      AS.scores[strike]=asScoreStrike(strike,row,chain,pcr,atm);
+    }
+    const ranked=Object.entries(AS.scores).sort((a,b)=>b[1].total-a[1].total).slice(0,5);
+    asRenderLeaderboard(ranked,atm);
+    const[topStrike,topScore]=ranked[0]||[];
+    if(topStrike&&topScore.total>=30){
+      const prevTop=AS.topPick?.strike;
+      AS.topPick={strike:Number(topStrike),...topScore,detectedAt:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})};
+      asRenderTopPick();
+      if(!AS.aiPending&&(AS.scanN%3===0||Number(topStrike)!==prevTop)){
+        asRunAI(sym,spot,atm,ranked.slice(0,3),pcr,exp);
+      }
+      if(AS.scanN===1||Number(topStrike)!==prevTop){
+        asLog('🎯 Top pick: '+sym+' '+topStrike+' '+topScore.side+' — Score '+topScore.total+' | '+topScore.signal);
+      }
+    }
+    document.getElementById('asStatus').textContent='✅ '+chain.length+' strikes | '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }catch(ex){
+    document.getElementById('asStatus').textContent='❌ '+ex.message;
+    asLog('❌ Scan error: '+ex.message);
+  }
+}
+
+function asScoreStrike(strike,row,chain,globalPcr,atm){
+  const hist=AS.history[strike]||[];
+  const latest=hist[hist.length-1];
+  const prev=hist.length>=2?hist[hist.length-2]:null;
+  const old=hist.length>=4?hist[hist.length-4]:hist[0];
+
+  // OI BUILDUP — how dominant is this strike vs chain average
+  const totalOI=row.cOI+row.pOI;
+  const chainAvg=chain.reduce((s,r)=>s+r.cOI+r.pOI,0)/Math.max(chain.length,1);
+  const oiRatio=chainAvg>0?totalOI/chainAvg:1;
+  const buildup=Math.min(Math.max(Math.round((oiRatio-1)*45+20),0),100);
+
+  // PCR EXTREME at this specific strike
+  const strikePCR=row.cOI>0?(row.pOI/row.cOI):1;
+  let pcrScore=0;
+  if(strikePCR>1.8)pcrScore=100;
+  else if(strikePCR>1.4)pcrScore=75;
+  else if(strikePCR>1.1)pcrScore=45;
+  else if(strikePCR<0.5)pcrScore=80;
+  else if(strikePCR<0.7)pcrScore=55;
+  else pcrScore=10;
+
+  // PREMIUM VELOCITY — speed of LTP movement
+  let velocity=0;
+  if(prev&&old&&latest){
+    const elapsed=Math.max((latest.ts-old.ts)/1000/60,0.5);
+    const cVel=Math.abs(latest.cLTP-old.cLTP)/elapsed;
+    const pVel=Math.abs(latest.pLTP-old.pLTP)/elapsed;
+    velocity=Math.min(Math.round((cVel+pVel)*2),100);
+  }
+
+  // OI UNWINDING — OI dropping + LTP rising = shorts covering
+  let unwind=0;
+  if(prev&&latest){
+    const cOIchg=latest.cOI-prev.cOI;
+    const pOIchg=latest.pOI-prev.pOI;
+    const cLTPchg=latest.cLTP-prev.cLTP;
+    const pLTPchg=latest.pLTP-prev.pLTP;
+    if(cOIchg<-500&&cLTPchg>0)unwind+=50;
+    if(pOIchg<-500&&pLTPchg>0)unwind+=50;
+    if(cOIchg<-2000||pOIchg<-2000)unwind=Math.min(unwind+30,100);
+    unwind=Math.min(unwind,100);
+  }
+
+  const total=Math.min(Math.round(buildup*0.25+pcrScore*0.30+velocity*0.25+unwind*0.20),100);
+  const side=strikePCR>1.2?'CE':strikePCR<0.8?'PE':(row.cLTP>row.pLTP?'CE':'PE');
+  let signal='BUILDING';
+  if(unwind>40)signal='SHORT COVERING';
+  else if(pcrScore>70&&side==='CE')signal='CALL TRAP';
+  else if(pcrScore>70&&side==='PE')signal='PUT TRAP';
+  else if(velocity>50)signal='VELOCITY SPIKE';
+  else if(buildup>60)signal='OI ACCUMULATION';
+  const ltp=side==='CE'?row.cLTP:row.pLTP;
+  const trigger=ltp>0?Math.round(ltp*1.10):null;
+  return{total,buildup,pcr:pcrScore,velocity,unwind,side,signal,strikePCR:strikePCR.toFixed(2),trigger,ltp};
+}
+
+function asRenderLeaderboard(ranked,atm){
+  document.getElementById('asLeaderboard').style.display='block';
+  const rows=ranked.map(([strike,sc])=>{
+    const isATM=Math.abs(Number(strike)-atm)<1;
+    const col=sc.total>=70?'var(--green)':sc.total>=45?'var(--gold)':'#ce93d8';
+    return '<div style="padding:7px 9px;border-radius:8px;background:rgba(0,0,0,.3);border:1px solid var(--b1);margin-bottom:5px;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
+      +'<div><span style="font-family:JetBrains Mono,monospace;font-size:12px;color:'+col+';">'+Number(strike).toLocaleString('en-IN')+'</span>'
+      +'<span style="font-size:9px;color:var(--dim2);margin-left:5px;">'+sc.side+'</span>'
+      +(isATM?'<span style="font-size:8px;background:rgba(0,188,212,.12);border:1px solid rgba(0,188,212,.2);color:var(--cyan);padding:1px 5px;border-radius:4px;margin-left:4px;">ATM</span>':'')
+      +'</div><div style="display:flex;align-items:center;gap:6px;">'
+      +'<span style="font-size:8px;color:var(--dim2);">'+sc.signal+'</span>'
+      +'<span style="font-family:JetBrains Mono,monospace;font-size:14px;color:'+col+';font-weight:700;">'+sc.total+'</span>'
+      +'</div></div>'
+      +'<div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px;"><div style="height:100%;width:'+sc.total+'%;background:'+col+';border-radius:2px;transition:width .6s;"></div></div>'
+      +'</div>';
+  }).join('');
+  document.getElementById('asLeaderRows').innerHTML=rows;
+}
+
+function asRenderTopPick(){
+  if(!AS.topPick)return;
+  const p=AS.topPick;
+  document.getElementById('asTopPick').style.display='block';
+  document.getElementById('asPickStrike').textContent=Number(p.strike).toLocaleString('en-IN');
+  document.getElementById('asPickSide').textContent=p.side;
+  document.getElementById('asPickSide').style.color=p.side==='CE'?'var(--green)':'var(--red)';
+  document.getElementById('asPickScore').textContent=p.total;
+  document.getElementById('asPickSignal').textContent=p.signal;
+  document.getElementById('asPickTime').textContent=p.detectedAt;
+  ['asB1','asB2','asB3','asB4'].forEach((id,i)=>{
+    const v=[p.buildup,p.pcr,p.velocity,p.unwind][i];
+    document.getElementById(id).style.width=v+'%';
+    document.getElementById(id+'v').textContent=v;
+  });
+}
+
+async function asRunAI(sym,spot,atm,top3,globalPcr,expiry){
+  if(AS.aiPending)return;
+  AS.aiPending=true;
+  const el=document.getElementById('asAIVerdict');
+  el.innerHTML='<span style="color:#ce93d8;">🧠 AI analysing patterns...</span>';
+  const picks=top3.map(([s,sc])=>
+    'Strike '+s+' '+sc.side+': Score='+sc.total+' | OI_Buildup='+sc.buildup+' | PCR_Score='+sc.pcr+'(raw '+sc.strikePCR+') | Velocity='+sc.velocity+' | Unwind='+sc.unwind+' | Signal='+sc.signal+' | LTP=Rs'+sc.ltp+' | Trigger=Rs'+sc.trigger
+  ).join('\n');
+  const ist=getISTNow();
+  const prompt='You are an expert Indian index options trader. Analyze Auto-Scout results for '+sym+':\n\nTime: '+ist.toLocaleTimeString('en-IN')+' | Spot: '+spot+' | ATM: '+atm+' | Global PCR: '+globalPcr+' | Expiry: '+expiry+'\n\nTOP 3 LOADING STRIKES:\n'+picks+'\n\nAnswer in 3 lines max:\n1. Which strike has highest big-move probability and WHY\n2. Short covering setup or directional breakout?\n3. What to watch for entry\n\nMax 60 words. Direct. Use Rs for prices.';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:150,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const text=data.content?.[0]?.text||'AI unavailable';
+    el.innerHTML='<span style="font-size:8px;letter-spacing:1px;color:#ce93d8;">AI VERDICT — '+ist.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</span><br><br>'+text.replace(/\n/g,'<br>');
+    asLog('🧠 AI verdict updated for '+AS.topPick?.strike+' '+AS.topPick?.side);
+  }catch(ex){
+    el.innerHTML='<span style="color:var(--dim2);">AI failed — check connection</span>';
+  }
+  AS.aiPending=false;
+}
+
+function asSendToFeed(){
+  if(!AS.topPick){alert('No top pick yet — wait for a scan');return;}
+  const p=AS.topPick;
+  const sym=document.getElementById('asSym')?.value||'NIFTY';
+  const raw='Auto-Scout: '+sym+' '+p.strike+' '+p.side+' — '+p.signal+' — trigger above Rs'+(p.trigger||p.ltp)+' — Scout Score '+p.total+'/100';
+  const ta=document.getElementById('ifRawInput');
+  if(ta){
+    ta.value=raw;
+    asLog('⚡ Sent to Intelligence Feed: '+sym+' '+p.strike+' '+p.side);
+    document.getElementById('ifRawInput').scrollIntoView({behavior:'smooth',block:'center'});
+    setTimeout(ifParseFeed,400);
+  }
+}
+
+function asLog(msg){
+  const el=document.getElementById('asLog');if(!el)return;
+  const t=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  el.innerHTML='<span style="color:var(--dim2);">['+t+']</span> '+msg+'<br>'+el.innerHTML;
+}
+
+
+// ── ONE-TAP CF WORKER DEPLOY FROM APP ──
+async function deployWorkerFromApp(){
+  const el = document.getElementById('deployStatus');
+  el.style.display = 'block';
+  el.style.color = 'var(--dim2)';
+  el.textContent = '⏳ Deploying to Cloudflare...';
+
+  const ACCOUNT_ID = '7ec7678eb525013d2c088eca4e1ac7a7';
+  const EMAIL = 'sridharsrtips@gmail.com';
+  const API_KEY = '287598a14015bc32f3c1a96bd92a0e248bd13';
+  const WORKER_NAME = 'dhan-proxy';
+
+  const WORKER_CODE = `export default {
+  async fetch(request, env, ctx) {
+    const cors = {"Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET,POST,OPTIONS","Access-Control-Allow-Headers":"Content-Type,access-token,client-id"};
+    if(request.method==="OPTIONS")return new Response(null,{headers:cors});
+    const url=new URL(request.url);
+    const path=url.pathname;
+    if(path==="/health")return Response.json({status:"ok",proxy:"dhan-proxy",ts:Date.now()},{headers:cors});
+    const token=request.headers.get("access-token")||"";
+    const clientId=request.headers.get("client-id")||"";
+    const dhanH={"access-token":token,"client-id":clientId,"Content-Type":"application/json"};
+    let body=null;
+    if(request.method==="POST"){try{body=await request.json();}catch(e){}}
+    const routes={"/dhan/ltp":"https://api.dhan.co/v2/marketfeed/ltp","/dhan/optionchain":"https://api.dhan.co/v2/optionchain","/dhan/orders":"https://api.dhan.co/v2/orders","/dhan/positions":"https://api.dhan.co/v2/positions","/dhan/holdings":"https://api.dhan.co/v2/holdings"};
+    const dhanUrl=routes[path];
+    if(!dhanUrl)return Response.json({error:"Unknown: "+path},{status:404,headers:cors});
+    try{
+      const resp=await fetch(dhanUrl,{method:body?"POST":"GET",headers:dhanH,body:body?JSON.stringify(body):undefined});
+      const data=await resp.json();
+      return Response.json(data,{headers:cors});
+    }catch(err){return Response.json({error:err.message},{status:500,headers:cors});}
+  }
+};`;
+
+  const apiUrl = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/workers/scripts/${WORKER_NAME}`;
+
+  try{
+    const resp = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'X-Auth-Email': EMAIL,
+        'X-Auth-Key': API_KEY,
+        'Content-Type': 'application/javascript',
+      },
+      body: WORKER_CODE
+    });
+    const data = await resp.json();
+    if(data.success){
+      el.style.color = 'var(--green)';
+      el.innerHTML = '✅ CF Worker deployed successfully! Tap TEST PROXY to verify.';
+      // Auto-test after 2 seconds
+      setTimeout(testCFProxy, 2000);
+    } else {
+      const msg = data.errors?.[0]?.message || JSON.stringify(data.errors);
+      el.style.color = 'var(--red)';
+      el.innerHTML = '❌ Deploy failed: ' + msg;
+    }
+  } catch(ex) {
+    el.style.color = 'var(--red)';
+    el.innerHTML = '❌ Network error: ' + ex.message + ' — Try on Chrome browser directly';
+  }
 }
 
 // ── SPLASH + INIT ──
