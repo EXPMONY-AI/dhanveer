@@ -1646,7 +1646,9 @@ async function getSpot(sym){
   if(S.cr.dc&&S.cr.dt){
     const{id,seg}=DI[sym]||{id:'13',seg:'IDX_I'};
     const d=await PF('/dhan/ltp','https://api.dhan.co/v2/marketfeed/ltp',dhH(),{[seg]:[Number(id)]});
-    const ltp=d?.data?.[seg]?.[id]?.last_price||0;
+    // Handle CF Worker _proxy wrapper + various Dhan response formats
+    const dat=d?.data||d;
+    const ltp=dat?.[seg]?.[id]?.last_price||dat?.[seg]?.[String(id)]?.last_price||0;
     return{ltp,chg:0};
   }
   throw new Error('No credentials saved — go to SETUP tab');
@@ -1658,14 +1660,60 @@ async function getChain(sym,exp){
     const d=await PF('/fyers/optionchain?'+params,
       'https://api-t1.fyers.in/data/optionchain?'+params,
       {Authorization:`${S.cr.fa}:${S.cr.ft}`});
-    return(d?.data?.optionsChain||[]).map(r=>({strike:r.strikePrice,cLTP:r.CE?.ltp||0,cOI:r.CE?.oi||0,cOIChg:r.CE?.oiChange||0,cIV:r.CE?.iv||0,cVol:r.CE?.volume||0,pLTP:r.PE?.ltp||0,pOI:r.PE?.oi||0,pOIChg:r.PE?.oiChange||0,pIV:r.PE?.iv||0,pVol:r.PE?.volume||0}));
+    const rows=d?.data?.optionsChain||d?.optionsChain||[];
+    if(!Array.isArray(rows))throw new Error('Fyers chain not array: '+JSON.stringify(rows).slice(0,80));
+    return rows.map(r=>({strike:r.strikePrice,cLTP:r.CE?.ltp||0,cOI:r.CE?.oi||0,cOIChg:r.CE?.oiChange||0,cIV:r.CE?.iv||0,cVol:r.CE?.volume||0,pLTP:r.PE?.ltp||0,pOI:r.PE?.oi||0,pOIChg:r.PE?.oiChange||0,pIV:r.PE?.iv||0,pVol:r.PE?.volume||0}));
   }
   if(S.cr.dc&&S.cr.dt){
     const{id}=DI[sym]||{id:'13'};
     const d=await PF('/dhan/optionchain','https://api.dhan.co/v2/optionchain',dhH(),{UnderlyingScrip:Number(id),UnderlyingSeg:'IDX_I',Expiry:exp});
-    return(d?.data||[]).map(r=>({strike:r.strike_price,cLTP:r.call_ltp||0,cOI:r.call_oi||0,cOIChg:r.call_oi_change||0,cIV:r.call_iv||0,cVol:r.call_volume||0,pLTP:r.put_ltp||0,pOI:r.put_oi||0,pOIChg:r.put_oi_change||0,pIV:r.put_iv||0,pVol:r.put_volume||0}));
+
+    // ── ROBUST DHAN RESPONSE PARSER ──
+    // Handles all known Dhan API response shapes + CF Worker wrapper
+    let rows=null;
+    try{
+      // Shape 1: d.data is direct array (most common)
+      if(Array.isArray(d?.data)) rows=d.data;
+      // Shape 2: d.data.data nested array
+      else if(Array.isArray(d?.data?.data)) rows=d.data.data;
+      // Shape 3: root is array
+      else if(Array.isArray(d)) rows=d;
+      // Shape 4: d.data is object with numeric keys
+      else if(d?.data&&typeof d.data==='object') rows=Object.values(d.data).filter(v=>typeof v==='object');
+      // Shape 5: check for Dhan error response
+      if(d?.status==='failure'||d?.errorCode){
+        const msg=d?.message||d?.errorCode||'Dhan API error';
+        throw new Error('Dhan: '+msg+' (market may be closed or token expired)');
+      }
+    }catch(parseErr){
+      if(parseErr.message.includes('Dhan:')) throw parseErr;
+      console.warn('[getChain parse]',parseErr.message);
+    }
+
+    if(!rows||!Array.isArray(rows)||rows.length===0){
+      // Log actual response for debugging
+      console.warn('[getChain] Raw response:',JSON.stringify(d).slice(0,300));
+      const ist=getISTNow();
+      const mn=ist.getHours()*60+ist.getMinutes();
+      if(mn<555||mn>930) throw new Error('Market closed — chain data unavailable (open 9:15 AM to 3:30 PM)');
+      throw new Error('Chain empty — check expiry date matches current week');
+    }
+
+    return rows.map(r=>({
+      strike:r.strike_price||r.strikePrice||r.strike||0,
+      cLTP:r.call_ltp||r.callLTP||0,
+      cOI:r.call_oi||r.callOI||0,
+      cOIChg:r.call_oi_change||r.callOIChg||0,
+      cIV:r.call_iv||r.callIV||0,
+      cVol:r.call_volume||r.callVolume||0,
+      pLTP:r.put_ltp||r.putLTP||0,
+      pOI:r.put_oi||r.putOI||0,
+      pOIChg:r.put_oi_change||r.putOIChg||0,
+      pIV:r.put_iv||r.putIV||0,
+      pVol:r.put_volume||r.putVolume||0
+    })).filter(r=>r.strike>0);
   }
-  throw new Error('No credentials saved — go to SETUP tab');
+  throw new Error('No credentials — go to SETUP tab');
 }
 
 function getPCR(chain){
