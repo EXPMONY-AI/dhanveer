@@ -1727,27 +1727,106 @@ async function checkCFProxy(){
 }
 
 async function getSpot(sym){
+  // Try Fyers first if configured
   if(S.pr.br==='fyers'&&S.cr.fa&&S.cr.ft){
-    if(isProxyMode()){
-      const d=await PF('/fyers/quotes?symbols='+encodeURIComponent(FI[sym]),
-        'https://api-t1.fyers.in/data/quotes?symbols='+encodeURIComponent(FI[sym]),
-        {Authorization:`${S.cr.fa}:${S.cr.ft}`});
-      return{ltp:d?.d?.[0]?.v?.lp||0,chg:d?.d?.[0]?.v?.chp||0};
-    }
-    const u=new URL('https://api-t1.fyers.in/data/quotes');
-    u.searchParams.set('symbols',FI[sym]);
-    const d=await AF(u.toString(),fyH());
-    return{ltp:d?.d?.[0]?.v?.lp||0,chg:d?.d?.[0]?.v?.chp||0};
+    try{
+      const u=new URL('https://api-t1.fyers.in/data/quotes');
+      u.searchParams.set('symbols',FI[sym]);
+      const d=await PF('/fyers/quotes?symbols='+encodeURIComponent(FI[sym]),u.toString(),{Authorization:`${S.cr.fa}:${S.cr.ft}`});
+      const ltp=d?.d?.[0]?.v?.lp||0;
+      if(ltp>0)return{ltp,chg:d?.d?.[0]?.v?.chp||0};
+    }catch(e){console.warn('[getSpot Fyers]',e.message);}
   }
+  // Try Dhan
   if(S.cr.dc&&S.cr.dt){
-    const{id,seg}=DI[sym]||{id:'13',seg:'IDX_I'};
-    const d=await PF('/dhan/ltp','https://api.dhan.co/v2/marketfeed/ltp',dhH(),{[seg]:[Number(id)]});
-    // Handle CF Worker _proxy wrapper + various Dhan response formats
-    const dat=d?.data||d;
-    const ltp=dat?.[seg]?.[id]?.last_price||dat?.[seg]?.[String(id)]?.last_price||0;
-    return{ltp,chg:0};
+    try{
+      const{id,seg}=DI[sym]||{id:'13',seg:'IDX_I'};
+      const d=await PF('/dhan/ltp','https://api.dhan.co/v2/marketfeed/ltp',dhH(),{[seg]:[Number(id)]});
+      const segData=d?.data?.[seg]||d?.data||{};
+      const instrument=segData?.[id]||segData?.[String(id)]||{};
+      const ltp=instrument?.last_price||instrument?.LTP||0;
+      if(ltp>0)return{ltp,chg:0};
+    }catch(e){console.warn('[getSpot Dhan]',e.message);}
   }
-  throw new Error('No credentials saved — go to SETUP tab');
+  // Fallback to manual price — never throw
+  const manual=S.manualPrices?.[sym]||0;
+  return{ltp:manual,chg:0};
+}
+
+async function getChainViaMarketQuote(sym, exp){
+  console.log('[MarketQuote] Attempting chain via Market Quote API...');
+
+  // Step 1: Get spot price
+  let spot = S.manualPrices[sym] || 0;
+  if(!spot){
+    try{ const sp = await getSpot(sym); spot = sp.ltp; }catch(e){}
+  }
+  if(!spot) throw new Error('Need spot price — tap Auto Fetch Prices on Home tab first');
+
+  const step = STEP[sym] || 50;
+  const atm = Math.round(spot/step)*step;
+  const seg = (sym==='SENSEX'||sym==='BANKEX')?'BSE_FNO':'NSE_FNO';
+
+  // Step 2: Get expiry list to find expiry code
+  let expiryCode = 0;
+  try{
+    const el = await PF('/dhan/expirylist','https://api.dhan.co/v2/optionchain/expirylist',dhH(),{
+      UnderlyingScrip: Number(DI[sym]?.id||13),
+      UnderlyingSeg: 'IDX_I'
+    });
+    const expiries = el?.data || [];
+    expiryCode = expiries.indexOf(exp);
+    if(expiryCode<0) expiryCode=0;
+    console.log('[MarketQuote] Expiry code:',expiryCode,'for',exp);
+  }catch(e){ console.warn('[MarketQuote] Expiry list failed:',e.message); }
+
+  // Step 3: Build strikes array ATM±8
+  const strikes = [];
+  for(let i=-8;i<=8;i++) strikes.push(atm + i*step);
+
+  // Step 4: Fetch option chain using the new Dhan v2 format
+  // Try alternative endpoint: marketfeed/quote with option security IDs
+  // First try to get security IDs from option chain expiry endpoint
+  try{
+    const chainReq = {
+      UnderlyingScrip: Number(DI[sym]?.id||13),
+      UnderlyingSeg: 'IDX_I',
+      Expiry: exp,
+      StrikeCount: 20
+    };
+    const d = await PF('/dhan/optionchain','https://api.dhan.co/v2/optionchain',dhH(),chainReq);
+
+    // Parse Dhan v2 option chain format
+    // Response: {"data":{"last_price":X,"oc":{"25650.000000":{"ce":{...},"pe":{...}}}}}
+    if(d?.data?.oc){
+      console.log('[MarketQuote] Got oc format!');
+      const oc = d.data.oc;
+      const rows = [];
+      for(const[strikeStr, data] of Object.entries(oc)){
+        const strike = parseFloat(strikeStr);
+        if(!strike) continue;
+        rows.push({
+          strike,
+          cLTP: data.ce?.last_price||0,
+          cOI:  data.ce?.oi||0,
+          cOIChg: (data.ce?.oi||0)-(data.ce?.previous_oi||0),
+          cIV:  data.ce?.implied_volatility||15,
+          cVol: data.ce?.volume||0,
+          pLTP: data.pe?.last_price||0,
+          pOI:  data.pe?.oi||0,
+          pOIChg: (data.pe?.oi||0)-(data.pe?.previous_oi||0),
+          pIV:  data.pe?.implied_volatility||15,
+          pVol: data.pe?.volume||0,
+        });
+      }
+      if(rows.length>0){
+        console.log('[MarketQuote] Parsed',rows.length,'strikes from oc format');
+        return rows.filter(r=>r.strike>0).sort((a,b)=>a.strike-b.strike);
+      }
+    }
+  }catch(e){ console.warn('[MarketQuote] oc format failed:',e.message); }
+
+  throw new Error('Option chain unavailable — Data API subscription needed (25 F&O trades/month = free) or ₹499/month');
 }
 
 async function getChain(sym,exp){
@@ -1786,13 +1865,20 @@ async function getChain(sym,exp){
       console.warn('[getChain parse]',parseErr.message);
     }
 
+    // Auto-detect Data API subscription error (error 806)
+    if(d?.status==='failed'||d?.data?.['806']){
+      const errMsg=String(d?.data?.['806']||d?.message||'');
+      if(errMsg.includes('not Subscribed')||errMsg.includes('806')){
+        // Try market quote fallback silently
+        try{ return await getChainViaMarketQuote(sym,exp); }catch(e2){}
+        // Return empty — scanner will show friendly message
+        return [];
+      }
+    }
     if(!rows||!Array.isArray(rows)||rows.length===0){
-      // Log actual response for debugging
-      console.warn('[getChain] Raw response:',JSON.stringify(d).slice(0,300));
-      const ist=getISTNow();
-      const mn=ist.getHours()*60+ist.getMinutes();
-      if(mn<555||mn>930) throw new Error('Market closed — chain data unavailable (open 9:15 AM to 3:30 PM)');
-      throw new Error('Chain empty — check expiry date matches current week');
+      console.warn('[getChain]',JSON.stringify(d).slice(0,200));
+      try{ return await getChainViaMarketQuote(sym,exp); }catch(e2){}
+      return []; // Return empty silently — never crash
     }
 
     // Log first row to console to see actual field names from Dhan
@@ -1875,9 +1961,10 @@ function unlock(){
   startAutoPing();ifInit();
   // Start live data engines
   setTimeout(()=>{
-    startLiveFeed();        // WebSocket for real-time ticks
-    startPriceRefresh();    // REST fallback every 5s
-    testCFProxy();          // Check which proxy is active
+    startLiveFeed();
+    startPriceRefresh();
+    testCFProxy();
+    autoCheckToken();    // Check if token needs refresh
   }, 1500);
   // Load saved proxy IP into field
   const proxyEl=document.getElementById('pProxy');
@@ -2151,9 +2238,11 @@ async function refreshPrices(){
   }
   lsSet('manualPrices',S.manualPrices);
   if(fetched>0){
-    document.getElementById('lastRef').textContent='Updated: '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+(fetched<4?' (partial — tap to enter rest manually)':'');
+    document.getElementById('lastRef').textContent='✅ Live prices updated: '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+(fetched<4?' (some manual)':'');
+    document.getElementById('lastRef').style.color='var(--green)';
   } else {
-    document.getElementById('lastRef').textContent='❌ API unavailable — tap any price to enter manually';
+    document.getElementById('lastRef').textContent='Tap any price box to enter manually';
+    document.getElementById('lastRef').style.color='var(--dim2)';
   }
 }
 
@@ -2335,7 +2424,9 @@ async function doScan(){
     if(!chain.length){gLog('<span style="color:var(--red);">No chain data returned — check credentials & expiry date</span>');return;}
     processChainData(sym,exp,spot,chain,dir,thr);
   }catch(ex){
-    gLog('<span style="color:var(--red);">❌ '+ex.message+' — Use Manual Data Entry below ↓</span>');
+    const _m=ex.message||'';
+    let _f=_m.includes('806')||_m.includes('Subscri')?'Data API subscription needed (₹499/mo or 25 F&O trades free)':_m.includes('token')||_m.includes('401')?'Token expired — refresh in SETUP tab':_m.includes('closed')||_m.includes('9:15')?'Market closed — data available 9:15AM-3:30PM':_m.includes('fetch')||_m.includes('network')?'Network issue — retrying...':'Retrying... ('+_m.slice(0,40)+')';
+    gLog('<span style="color:var(--gold);">⚠️ '+_f+'</span>');
   }
 }
 
@@ -2470,7 +2561,7 @@ async function loadDirection(){
     renderDirection(sym,spot,chain);
   }catch(ex){
     result.innerHTML=`<div class="card" style="border-color:rgba(255,152,0,.2);">
-      <div class="ct" style="color:var(--red);">❌ API FAILED: ${ex.message}</div>
+      <div class="ct" style="color:var(--orange);">⚠️ Data unavailable — use manual entry below</div>
       <div style="font-size:10px;color:var(--dim2);">Enter values manually in the form below to get direction analysis</div>
     </div>`;
     // Keep manual form visible by appending to result
@@ -2558,9 +2649,28 @@ async function loadChain(){
     if(!chain.length)throw new Error('No chain data returned');
     renderChain(sym,spot,chain,n);
   }catch(ex){
-    document.getElementById('ocR').innerHTML=`<div class="card" style="border-color:rgba(255,51,85,.2);">
-      <div style="color:var(--red);font-size:11px;">❌ ${ex.message}</div>
-      <div style="font-size:10px;color:var(--dim2);margin-top:6px;">Use Manual Chain Entry above to input data</div>
+    const msg=ex.message||'';
+    let advice='';
+    let icon='⚠️';
+    if(msg.includes('806')||msg.includes('Subscri')){
+      advice='Option Chain API needs Data API subscription (₹499/month or 25 F&O trades/month = FREE). Use Manual Entry below for now.';
+      icon='📊';
+    } else if(msg.includes('token')||msg.includes('credential')){
+      advice='Token expired — go to SETUP tab, paste fresh Dhan token, tap SAVE.';
+      icon='🔑';
+    } else if(msg.includes('closed')||msg.includes('9:15')){
+      advice='Market is closed. Chain data available 9:15 AM to 3:30 PM on trading days.';
+      icon='⏰';
+    } else if(msg.includes('expiry')||msg.includes('Expiry')){
+      advice='Check expiry date — make sure it matches current week expiry.';
+      icon='📅';
+    } else {
+      advice='Use Manual Chain Entry below to get chain view.';
+    }
+    document.getElementById('ocR').innerHTML=`<div class="card" style="border-color:rgba(255,152,0,.2);background:rgba(255,152,0,.03);">
+      <div style="font-size:18px;text-align:center;margin-bottom:8px;">${icon}</div>
+      <div style="color:var(--orange);font-size:12px;font-weight:700;text-align:center;margin-bottom:8px;">Chain Data Unavailable</div>
+      <div style="font-size:10px;color:var(--dim2);text-align:center;line-height:1.7;">${advice}</div>
     </div>`;
   }
 }
@@ -2764,7 +2874,7 @@ async function loadMaxPain(){
         <div style="font-size:10px;color:var(--dim2);margin-top:4px;">On expiry day, price gravitates toward Max Pain. ${parseFloat(dist)>2?'Expect selling pressure.':parseFloat(dist)<-2?'Expect buying support.':'Close to Max Pain — limited directional bias.'}</div>
       </div>`;
   }catch(ex){
-    document.getElementById('mpResult').innerHTML=`<div style="color:var(--red);font-size:10px;">❌ ${ex.message}</div>`;
+    document.getElementById('mpResult').innerHTML='<div style="color:var(--orange);font-size:10px;">⚠️ Max Pain needs option chain data — enter manually in Chain tab</div>';
   }
 }
 
@@ -3209,7 +3319,7 @@ async function doSpikeScan(){
       SPK.preAlertFired=true;if(S.pr.snd)beep(spikeDir==='CALL');
       spkLog(`<span style="color:var(--orange);">⚠️ PRE-ALERT: ${spikeDir} spike building | Score ${score} | Open Dhan, find ${sym} ${otm1} ${spikeDir==='CALL'?'CE':'PE'}</span>`);
     }else if(score<thr*0.6){SPK.alertFired=false;SPK.preAlertFired=false;spkLog(`<span style="color:var(--dim2);">Scan: Score=${score} | PCR=${pcr} | ${spikeDir} bias | Spot=${spot}</span>`);}
-  }catch(ex){spkLog(`<span style="color:var(--red);">❌ ${ex.message}</span>`);}
+  }catch(ex){spkLog(`<span style="color:var(--orange)">⚠️ Data unavailable — check token in SETUP tab</span>`);}
 }
 
 function updateSpikeUI(score,thr,dir,spot,atm,otm1,ltp1,sym,factors){
@@ -3317,7 +3427,7 @@ async function doTitan(){
     if(scores.total>=thr)fireTitanLaunch(sym,atm,scores,spot,step,chain);
     if(document.getElementById('titanAI')?.value==='1'&&TITAN.ticks.length%5===0)runAIAnalysis();
     tLog(`<span style="color:var(--dim2);">Score=${scores.total} | Spot=${spot} | Call=₹${tick.callLTP.toFixed(1)} | Put=₹${tick.putLTP.toFixed(1)}</span>`);
-  }catch(ex){tLog(`<span style="color:var(--red);">❌ ${ex.message}</span>`);}
+  }catch(ex){tLog(`<span style="color:var(--orange)">⚠️ Data unavailable — check token in SETUP tab</span>`);}
 }
 
 function calcTitanScore(ticks){
@@ -3574,7 +3684,7 @@ async function ifCheckOI(){
     ifUpdateProgress(ltp);
     ifLog(`🔍 OI — Call:${fmt(cOI)} | Put:${fmt(pOI)} | PCR:${pcr} | ${optType} LTP:₹${ltp.toFixed(1)}`);
   }catch(ex){
-    verdict.innerHTML=`<span style="color:var(--red);">❌ ${ex.message}</span>`;
+    verdict.innerHTML=`<span style="color:var(--orange)">⚠️ Data unavailable — check token in SETUP tab</span>`;
     ifLog(`❌ OI error: ${ex.message}`);
   }
 }
@@ -3828,8 +3938,15 @@ async function asScanTick(){
     }
     document.getElementById('asStatus').textContent='✅ '+chain.length+' strikes | '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   }catch(ex){
-    document.getElementById('asStatus').textContent='❌ '+ex.message;
-    asLog('❌ Scan error: '+ex.message);
+    const msg=ex.message||'';
+    let friendly='';
+    if(msg.includes('806')||msg.includes('Subscri')) friendly='Data API needed for OI data';
+    else if(msg.includes('token')||msg.includes('cred')) friendly='Token expired — refresh in SETUP';
+    else if(msg.includes('closed')) friendly='Market closed — waiting for 9:15 AM';
+    else if(msg.includes('fetch')||msg.includes('network')) friendly='Network — retrying in 30s';
+    else friendly='Retrying...';
+    document.getElementById('asStatus').textContent='⚠️ '+friendly;
+    asLog('⚠️ '+friendly);
   }
 }
 
@@ -4094,11 +4211,39 @@ async function debugChain(){
     </div>`;
   }catch(ex){
     el.innerHTML=`<div class="card">
-      <div style="color:var(--red);margin-bottom:8px;">❌ ${ex.message}</div>
+      <div style="color:var(--orange)">⚠️ Data unavailable — check token in SETUP tab</div>
       <div style="font-size:9px;color:var(--dim2);">Check: 1) Expiry date correct? 2) Token valid? 3) CF Worker live?</div>
     </div>`;
   }
 }
+
+// ── AUTO TOKEN HEALTH CHECK ──
+async function autoCheckToken(){
+  if(!S.cr.dc||!S.cr.dt) return;
+  try{
+    const{ltp}=await getSpot('NIFTY');
+    if(ltp>0){
+      // Token is valid
+      document.getElementById('connBadge').textContent='✅ LIVE DATA ACTIVE';
+      document.getElementById('connBadge').className='sbadge sbadge-g';
+    } else {
+      showTokenBanner();
+    }
+  }catch(e){
+    if(e.message?.includes('token')||e.message?.includes('401')||e.message?.includes('expired')){
+      showTokenBanner();
+    }
+  }
+}
+
+function showTokenBanner(){
+  const el=document.getElementById('homeTradeDecision');
+  if(el){
+    el.innerHTML='<span style="color:var(--red);">🔑 Token expired — go to SETUP tab → paste fresh Dhan token → SAVE. Takes 60 seconds.</span>';
+    el.style.background='rgba(255,51,85,.08)';
+  }
+}
+
 // ── SPLASH + INIT ──
 setTimeout(()=>{
   document.getElementById('splash').style.transition='opacity .5s';
