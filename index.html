@@ -849,7 +849,10 @@ textarea{width:100%;background:#010407;border:1px solid var(--b1);border-radius:
         </div>
         <div><label>Strikes ATM ±</label>
           <select id="ocN"><option value="4">4 strikes (8 rows)</option><option value="6" selected>6 strikes (12 rows)</option><option value="8">8 strikes (16 rows)</option><option value="10">10 strikes (20 rows)</option></select></div>
-        <button class="btn btn-gold" ontouchend="loadChain()">📡 LOAD OPTION CHAIN</button>
+        <div class="brow">
+          <button class="btn btn-gold" ontouchend="loadChain()">📡 LOAD OPTION CHAIN</button>
+          <button class="btn btn-ol btn-sm" ontouchend="debugChain()">🔍 DEBUG</button>
+        </div>
       </div>
 
       <!-- Manual Entry Fallback -->
@@ -1792,18 +1795,26 @@ async function getChain(sym,exp){
       throw new Error('Chain empty — check expiry date matches current week');
     }
 
+    // Log first row to console to see actual field names from Dhan
+    if(rows.length>0) console.log('[getChain] Sample row keys:',Object.keys(rows[0]),JSON.stringify(rows[0]).slice(0,300));
+
     return rows.map(r=>({
-      strike:r.strike_price||r.strikePrice||r.strike||0,
-      cLTP:r.call_ltp||r.callLTP||0,
-      cOI:r.call_oi||r.callOI||0,
-      cOIChg:r.call_oi_change||r.callOIChg||0,
-      cIV:r.call_iv||r.callIV||0,
-      cVol:r.call_volume||r.callVolume||0,
-      pLTP:r.put_ltp||r.putLTP||0,
-      pOI:r.put_oi||r.putOI||0,
-      pOIChg:r.put_oi_change||r.putOIChg||0,
-      pIV:r.put_iv||r.putIV||0,
-      pVol:r.put_volume||r.putVolume||0
+      strike: r.strike_price||r.strikePrice||r.strike||r.strikeprice||0,
+      // LTP fields
+      cLTP: r.call_ltp||r.callLTP||r.ce_ltp||r.CE_LTP||r.last_price_ce||0,
+      pLTP: r.put_ltp||r.putLTP||r.pe_ltp||r.PE_LTP||r.last_price_pe||0,
+      // OI fields — Dhan may use different names
+      cOI:  r.call_oi||r.callOI||r.oi_ce||r.OI_CE||r.ce_oi||r.openInterest_ce||r.call_open_interest||0,
+      pOI:  r.put_oi||r.putOI||r.oi_pe||r.OI_PE||r.pe_oi||r.openInterest_pe||r.put_open_interest||0,
+      // OI change
+      cOIChg: r.call_oi_change||r.callOIChg||r.oi_change_ce||r.ce_oi_change||0,
+      pOIChg: r.put_oi_change||r.putOIChg||r.oi_change_pe||r.pe_oi_change||0,
+      // IV
+      cIV: r.call_iv||r.callIV||r.iv_ce||r.implied_volatility_ce||15,
+      pIV: r.put_iv||r.putIV||r.iv_pe||r.implied_volatility_pe||15,
+      // Volume
+      cVol: r.call_volume||r.callVolume||r.volume_ce||r.ce_volume||0,
+      pVol: r.put_volume||r.putVolume||r.volume_pe||r.pe_volume||0,
     })).filter(r=>r.strike>0);
   }
   throw new Error('No credentials — go to SETUP tab');
@@ -1812,12 +1823,16 @@ async function getChain(sym,exp){
 function getPCR(chain){
   let tC=0,tP=0,pain={};
   for(const r of chain){tC+=r.cOI;tP+=r.pOI;pain[r.strike]=0;}
-  for(const r of chain)for(const s of chain){
-    if(s.strike<r.strike)pain[r.strike]+=(r.strike-s.strike)*s.cOI;
-    if(s.strike>r.strike)pain[r.strike]+=(s.strike-r.strike)*s.pOI;
+  // Max Pain — only calculate if OI data is present
+  if(tC>0||tP>0){
+    for(const r of chain)for(const s of chain){
+      if(s.strike<r.strike)pain[r.strike]+=(r.strike-s.strike)*s.cOI;
+      if(s.strike>r.strike)pain[r.strike]+=(s.strike-r.strike)*s.pOI;
+    }
   }
-  const mp=Object.entries(pain).sort((a,b)=>a[1]-b[1])[0]?.[0]||0;
-  return{pcr:(tP/(tC||1)).toFixed(3),maxPain:mp,tC,tP};
+  const mp=tC>0||tP>0 ? Object.entries(pain).sort((a,b)=>a[1]-b[1])[0]?.[0]||0 : 0;
+  const pcrVal = tC>0 ? (tP/tC).toFixed(3) : tP>0 ? '∞' : 'N/A';
+  return{pcr:pcrVal,maxPain:mp,tC,tP,hasOI:(tC>0||tP>0)};
 }
 
 function fmt(n){if(n>=10000000)return(n/10000000).toFixed(1)+'Cr';if(n>=100000)return(n/100000).toFixed(1)+'L';if(n>=1000)return(n/1000).toFixed(1)+'K';return n||0;}
@@ -2572,13 +2587,15 @@ function buildManualChain(){
 function renderChain(sym,spot,chain,n){
   const step=STEP[sym]||50,atm=Math.round(spot/step)*step;
   const flt=chain.filter(r=>Math.abs(r.strike-atm)<=step*n).sort((a,b)=>a.strike-b.strike);
-  const{pcr,maxPain}=getPCR(chain);
+  const{pcr,maxPain,tC,tP,hasOI}=getPCR(chain);
+  const oiWarning = !hasOI ? '<div style="padding:8px;border-radius:8px;background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.2);font-size:9px;color:var(--orange);margin-bottom:8px;">⚠️ OI data showing 0 — Dhan may not include OI in option chain response. LTP data is correct. Use Scanner tab for OI analysis.</div>' : '';
   let h=`<div class="card">
     <div class="ct">🔗 <span class="hl">${sym} OPTION CHAIN</span></div>
+    ${oiWarning}
     <div class="g3" style="margin-bottom:10px;">
       <div class="st"><div class="sl">SPOT</div><div class="sv" style="font-size:13px;">${spot.toLocaleString('en-IN')}</div></div>
-      <div class="st"><div class="sl">PCR</div><div class="sv">${pcr}</div></div>
-      <div class="st"><div class="sl">MAX PAIN</div><div class="sv" style="font-size:13px;">${maxPain}</div></div>
+      <div class="st"><div class="sl">PCR</div><div class="sv" style="color:${pcr==='N/A'?'var(--dim2)':parseFloat(pcr)>1.2?'var(--green)':parseFloat(pcr)<0.8?'var(--red)':'var(--gold)'};">${pcr}</div></div>
+      <div class="st"><div class="sl">MAX PAIN</div><div class="sv" style="font-size:13px;">${hasOI?maxPain:'--'}</div></div>
     </div>
     <div style="overflow-x:auto;"><table class="tbl">
     <thead><tr>
@@ -4017,6 +4034,31 @@ async function deployWorkerFromApp(){
   }
 }
 
+
+// ── CHAIN DEBUG — logs raw Dhan response to see actual field names ──
+async function debugChain(){
+  const sym=document.getElementById('ocSym').value;
+  const exp=document.getElementById('ocExp').value;
+  if(!exp){alert('Set expiry date first');return;}
+  const el=document.getElementById('ocR');
+  el.innerHTML='<div class="card" style="color:var(--dim2);font-size:10px;">🔍 Fetching raw response...</div>';
+  try{
+    const{id}=DI[sym]||{id:'13'};
+    const raw=await PF('/dhan/optionchain','https://api.dhan.co/v2/optionchain',dhH(),{UnderlyingScrip:Number(id),UnderlyingSeg:'IDX_I',Expiry:exp});
+    const firstRow=raw?.data?.[0]||raw?.[0]||{};
+    const keys=Object.keys(firstRow);
+    el.innerHTML=`<div class="card">
+      <div class="ct">🔍 RAW RESPONSE DEBUG</div>
+      <div style="font-size:9px;color:var(--dim2);margin-bottom:8px;">Total rows: ${(raw?.data||raw||[]).length}</div>
+      <div style="font-size:9px;color:var(--gold);margin-bottom:6px;">Field names in first row:</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--cyan);word-break:break-all;line-height:2;">${keys.join(' | ')}</div>
+      <div style="font-size:9px;color:var(--gold);margin-top:8px;margin-bottom:6px;">First row values:</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--tx);word-break:break-all;line-height:1.8;">${JSON.stringify(firstRow,null,1).slice(0,500)}</div>
+    </div>`;
+  }catch(ex){
+    el.innerHTML=`<div class="card"><div style="color:var(--red);">❌ ${ex.message}</div></div>`;
+  }
+}
 // ── SPLASH + INIT ──
 setTimeout(()=>{
   document.getElementById('splash').style.transition='opacity .5s';
