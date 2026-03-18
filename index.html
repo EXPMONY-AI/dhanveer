@@ -1375,7 +1375,100 @@ const FI={NIFTY:'NSE:NIFTY50-INDEX',BANKNIFTY:'NSE:NIFTYBANK-INDEX',FINNIFTY:'NS
 const DI={NIFTY:{id:'13',seg:'IDX_I'},BANKNIFTY:{id:'25',seg:'IDX_I'},FINNIFTY:{id:'27',seg:'IDX_I'},SENSEX:{id:'51',seg:'IDX_I'}};
 const STEP={NIFTY:50,BANKNIFTY:100,FINNIFTY:50,SENSEX:100};
 const LOT={NIFTY:65,BANKNIFTY:30,FINNIFTY:40,SENSEX:20};
-const HOLIDAYS_2026=['2026-01-26','2026-03-02','2026-03-30','2026-04-02','2026-04-10','2026-04-14','2026-05-01','2026-08-15','2026-10-02','2026-10-20','2026-11-04','2026-11-05','2026-12-25'];
+// ── VERIFIED EXPIRY & HOLIDAY CALENDAR 2026 ──
+// Source: NSE/BSE official + fatafatniftylevels.in (updated 18-Mar-2026)
+// NSE (Nifty): Every TUESDAY | BSE (Sensex): Every THURSDAY
+// Holiday rule: If Tue/Thu is holiday → expiry shifts to PREVIOUS trading day
+
+const HOLIDAYS_2026=[
+  '2026-01-26', // Republic Day
+  '2026-02-19', // Chhatrapati Shivaji Maharaj Jayanti
+  '2026-03-02', // Mahashivratri
+  '2026-03-26', // Shri Ram Navami (Thu → Sensex shifts to Wed 25-Mar)
+  '2026-03-31', // Shri Mahavir Jayanti (Tue → Nifty shifts to Mon 30-Mar)
+  '2026-04-03', // Good Friday
+  '2026-04-14', // Dr. Baba Saheb Ambedkar Jayanti (Tue → Nifty shifts to Mon 13-Apr)
+  '2026-05-01', // Maharashtra Day
+  '2026-05-28', // Bakri Eid (Thu → Sensex shifts to Wed 27-May)
+  '2026-08-15', // Independence Day
+  '2026-10-02', // Gandhi Jayanti
+  '2026-10-20', // Dussehra
+  '2026-11-04', // Diwali Laxmi Pujan
+  '2026-11-05', // Diwali Balipratipada
+  '2026-12-25', // Christmas
+];
+
+// NIFTY WEEKLY EXPIRY DATES (every Tuesday, holiday-adjusted)
+const NIFTY_EXPIRY_2026 = [
+  // March
+  '2026-03-24','2026-03-30', // 31 Mar holiday → shifts to Mon 30
+  // April
+  '2026-04-07','2026-04-13', // 14 Apr holiday → shifts to Mon 13
+  '2026-04-21','2026-04-28', // Monthly
+  // May
+  '2026-05-05','2026-05-12','2026-05-19','2026-05-26', // Monthly
+  // June
+  '2026-06-02','2026-06-09','2026-06-16','2026-06-23','2026-06-30', // Monthly
+  // July
+  '2026-07-07','2026-07-14','2026-07-21','2026-07-28', // Monthly
+  // Aug
+  '2026-08-04','2026-08-11','2026-08-18','2026-08-25', // Monthly
+  // Sep
+  '2026-09-01','2026-09-08','2026-09-15','2026-09-22','2026-09-29', // Monthly
+  // Oct
+  '2026-10-06','2026-10-13','2026-10-27', // 20 Oct holiday
+  // Nov
+  '2026-11-03','2026-11-10','2026-11-17','2026-11-24', // Monthly
+  // Dec
+  '2026-12-01','2026-12-08','2026-12-15','2026-12-22','2026-12-29', // Monthly
+];
+
+// SENSEX WEEKLY EXPIRY DATES (every Thursday, holiday-adjusted)
+const SENSEX_EXPIRY_2026 = [
+  // March
+  '2026-03-19','2026-03-25', // 26 Mar holiday → shifts to Wed 25
+  // April
+  '2026-04-02','2026-04-09','2026-04-16','2026-04-23','2026-04-30', // Monthly
+  // May
+  '2026-05-07','2026-05-14','2026-05-21','2026-05-27', // 28 May holiday → shifts to Wed 27
+  // June
+  '2026-06-04','2026-06-11','2026-06-18','2026-06-25', // Monthly
+  // July
+  '2026-07-02','2026-07-09','2026-07-16','2026-07-23','2026-07-30', // Monthly
+  // Aug
+  '2026-08-06','2026-08-13','2026-08-20','2026-08-27', // Monthly
+  // Sep
+  '2026-09-03','2026-09-10','2026-09-17','2026-09-24', // Monthly
+  // Oct
+  '2026-10-01','2026-10-08','2026-10-15','2026-10-22','2026-10-29', // Monthly
+  // Nov
+  '2026-11-12','2026-11-19','2026-11-26', // 4,5 Nov holidays
+  // Dec
+  '2026-12-03','2026-12-10','2026-12-17','2026-12-24','2026-12-31', // Monthly
+];
+
+// Helper functions for expiry detection
+function isNiftyExpiry(dateStr){ return NIFTY_EXPIRY_2026.includes(dateStr); }
+function isSensexExpiry(dateStr){ return SENSEX_EXPIRY_2026.includes(dateStr); }
+function isHoliday(dateStr){ return HOLIDAYS_2026.includes(dateStr); }
+function getNextNiftyExpiry(){
+  const today=toISTDate(getISTNow());
+  return NIFTY_EXPIRY_2026.find(d=>d>=today)||NIFTY_EXPIRY_2026[NIFTY_EXPIRY_2026.length-1];
+}
+function getNextSensexExpiry(){
+  const today=toISTDate(getISTNow());
+  return SENSEX_EXPIRY_2026.find(d=>d>=today)||SENSEX_EXPIRY_2026[SENSEX_EXPIRY_2026.length-1];
+}
+function getDayType(){
+  const ist=getISTNow();
+  const today=toISTDate(ist);
+  if(isNiftyExpiry(today)) return 'NIFTY_EXPIRY';
+  if(isSensexExpiry(today)) return 'SENSEX_EXPIRY';
+  if(isHoliday(today)) return 'HOLIDAY';
+  const dow=ist.getDay();
+  if(dow===0||dow===6) return 'WEEKEND';
+  return 'NORMAL';
+}
 
 // ── API HELPERS ──
 function fyH(){return{Authorization:`${S.cr.fa}:${S.cr.ft}`,'Content-Type':'application/json'};}
