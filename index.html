@@ -4035,28 +4035,68 @@ async function deployWorkerFromApp(){
 }
 
 
-// ── CHAIN DEBUG — logs raw Dhan response to see actual field names ──
+// ── CHAIN DEBUG v2 — shows complete raw response structure ──
 async function debugChain(){
   const sym=document.getElementById('ocSym').value;
   const exp=document.getElementById('ocExp').value;
   if(!exp){alert('Set expiry date first');return;}
   const el=document.getElementById('ocR');
-  el.innerHTML='<div class="card" style="color:var(--dim2);font-size:10px;">🔍 Fetching raw response...</div>';
+  el.innerHTML='<div class="card" style="color:var(--dim2);font-size:10px;">🔍 Fetching raw Dhan response...</div>';
   try{
     const{id}=DI[sym]||{id:'13'};
+    // Direct fetch to see raw response before any processing
     const raw=await PF('/dhan/optionchain','https://api.dhan.co/v2/optionchain',dhH(),{UnderlyingScrip:Number(id),UnderlyingSeg:'IDX_I',Expiry:exp});
-    const firstRow=raw?.data?.[0]||raw?.[0]||{};
-    const keys=Object.keys(firstRow);
+
+    // Analyse response structure deeply
+    const topKeys=Object.keys(raw||{});
+    const dataVal=raw?.data;
+    const dataType=Array.isArray(dataVal)?'ARRAY('+dataVal.length+')':typeof dataVal;
+
+    // Try to find rows wherever they are
+    let rows=null;
+    let rowsPath='not found';
+    if(Array.isArray(raw)){rows=raw;rowsPath='root array';}
+    else if(Array.isArray(raw?.data)){rows=raw.data;rowsPath='raw.data';}
+    else if(Array.isArray(raw?.data?.data)){rows=raw.data.data;rowsPath='raw.data.data';}
+    else if(raw?.data&&typeof raw.data==='object'){
+      const vals=Object.values(raw.data);
+      if(vals.length>0&&typeof vals[0]==='object'){rows=vals;rowsPath='Object.values(raw.data)';}
+    }
+
+    const firstRow=rows?.[0]||{};
+    const rowKeys=Object.keys(firstRow);
+
     el.innerHTML=`<div class="card">
-      <div class="ct">🔍 RAW RESPONSE DEBUG</div>
-      <div style="font-size:9px;color:var(--dim2);margin-bottom:8px;">Total rows: ${(raw?.data||raw||[]).length}</div>
-      <div style="font-size:9px;color:var(--gold);margin-bottom:6px;">Field names in first row:</div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--cyan);word-break:break-all;line-height:2;">${keys.join(' | ')}</div>
-      <div style="font-size:9px;color:var(--gold);margin-top:8px;margin-bottom:6px;">First row values:</div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--tx);word-break:break-all;line-height:1.8;">${JSON.stringify(firstRow,null,1).slice(0,500)}</div>
+      <div class="ct">🔍 <span style="color:var(--cyan);">RAW RESPONSE DEBUG v2</span></div>
+
+      <div style="margin-bottom:10px;padding:8px;background:rgba(0,0,0,.3);border-radius:8px;">
+        <div style="font-size:8px;letter-spacing:2px;color:var(--dim2);margin-bottom:5px;">TOP LEVEL STRUCTURE</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--gold);">Top keys: ${topKeys.join(', ')||'none'}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--cyan);margin-top:3px;">data type: ${dataType}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--green);margin-top:3px;">rows found at: ${rowsPath}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--tx);margin-top:3px;">row count: ${rows?.length||0}</div>
+      </div>
+
+      <div style="margin-bottom:10px;padding:8px;background:rgba(0,0,0,.3);border-radius:8px;">
+        <div style="font-size:8px;letter-spacing:2px;color:var(--dim2);margin-bottom:5px;">FIRST ROW FIELD NAMES</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--cyan);word-break:break-all;line-height:1.8;">${rowKeys.length>0?rowKeys.join(' | '):'NO FIELDS FOUND'}</div>
+      </div>
+
+      <div style="margin-bottom:10px;padding:8px;background:rgba(0,0,0,.3);border-radius:8px;">
+        <div style="font-size:8px;letter-spacing:2px;color:var(--dim2);margin-bottom:5px;">FIRST ROW RAW VALUES</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--tx);word-break:break-all;line-height:1.6;">${JSON.stringify(firstRow).slice(0,600)||'empty'}</div>
+      </div>
+
+      <div style="padding:8px;background:rgba(0,0,0,.3);border-radius:8px;">
+        <div style="font-size:8px;letter-spacing:2px;color:var(--dim2);margin-bottom:5px;">FULL RAW RESPONSE (first 800 chars)</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--dim2);word-break:break-all;line-height:1.6;">${JSON.stringify(raw).slice(0,800)}</div>
+      </div>
     </div>`;
   }catch(ex){
-    el.innerHTML=`<div class="card"><div style="color:var(--red);">❌ ${ex.message}</div></div>`;
+    el.innerHTML=`<div class="card">
+      <div style="color:var(--red);margin-bottom:8px;">❌ ${ex.message}</div>
+      <div style="font-size:9px;color:var(--dim2);">Check: 1) Expiry date correct? 2) Token valid? 3) CF Worker live?</div>
+    </div>`;
   }
 }
 // ── SPLASH + INIT ──
