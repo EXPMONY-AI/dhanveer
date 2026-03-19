@@ -759,9 +759,9 @@ async function getSpot(sym){
   if(S.cr.dc&&S.cr.dt){
     try{
       const{id,seg}=DI[sym]||{id:'13',seg:'IDX_I'};
-      // Dhan v2 LTP API: POST {IDX_I:[13]}
-      const body={[seg]:[Number(id)]};
-      const r=await fetch(CF+'/dhan/ltp',{
+      // Market Quote API (FREE) - string security IDs
+      const body={[seg]:[String(id)]};
+      const r=await fetch(CF+'/dhan/quote',{
         method:'POST',
         headers:{'Content-Type':'application/json','access-token':S.cr.dt,'client-id':S.cr.dc},
         body:JSON.stringify(body),
@@ -1024,10 +1024,10 @@ async function testCreds(){
 
   // Step 2: Test with Dhan LTP API
   try{
-    const r=await fetch(CF+'/dhan/ltp',{
+    const r=await fetch(CF+'/dhan/quote',{
       method:'POST',
       headers:{'Content-Type':'application/json','access-token':S.cr.dt,'client-id':S.cr.dc},
-      body:JSON.stringify({'IDX_I':[13]}),
+      body:JSON.stringify({'IDX_I':['13']}),
       signal:AbortSignal.timeout(10000)
     });
     const d=await r.json();
@@ -1159,8 +1159,8 @@ async function fetchPrices(){
   }
   // Fetch all 4 indices in ONE API call
   try{
-    const body={'IDX_I':[13,25,27,51]}; // NIFTY,BANKNIFTY,FINNIFTY,SENSEX
-    const r=await fetch(CF+'/dhan/ltp',{
+    const body={'IDX_I':['13','25','27','51']}; // NIFTY,BANKNIFTY,FINNIFTY,SENSEX
+    const r=await fetch(CF+'/dhan/quote',{
       method:'POST',
       headers:{'Content-Type':'application/json','access-token':S.cr.dt,'client-id':S.cr.dc},
       body:JSON.stringify(body),
@@ -1173,11 +1173,11 @@ async function fetchPrices(){
       document.getElementById('tokenAlert').style.display='block';
       return;
     }
-    const seg=d?.data?.IDX_I||{};
+    const seg=d?.data?.IDX_I||d?.data?.IDX_I||{};
     const map={'13':'NIFTY','25':'BANKNIFTY','27':'FINNIFTY','51':'SENSEX'};
     let fetched=0;
     for(const[id,sym] of Object.entries(map)){
-      const inst=seg?.[id]||seg?.[Number(id)]||{};
+      const inst=seg?.[id]||seg?.[Number(id)]||Object.values(seg).find((_,i)=>Object.keys(seg)[i]===id)||{};
       const ltp=inst?.last_price||inst?.LTP||inst?.ltp||0;
       if(ltp>0){S.mp[sym]=ltp;updatePrice(sym,ltp,'live');fetched++;}
     }
@@ -1237,10 +1237,10 @@ async function autoCheckToken(){
 
   // Test Dhan token silently
   try{
-    const r=await fetch(CF+'/dhan/ltp',{
+    const r=await fetch(CF+'/dhan/quote',{
       method:'POST',
       headers:{'Content-Type':'application/json','access-token':S.cr.dt,'client-id':S.cr.dc},
-      body:JSON.stringify({'IDX_I':[13]}),
+      body:JSON.stringify({'IDX_I':['13']}),
       signal:AbortSignal.timeout(8000)
     });
     const d=await r.json();
