@@ -760,8 +760,15 @@ async function getSpot(sym){
     try{
       const{id,seg}=DI[sym]||{id:'13',seg:'IDX_I'};
       const d=await cfFetch('/dhan/ltp',{[seg]:[Number(id)]});
-      const ltp=d?.data?.[seg]?.[id]?.last_price||d?.data?.[seg]?.[String(id)]?.last_price||0;
+      // Dhan response: {data:{IDX_I:{"13":{last_price:X}}}}
+      const segData=d?.data?.[seg]||{};
+      // Try all possible key formats
+      const inst=segData?.[id]||segData?.[String(id)]||segData?.[Number(id)]||
+                 Object.values(segData)?.[0]||{};
+      const ltp=inst?.last_price||inst?.LTP||inst?.ltp||0;
       if(ltp>0){S.mp[sym]=ltp;ls.set('mp',S.mp);return ltp;}
+      // If data exists but no LTP - log for debug
+      if(d?.data)console.log('[spot] Response:',JSON.stringify(d).slice(0,200));
     }catch(e){console.warn('[spot]',e.message);}
   }
   return S.mp[sym]||0;
@@ -981,12 +988,69 @@ function clearCreds(){S.cr={dc:'',dt:'',fa:'',ft:''};ls.set('cr',S.cr);document.
 function credMsg(m,t){const e=document.getElementById('credMsg');e.textContent=m;e.style.color=t==='ok'?'var(--green)':t==='er'?'var(--red)':'var(--dim2)';}
 
 async function testCreds(){
-  credMsg('Testing...','');
+  credMsg('Testing CF Worker...','');
+  // Step 1: Check CF Worker health
   try{
-    const spot=await getSpot('NIFTY');
-    if(spot>0){credMsg('✅ Connected! Nifty='+spot.toLocaleString('en-IN'),'ok');updateConnBadge('CF_WORKER');}
-    else{credMsg('⚠️ Connected but no price data — check token','');}
-  }catch(e){credMsg('❌ '+friendlyErr(e.message),'er');}
+    const r=await fetch(CF+'/health',{signal:AbortSignal.timeout(5000)});
+    const h=await r.json();
+    if(h.status!=='ok'){credMsg('❌ CF Worker not responding','er');return;}
+  }catch(e){credMsg('❌ CF Worker unreachable: '+e.message,'er');return;}
+
+  credMsg('CF OK — Testing Dhan token...','');
+
+  // Step 2: Test Dhan LTP directly
+  try{
+    const{id,seg}=DI['NIFTY'];
+    const body={[seg]:[Number(id)]};
+    const r=await fetch(CF+'/dhan/ltp',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','access-token':S.cr.dt,'client-id':S.cr.dc},
+      body:JSON.stringify(body),
+      signal:AbortSignal.timeout(8000)
+    });
+    const d=await r.json();
+    console.log('[testCreds] Full response:',JSON.stringify(d));
+
+    // Check for Dhan errors
+    if(d?.status==='failed'||d?.httpStatus==='UNAUTHORIZED'){
+      credMsg('❌ Token invalid or expired — get fresh token from Dhan app','er');
+      document.getElementById('tokenAlert').style.display='block';
+      return;
+    }
+
+    // Try to extract price from all possible formats
+    const segData=d?.data?.[seg]||d?.data||{};
+    const allVals=Object.values(segData);
+    let ltp=0;
+    // Try direct key access
+    const inst=segData?.[id]||segData?.[String(id)]||allVals?.[0]||{};
+    ltp=inst?.last_price||inst?.LTP||inst?.ltp||0;
+
+    // If still 0, try deeper
+    if(!ltp&&allVals.length>0){
+      for(const v of allVals){
+        if(typeof v==='object'&&v!==null){
+          ltp=v?.last_price||v?.LTP||v?.ltp||0;
+          if(ltp>0)break;
+        }
+      }
+    }
+
+    if(ltp>0){
+      S.mp['NIFTY']=ltp;ls.set('mp',S.mp);
+      updatePrice('NIFTY',ltp,'live');
+      credMsg('✅ Connected! Nifty='+ltp.toLocaleString('en-IN'),'ok');
+      updateConnBadge('CF_WORKER');
+      document.getElementById('tokenAlert').style.display='none';
+    } else {
+      // Show raw response for debugging
+      const raw=JSON.stringify(d).slice(0,120);
+      credMsg('⚠️ API responded but price format unknown. Raw: '+raw,'');
+      console.warn('[testCreds] Unknown format:',d);
+    }
+  }catch(e){
+    credMsg('❌ '+friendlyErr(e.message),'er');
+  }
 }
 async function testConn(){
   const el=document.getElementById('setupStatusTxt');
@@ -1061,17 +1125,53 @@ function startPriceRefresh(){
 function stopPriceRefresh(){if(priceTimer){clearInterval(priceTimer);priceTimer=null;}}
 
 async function fetchPrices(){
-  const syms=['NIFTY','SENSEX','BANKNIFTY','FINNIFTY'];
-  let fetched=0;
-  for(const sym of syms){
-    try{
-      const ltp=await getSpot(sym);
-      if(ltp>0){updatePrice(sym,ltp,'live');fetched++;}
-    }catch(e){}
+  if(!S.cr.dc||!S.cr.dt){
+    document.getElementById('priceStatus').textContent='Go to SETUP → save Dhan token first';
+    return;
   }
-  const el=document.getElementById('priceStatus');
-  if(el){
-    if(fetched>0){el.textContent='✅ Updated: '+ist().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});el.style.color='var(--green)';}
+  // Fetch all 4 indices in ONE API call (more efficient)
+  try{
+    const body={'IDX_I':[13,25,27,51]}; // NIFTY,BANKNIFTY,FINNIFTY,SENSEX
+    const r=await fetch(CF+'/dhan/ltp',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','access-token':S.cr.dt,'client-id':S.cr.dc},
+      body:JSON.stringify(body),
+      signal:AbortSignal.timeout(8000)
+    });
+    const d=await r.json();
+    if(d?.status==='failed'){
+      document.getElementById('priceStatus').textContent='Token expired — refresh in SETUP tab';
+      document.getElementById('priceStatus').style.color='var(--red)';
+      document.getElementById('tokenAlert').style.display='block';
+      return;
+    }
+    const seg=d?.data?.IDX_I||{};
+    const map={'13':'NIFTY','25':'BANKNIFTY','27':'FINNIFTY','51':'SENSEX'};
+    let fetched=0;
+    for(const[id,sym] of Object.entries(map)){
+      const inst=seg?.[id]||seg?.[Number(id)]||{};
+      const ltp=inst?.last_price||inst?.LTP||inst?.ltp||0;
+      if(ltp>0){S.mp[sym]=ltp;updatePrice(sym,ltp,'live');fetched++;}
+    }
+    ls.set('mp',S.mp);
+    const el=document.getElementById('priceStatus');
+    if(fetched>0){
+      el.textContent='✅ '+fetched+' prices live — '+ist().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      el.style.color='var(--green)';
+      document.getElementById('tokenAlert').style.display='none';
+      updateConnBadge('CF_WORKER');
+    }else{
+      el.textContent='⚠️ Token may be expired — go to SETUP → refresh token';
+      el.style.color='var(--orange)';
+    }
+  }catch(e){
+    // Fallback: fetch one by one
+    let fetched=0;
+    for(const sym of ['NIFTY','SENSEX','BANKNIFTY','FINNIFTY']){
+      try{const ltp=await getSpot(sym);if(ltp>0){updatePrice(sym,ltp,'live');fetched++;}}catch{}
+    }
+    const el=document.getElementById('priceStatus');
+    if(fetched>0){el.textContent='✅ '+fetched+' prices updated';el.style.color='var(--green)';}
     else{el.textContent='Tap any price to enter manually';el.style.color='var(--dim2)';}
   }
 }
@@ -1669,19 +1769,6 @@ function flash(){
   f.style.opacity='1';setTimeout(()=>f.style.opacity='0',120);
 }
 
-// ── SPLASH → PIN ──
-setTimeout(()=>{
-  document.getElementById('splash').style.transition='opacity .4s';
-  document.getElementById('splash').style.opacity='0';
-  setTimeout(()=>{
-    document.getElementById('splash').style.display='none';
-    document.getElementById('pin').style.display='flex';
-    document.getElementById('pinPrompt').textContent=S.pin?'ENTER YOUR PIN':'CREATE YOUR 4-DIGIT PIN';
-  },400);
-},2500);
-</script>
-
-<script>
 // Register Service Worker for PWA
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
@@ -1717,6 +1804,18 @@ function installApp(){
     alert('To install:\n\nChrome: tap ⋮ menu → Add to Home Screen\nSafari: tap Share → Add to Home Screen');
   }
 }
+
+// ── SPLASH → PIN ──
+setTimeout(()=>{
+  document.getElementById('splash').style.transition='opacity .4s';
+  document.getElementById('splash').style.opacity='0';
+  setTimeout(()=>{
+    document.getElementById('splash').style.display='none';
+    document.getElementById('pin').style.display='flex';
+    document.getElementById('pinPrompt').textContent=S.pin?'ENTER YOUR PIN':'CREATE YOUR 4-DIGIT PIN';
+  },400);
+},2500);
 </script>
+
 </body>
 </html>
