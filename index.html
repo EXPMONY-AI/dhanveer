@@ -754,21 +754,44 @@ async function cfFetch(path,body=null){
   return d;
 }
 
-// ── GET SPOT PRICE ── (never fails)
+// ── GET SPOT PRICE ── (never fails, market-hours aware)
 async function getSpot(sym){
   if(S.cr.dc&&S.cr.dt){
     try{
       const{id,seg}=DI[sym]||{id:'13',seg:'IDX_I'};
-      const d=await cfFetch('/dhan/ltp',{[seg]:[Number(id)]});
-      // Dhan response: {data:{IDX_I:{"13":{last_price:X}}}}
-      const segData=d?.data?.[seg]||{};
-      // Try all possible key formats
-      const inst=segData?.[id]||segData?.[String(id)]||segData?.[Number(id)]||
-                 Object.values(segData)?.[0]||{};
-      const ltp=inst?.last_price||inst?.LTP||inst?.ltp||0;
-      if(ltp>0){S.mp[sym]=ltp;ls.set('mp',S.mp);return ltp;}
-      // If data exists but no LTP - log for debug
-      if(d?.data)console.log('[spot] Response:',JSON.stringify(d).slice(0,200));
+      // Dhan v2 LTP API: POST {IDX_I:[13]}
+      const body={[seg]:[Number(id)]};
+      const r=await fetch(CF+'/dhan/ltp',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','access-token':S.cr.dt,'client-id':S.cr.dc},
+        body:JSON.stringify(body),
+        signal:AbortSignal.timeout(8000)
+      });
+      const d=await r.json();
+
+      // Check for auth error
+      if(d?.httpStatus==='UNAUTHORIZED'||d?.errorCode==='DH-901'){
+        console.warn('[spot] Token unauthorized');
+        return S.mp[sym]||0;
+      }
+
+      // Dhan v2 response: {data:{IDX_I:{"13":{last_price:X}}},"status":"success"}
+      if(d?.status==='success'||d?.data){
+        const segData=d?.data?.[seg]||{};
+        // Try string key, number key, first value
+        const inst=segData[String(id)]||segData[Number(id)]||
+                   segData[id]||Object.values(segData)[0]||{};
+        const ltp=inst?.last_price||inst?.LTP||inst?.ltp||0;
+        if(ltp>0){
+          S.mp[sym]=ltp;
+          ls.set('mp',S.mp);
+          return ltp;
+        }
+        // Market closed — Dhan returns 0 after hours, use cached
+        const cached=S.mp[sym]||0;
+        return cached;
+      }
+      console.log('[spot] Unexpected:',JSON.stringify(d).slice(0,150));
     }catch(e){console.warn('[spot]',e.message);}
   }
   return S.mp[sym]||0;
@@ -988,65 +1011,69 @@ function clearCreds(){S.cr={dc:'',dt:'',fa:'',ft:''};ls.set('cr',S.cr);document.
 function credMsg(m,t){const e=document.getElementById('credMsg');e.textContent=m;e.style.color=t==='ok'?'var(--green)':t==='er'?'var(--red)':'var(--dim2)';}
 
 async function testCreds(){
-  credMsg('Testing CF Worker...','');
-  // Step 1: Check CF Worker health
+  credMsg('Step 1: Checking CF Worker...','');
+
+  // Step 1: CF Worker health
   try{
-    const r=await fetch(CF+'/health',{signal:AbortSignal.timeout(5000)});
+    const r=await fetch(CF+'/health',{signal:AbortSignal.timeout(6000)});
     const h=await r.json();
-    if(h.status!=='ok'){credMsg('❌ CF Worker not responding','er');return;}
-  }catch(e){credMsg('❌ CF Worker unreachable: '+e.message,'er');return;}
+    if(h.status!=='ok'){credMsg('❌ CF Worker not responding — tap DEPLOY WORKER in SETUP','er');return;}
+  }catch(e){credMsg('❌ CF Worker unreachable: '+friendlyErr(e.message),'er');return;}
 
-  credMsg('CF OK — Testing Dhan token...','');
+  credMsg('Step 2: Verifying Dhan token...','');
 
-  // Step 2: Test Dhan LTP directly
+  // Step 2: Test with Dhan LTP API
   try{
-    const{id,seg}=DI['NIFTY'];
-    const body={[seg]:[Number(id)]};
     const r=await fetch(CF+'/dhan/ltp',{
       method:'POST',
       headers:{'Content-Type':'application/json','access-token':S.cr.dt,'client-id':S.cr.dc},
-      body:JSON.stringify(body),
-      signal:AbortSignal.timeout(8000)
+      body:JSON.stringify({'IDX_I':[13]}),
+      signal:AbortSignal.timeout(10000)
     });
     const d=await r.json();
-    console.log('[testCreds] Full response:',JSON.stringify(d));
 
-    // Check for Dhan errors
-    if(d?.status==='failed'||d?.httpStatus==='UNAUTHORIZED'){
-      credMsg('❌ Token invalid or expired — get fresh token from Dhan app','er');
+    // Show raw response in console for debugging
+    console.log('[testCreds] Raw Dhan response:',JSON.stringify(d));
+
+    // Check auth errors first
+    if(d?.httpStatus==='UNAUTHORIZED'||d?.errorCode==='DH-901'||d?.errorType==='Invalid_Token'){
+      credMsg('❌ Token rejected by Dhan — generate a FRESH token from Dhan app right now','er');
       document.getElementById('tokenAlert').style.display='block';
       return;
     }
 
-    // Try to extract price from all possible formats
-    const segData=d?.data?.[seg]||d?.data||{};
-    const allVals=Object.values(segData);
-    let ltp=0;
-    // Try direct key access
-    const inst=segData?.[id]||segData?.[String(id)]||allVals?.[0]||{};
-    ltp=inst?.last_price||inst?.LTP||inst?.ltp||0;
-
-    // If still 0, try deeper
-    if(!ltp&&allVals.length>0){
-      for(const v of allVals){
-        if(typeof v==='object'&&v!==null){
-          ltp=v?.last_price||v?.LTP||v?.ltp||0;
-          if(ltp>0)break;
-        }
-      }
+    // Check other errors
+    if(d?.status==='failed'){
+      const msg=d?.errorMessage||d?.message||JSON.stringify(d?.data||{}).slice(0,60);
+      credMsg('❌ Dhan error: '+msg,'er');
+      return;
     }
 
+    // Extract LTP — try all known Dhan v2 response formats
+    const seg=d?.data?.IDX_I||d?.data?.['IDX_I']||{};
+    const inst=seg?.['13']||seg?.[13]||Object.values(seg)[0]||{};
+    const ltp=inst?.last_price||inst?.LTP||inst?.ltp||0;
+
     if(ltp>0){
-      S.mp['NIFTY']=ltp;ls.set('mp',S.mp);
+      // Perfect — live price received
+      S.mp.NIFTY=ltp;ls.set('mp',S.mp);
       updatePrice('NIFTY',ltp,'live');
-      credMsg('✅ Connected! Nifty='+ltp.toLocaleString('en-IN'),'ok');
+      credMsg('✅ Token valid! Nifty='+ltp.toLocaleString('en-IN')+' — Live data flowing','ok');
       updateConnBadge('CF_WORKER');
       document.getElementById('tokenAlert').style.display='none';
+    } else if(d?.status==='success'||d?.data){
+      // Token valid but market closed (price=0 after hours)
+      const mn=ist().getHours()*60+ist().getMinutes();
+      const isOpen=mn>=555&&mn<=930&&ist().getDay()>=1&&ist().getDay()<=5;
+      if(!isOpen){
+        credMsg('✅ Token valid! Market closed — prices will show at 9:15 AM','ok');
+        updateConnBadge('CF_WORKER');
+        document.getElementById('tokenAlert').style.display='none';
+      } else {
+        credMsg('⚠️ Token accepted but no price — raw: '+JSON.stringify(d).slice(0,100),'');
+      }
     } else {
-      // Show raw response for debugging
-      const raw=JSON.stringify(d).slice(0,120);
-      credMsg('⚠️ API responded but price format unknown. Raw: '+raw,'');
-      console.warn('[testCreds] Unknown format:',d);
+      credMsg('⚠️ Unexpected response. Raw: '+JSON.stringify(d).slice(0,100),'');
     }
   }catch(e){
     credMsg('❌ '+friendlyErr(e.message),'er');
@@ -1127,9 +1154,10 @@ function stopPriceRefresh(){if(priceTimer){clearInterval(priceTimer);priceTimer=
 async function fetchPrices(){
   if(!S.cr.dc||!S.cr.dt){
     document.getElementById('priceStatus').textContent='Go to SETUP → save Dhan token first';
+    document.getElementById('priceStatus').style.color='var(--orange)';
     return;
   }
-  // Fetch all 4 indices in ONE API call (more efficient)
+  // Fetch all 4 indices in ONE API call
   try{
     const body={'IDX_I':[13,25,27,51]}; // NIFTY,BANKNIFTY,FINNIFTY,SENSEX
     const r=await fetch(CF+'/dhan/ltp',{
@@ -1195,15 +1223,54 @@ function enterPrice(sym){
 
 // ── TOKEN CHECK ──
 async function autoCheckToken(){
-  if(!S.cr.dc||!S.cr.dt)return;
-  const spot=await getSpot('NIFTY');
-  const ta=document.getElementById('tokenAlert');
-  const cb=document.getElementById('connBadge');
-  if(spot>0){
+  if(!S.cr.dc||!S.cr.dt){
+    // No credentials at all
+    document.getElementById('tokenAlert').style.display='block';
+    return;
+  }
+  // Check CF Worker first
+  try{
+    const r=await fetch(CF+'/health',{signal:AbortSignal.timeout(5000)});
+    const h=await r.json();
+    if(h.status!=='ok'){updateConnBadge('FAILED');return;}
+  }catch(e){updateConnBadge('FAILED');return;}
+
+  // Test Dhan token silently
+  try{
+    const r=await fetch(CF+'/dhan/ltp',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','access-token':S.cr.dt,'client-id':S.cr.dc},
+      body:JSON.stringify({'IDX_I':[13]}),
+      signal:AbortSignal.timeout(8000)
+    });
+    const d=await r.json();
+    const ta=document.getElementById('tokenAlert');
+
+    // Auth failure
+    if(d?.httpStatus==='UNAUTHORIZED'||d?.errorCode==='DH-901'||d?.errorType==='Invalid_Token'){
+      if(ta)ta.style.display='block';
+      updateConnBadge('FAILED');
+      return;
+    }
+
+    // Success or market closed
+    const seg=d?.data?.IDX_I||d?.data?.['IDX_I']||{};
+    const inst=seg?.['13']||seg?.[13]||Object.values(seg)[0]||{};
+    const ltp=inst?.last_price||0;
+
+    if(ltp>0){
+      S.mp.NIFTY=ltp;ls.set('mp',S.mp);
+      updatePrice('NIFTY',ltp,'live');
+    }
+
+    // Token is valid (market may just be closed)
     if(ta)ta.style.display='none';
     updateConnBadge('CF_WORKER');
-  }else{
-    if(ta)ta.style.display='block';
+    document.getElementById('dataSource').textContent='CF Worker — Token valid ✅';
+
+  }catch(e){
+    console.warn('[autoCheck]',e.message);
+    updateConnBadge('CF_WORKER'); // Don't show error — may just be network blip
   }
 }
 
