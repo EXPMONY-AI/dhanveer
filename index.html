@@ -869,24 +869,30 @@ function fmt(n){if(n>=1e7)return(n/1e7).toFixed(1)+'Cr';if(n>=1e5)return(n/1e5).
 
 // ── CLOCK ──
 function tick(){
+  if(S.locked) return; // Don't run when app is locked/hidden
   const n=ist();
-  document.getElementById('clk').textContent=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+  const clkEl=document.getElementById('clk');
+  if(!clkEl) return; // Safety check
+  clkEl.textContent=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
   const mn=n.getHours()*60+n.getMinutes(),wd=n.getDay()>=1&&n.getDay()<=5;
   const open=wd&&mn>=555&&mn<=930;
   const pill=document.getElementById('mktPill'),dot=document.getElementById('mktDot'),txt=document.getElementById('mktTxt');
   const mb=document.getElementById('mktBadge');
-  if(open){
-    pill.className='mkt-pill mkt-open';dot.className='mkt-dot mkt-dot-o';txt.textContent='OPEN';
-    if(mb){mb.textContent='🟢 MARKET OPEN';mb.className='badge badge-g';}
-  }else{
-    pill.className='mkt-pill mkt-close';dot.className='mkt-dot mkt-dot-c';txt.textContent='CLOSED';
-    if(mb){mb.textContent='🌙 CLOSED';mb.className='badge badge-r';}
+  if(pill&&dot&&txt){
+    if(open){
+      pill.className='mkt-pill mkt-open';dot.className='mkt-dot mkt-dot-o';txt.textContent='OPEN';
+      if(mb){mb.textContent='🟢 MARKET OPEN';mb.className='badge badge-g';}
+    }else{
+      pill.className='mkt-pill mkt-close';dot.className='mkt-dot mkt-dot-c';txt.textContent='CLOSED';
+      if(mb){mb.textContent='🌙 CLOSED';mb.className='badge badge-r';}
+    }
   }
   updateSession(n,mn,open);
 }
-setInterval(tick,10000);tick();
+setInterval(tick,10000); // tick() called after unlock, not at load
 
 function updateSession(n,mn,open){
+  if(S.locked) return;
   const el=document.getElementById('sessName'),pct=document.getElementById('sessPct'),
     bar=document.getElementById('sessBar'),adv=document.getElementById('sessAdvice');
   if(!el)return;
@@ -903,6 +909,7 @@ function updateSession(n,mn,open){
 }
 
 function updateDayBadge(){
+  if(S.locked)return;
   const el=document.getElementById('dayBadge');if(!el)return;
   const dt=dayType(),nE=nextNiftyExp(),sE=nextSensexExp(),t=today();
   const dn=nE?Math.round((new Date(nE)-new Date(t))/86400000):99;
@@ -951,6 +958,7 @@ function unlock(){
   document.getElementById('pin').style.display='none';
   document.getElementById('app').style.display='flex';
   pinMsg('');startIdle();
+  tick(); // Start clock now that DOM is visible
   updateDayBadge();loadCredentials();loadTrades();buildChecklist();autoSetExpiries();
   setTimeout(()=>{startPriceRefresh();checkCF();autoCheckToken();},800);
 }
@@ -1402,7 +1410,7 @@ async function parseFeed(){
   try{
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:`Parse this Indian options call, return ONLY JSON:\n"${raw}"\n{"strike":<num>,"optType":"CE or PE","trigger":<num>,"signal":"SHORT_COVERING/BREAKOUT/IV_SPIKE/DIRECTIONAL","sym":"NIFTY/BANKNIFTY/SENSEX/FINNIFTY","summary":"<1 sentence>","confidence":<0-100>}`}]})});
     const d=await r.json();
-    let txt=d.content?.[0]?.text||'{}';txt=txt.replace(/\`\`\`json|\`\`\`/g,'').trim();
+    let txt=d.content?.[0]?.text||'{}';txt=txt.replace(/```json|```/g,'').trim();
     const parsed=JSON.parse(txt);IF.active={...parsed,raw,ts:Date.now()};IF.triggered=false;
     el.innerHTML=`<div style="padding:10px;border-radius:9px;background:rgba(0,0,0,.3);border:1px solid rgba(0,212,255,.15);"><div class="g2" style="margin-bottom:8px;"><div class="stat"><div class="stat-l">STRIKE</div><div class="stat-v" style="color:var(--cyan);">${parsed.strike||'?'}</div></div><div class="stat"><div class="stat-l">TYPE</div><div class="stat-v" style="color:${parsed.optType==='CE'?'var(--green)':'var(--red)'};">${parsed.optType||'?'}</div></div></div><div class="g2" style="margin-bottom:8px;"><div class="stat"><div class="stat-l">TRIGGER ₹</div><div class="stat-v" style="color:var(--green);">${parsed.trigger||'?'}</div></div><div class="stat"><div class="stat-l">SIGNAL</div><div class="stat-v" style="font-size:10px;color:var(--cyan);">${(parsed.signal||'').replace(/_/g,' ')}</div></div></div><div style="font-size:10px;color:var(--dim2);line-height:1.7;">${parsed.summary||''}<br><span style="font-size:8px;">Confidence: ${parsed.confidence||'?'}% | Index: ${parsed.sym||'?'}</span></div></div>`;
     document.getElementById('feedBadge').style.display='inline-flex';
