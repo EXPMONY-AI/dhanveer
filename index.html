@@ -1301,12 +1301,10 @@ async function runTitanAI(sym,spot,atm,sc){
   const t=TX.ticks.slice(-5);if(t.length<2)return;
   const l=t[t.length-1],o=t[0];const cChg=o.cL>0?((l.cL-o.cL)/o.cL*100).toFixed(1):0;
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:120,messages:[{role:'user',content:`Indian options trader. Analyse:
-${sym} Spot:${spot} ATM:${atm} CE:₹${l.cL.toFixed(1)} PE:₹${l.pL.toFixed(1)} CE_chg:${cChg}% Score:${sc.total}/100
-3 lines: 1.What's happening 2.Entry good? 3.Key risk. Max 50 words.`}]})});
+    const prompt1=`${sym} Spot:${spot} ATM:${atm} CE:₹${l.cL.toFixed(1)} PE:₹${l.pL.toFixed(1)} CE_chg:${cChg}% Score:${sc.total}/100. 3 lines: 1.Whats happening 2.Entry good? 3.Key risk. Max 50 words.`;
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:120,messages:[{role:'user',content:'Indian options trader. Analyse: '+prompt1}]})});
     const d=await r.json();
-    el.innerHTML='<span style="font-size:8px;color:var(--cyan);">AI — '+ist().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</span><br><br>'+(d.content?.[0]?.text||'').replace(/
-/g,'<br>');
+    el.innerHTML='<span style="font-size:8px;color:var(--cyan);">AI — '+ist().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</span><br><br>'+(d.content?.[0]?.text||'').replace(/\n/g,'<br>');
   }catch(e){el.innerHTML='<span style="color:var(--dim2);">AI unavailable</span>';}
 }
 function tLog(m){const e=document.getElementById('titanLog');if(!e)return;const t=ist().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});e.innerHTML='<span style="color:var(--dim2);">['+t+']</span> '+m+'<br>'+e.innerHTML;const lines=e.innerHTML.split('<br>');if(lines.length>30)e.innerHTML=lines.slice(0,25).join('<br>');}
