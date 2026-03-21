@@ -1558,20 +1558,7 @@ setInterval(updateAIAdvice,60000);
 // Dhan Historical API → PDH/PDL → Zones → Red Bar Detection
 // ================================================
 
-const TK = {
-  on: false,
-  timer: null,
-  candleTimer: null,
-  sym: 'SENSEX',
-  interval: '1',
-  zones: null,
-  candles: [],       // today's 1-min candles from Dhan API
-  pdh: 0, pdl: 0,   // auto-fetched from Dhan API
-  signal: null,
-  signalBar: 0,
-  totalBars: 0,
-  lastSignalType: null,
-};
+
 
 // -- Dhan historical candles (needs Data API) --
 async function dhanCandles(sym, fromDate, toDate, interval) {
@@ -2086,7 +2073,7 @@ function tkStatus(msg, color='var(--dim2)') {
   if(el) { el.textContent = msg; el.style.color = color; }
 }
 
- ENGINE -- Dr. Devendra Red Bar Theory
+// ENGINE -- Dr. Devendra Red Bar Theory
 // Institution zones + TRIKAL levels + Red Bar detection
 // ================================================
 
@@ -2469,13 +2456,13 @@ setTimeout(function(){
   }, 400);
 }, 2500);
 
-// PWA
+// PWA Service Worker
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('sw.js').catch(function(){});
   });
 }
 
-</script>
+</script></script>
 </body>
 </html>
