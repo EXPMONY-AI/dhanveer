@@ -54,21 +54,20 @@ body{padding-top:var(--sat);}
 .scroll::-webkit-scrollbar-thumb{background:var(--b2);}
 
 /* BOTTOM NAV */
-.bnav{display:flex;padding:6px 0 calc(6px + var(--sab));
+.bnav{display:flex;padding:4px 0 calc(4px + var(--sab));
   background:rgba(3,5,8,.98);border-top:1px solid var(--b1);
-  flex-shrink:0;overflow-x:auto;scrollbar-width:none;}
-.bnav::-webkit-scrollbar{display:none;}
+  flex-shrink:0;width:100%;}
 .nb{display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:5px 6px;border:none;background:none;cursor:pointer;
-  min-width:54px;flex-shrink:0;position:relative;}
-.nb-i{font-size:18px;transition:transform .15s;}
-.nb-l{font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
-  color:var(--dim2);transition:color .15s;}
+  padding:5px 2px;border:none;background:none;cursor:pointer;
+  flex:1;position:relative;min-width:0;}
+.nb-i{font-size:17px;transition:transform .15s;line-height:1;}
+.nb-l{font-size:6.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;
+  color:var(--dim2);transition:color .15s;white-space:nowrap;}
 .nb.on .nb-l{color:var(--gold);}
 .nb.on .nb-i{transform:translateY(-2px);}
 .nb.on::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
-  width:24px;height:2px;background:var(--gold);border-radius:0 0 3px 3px;
-  box-shadow:0 0 8px rgba(240,165,0,.6);}
+  width:20px;height:2px;background:var(--gold);border-radius:0 0 3px 3px;
+  box-shadow:0 0 6px rgba(240,165,0,.6);}
 
 /* PAGES */
 .pg{display:none;padding:12px 14px calc(70px + var(--sab));}
@@ -322,6 +321,7 @@ textarea{resize:none;height:70px;font-size:12px;}
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
             <span class="badge badge-o" id="connBadge">&#9889; CONNECTING</span>
+            <span class="badge badge-c" id="wsBadge" style="display:none;">WS</span>
             <span class="badge badge-r" id="mktBadge">&#127769; CLOSED</span>
           </div>
           <span class="badge badge-c" id="expiryChip">LOADING</span>
@@ -699,7 +699,7 @@ textarea{resize:none;height:70px;font-size:12px;}
   <!-- BOTTOM NAV -->
   <div class="bnav">
     <button class="nb on" id="nb-home" ontouchend="goTab('home')"><div class="nb-i">&#127968;</div><div class="nb-l">HOME</div></button>
-    <button class="nb" id="nb-scanner" ontouchend="goTab('scanner')"><div class="nb-i">&#9889;</div><div class="nb-l">SCANNER</div></button>
+    <button class="nb" id="nb-scanner" ontouchend="goTab('scanner')"><div class="nb-i">&#9889;</div><div class="nb-l">SCAN</div></button>
     <button class="nb" id="nb-titan" ontouchend="goTab('titan')"><div class="nb-i">&#128640;</div><div class="nb-l">TITAN</div></button>
     <button class="nb" id="nb-paper" ontouchend="goTab('paper')"><div class="nb-i">&#128221;</div><div class="nb-l">PAPER</div></button>
     <button class="nb" id="nb-trikal" ontouchend="goTab('trikal')"><div class="nb-i">&#128983;</div><div class="nb-l">TRIKAL</div></button>
@@ -779,6 +779,13 @@ async function cfFetch(path,body=null){
 // -- GET SPOT PRICE -- cached from option chain or manual entry
 // Dhan's option chain response includes spot price (last_price field)
 // So getChain() auto-updates spot cache - no separate LTP call needed
+
+async function smartGetSpot(sym) {
+  const cached = wsGetLtp(sym);
+  if(cached) return cached;
+  return getSpot(sym);
+}
+
 async function getSpot(sym){
   // First try: get from option chain cache (updated by getChain)
   if(S.mp[sym]>0) return S.mp[sym];
@@ -982,14 +989,15 @@ function unlock(){
   document.getElementById('pin').style.display='none';
   document.getElementById('app').style.display='flex';
   pinMsg('');startIdle();
-  tick(); // Start clock now that DOM is visible
+  tick();
   updateDayBadge();loadCredentials();loadTrades();buildChecklist();autoSetExpiries();
-  setTimeout(()=>{startPriceRefresh();checkCF();autoCheckToken();},800);
+  setTimeout(function(){startPriceRefresh();checkCF();autoCheckToken();},800);
+  setTimeout(function(){wsConnect();},1800);
 }
 
 function lockApp(){
   S.locked=true;S.pb='';S.npb='';upd();
-  stopScan();stopTitan();scoutStop();stopFeedMonitor();stopPriceRefresh();if(TK.on)stopTRIKAL();
+  stopScan();stopTitan();scoutStop();stopFeedMonitor();stopPriceRefresh();wsDisconnect();if(TK.on)stopTRIKAL();
   document.getElementById('pin').style.display='flex';
   document.getElementById('app').style.display='none';
   clearInterval(S.idle);
@@ -1051,7 +1059,42 @@ async function checkCF(){
 async function deployWorker(){
   const el=document.getElementById('deployStatus');
   if(el){el.style.display='block';el.textContent='⏳ Deploying...';el.style.color='var(--dim2)';}
-  const CODE=`export default{async fetch(r,e,c){const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type,access-token,client-id'};if(r.method==='OPTIONS')return new Response(null,{headers:cors});const u=new URL(r.url),p=u.pathname;if(p==='/health')return Response.json({status:'ok',proxy:'dhan-proxy',version:'2.1',ts:Date.now()},{headers:cors});const t=r.headers.get('access-token')||'',i=r.headers.get('client-id')||'';if(!t||!i)return Response.json({error:'Missing credentials'},{status:401,headers:cors});const dH={'access-token':t,'client-id':i,'Content-Type':'application/json'};let b=null;if(r.method==='POST'){try{b=await r.json();}catch(e){}}const routes={'/dhan/ltp':'https://api.dhan.co/v2/marketfeed/ltp','/dhan/optionchain':'https://api.dhan.co/v2/optionchain','/dhan/expirylist':'https://api.dhan.co/v2/optionchain/expirylist','/dhan/quote':'https://api.dhan.co/v2/marketfeed/quote','/dhan/orders':'https://api.dhan.co/v2/orders','/dhan/positions':'https://api.dhan.co/v2/positions','/dhan/holdings':'https://api.dhan.co/v2/holdings','/dhan/funds':'https://api.dhan.co/v2/fundlimit','/dhan/candles':'https://api.dhan.co/v2/charts/intraday','/dhan/prevday':'https://api.dhan.co/v2/charts/historical'};const dU=routes[p];if(!dU)return Response.json({error:'Unknown: '+p},{status:404,headers:cors});try{const resp=await fetch(dU,{method:b?'POST':'GET',headers:dH,body:b?JSON.stringify(b):undefined});const data=await resp.json();return Response.json(data,{headers:cors});}catch(err){return Response.json({error:err.message},{status:500,headers:cors});}}}`;
+  const CODE=`export default{async fetch(r,env,c){
+const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type,access-token,client-id'};
+if(r.method==='OPTIONS')return new Response(null,{headers:cors});
+const u=new URL(r.url),p=u.pathname;
+let b=null;if(r.method==='POST'){try{b=await r.json();}catch(e){}}
+if(p==='/health')return Response.json({status:'ok',proxy:'dhan-proxy',version:'3.0',ai:!!(env.GEMINI_KEY||env.GROQ_KEY||env.ANTHROPIC_KEY),ts:Date.now()},{headers:cors});
+if(p==='/ai/chat'){
+  const prompt=b?.prompt||'';const maxTok=b?.max_tokens||120;
+  const gKey=env.GEMINI_KEY||'';const rKey=env.GROQ_KEY||'';const aKey=env.ANTHROPIC_KEY||'';
+  try{
+    if(gKey){
+      const gr=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+gKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:maxTok}})});
+      const gd=await gr.json();
+      return Response.json({text:gd?.candidates?.[0]?.content?.parts?.[0]?.text||''},{headers:cors});
+    }
+    if(rKey){
+      const rr=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+rKey},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],max_tokens:maxTok})});
+      const rd=await rr.json();
+      return Response.json({text:rd?.choices?.[0]?.message?.content||''},{headers:cors});
+    }
+    if(aKey){
+      const ar=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':aKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTok,messages:[{role:'user',content:prompt}]})});
+      const ad=await ar.json();
+      return Response.json({text:ad?.content?.[0]?.text||''},{headers:cors});
+    }
+    return Response.json({text:'',error:'No AI key set in CF Worker'},{headers:cors});
+  }catch(err){return Response.json({text:'',error:err.message},{status:500,headers:cors});}
+}
+const t=r.headers.get('access-token')||'',i=r.headers.get('client-id')||'';
+if(!t||!i)return Response.json({error:'Missing credentials'},{status:401,headers:cors});
+const dH={'access-token':t,'client-id':i,'Content-Type':'application/json'};
+const routes={'/dhan/ltp':'https://api.dhan.co/v2/marketfeed/ltp','/dhan/quote':'https://api.dhan.co/v2/marketfeed/quote','/dhan/optionchain':'https://api.dhan.co/v2/optionchain','/dhan/expirylist':'https://api.dhan.co/v2/optionchain/expirylist','/dhan/candles':'https://api.dhan.co/v2/charts/intraday','/dhan/prevday':'https://api.dhan.co/v2/charts/historical','/dhan/orders':'https://api.dhan.co/v2/orders','/dhan/positions':'https://api.dhan.co/v2/positions','/dhan/holdings':'https://api.dhan.co/v2/holdings','/dhan/funds':'https://api.dhan.co/v2/fundlimit'};
+const dU=routes[p];if(!dU)return Response.json({error:'Unknown route: '+p},{status:404,headers:cors});
+try{const resp=await fetch(dU,{method:b?'POST':'GET',headers:dH,body:b?JSON.stringify(b):undefined});const data=await resp.json();return Response.json(data,{headers:cors});}
+catch(err){return Response.json({error:err.message},{status:500,headers:cors});}
+}}`;
   try{
     const resp=await fetch('https://api.cloudflare.com/client/v4/accounts/7ec7678eb525013d2c088eca4e1ac7a7/workers/scripts/dhan-proxy',{method:'PUT',headers:{'X-Auth-Email':'sridharsrtips@gmail.com','X-Auth-Key':'287598a14015bc32f3c1a96bd92a0e248bd13','Content-Type':'application/javascript'},body:CODE});
     const data=await resp.json();
@@ -1070,7 +1113,7 @@ function updateConnBadge(src){
 }
 
 let priceTimer=null;
-function startPriceRefresh(){stopPriceRefresh();fetchPrices();priceTimer=setInterval(fetchPrices,8000);}
+function startPriceRefresh(){stopPriceRefresh();fetchPricesHybrid();priceTimer=setInterval(fetchPricesHybrid,8000);}
 function stopPriceRefresh(){if(priceTimer){clearInterval(priceTimer);priceTimer=null;}}
 
 async function fetchPrices(){
@@ -1117,7 +1160,7 @@ async function fetchPrices(){
     }
   }catch(e){
     let fetched=0;
-    for(const sym of['NIFTY','SENSEX','BANKNIFTY','FINNIFTY']){try{const ltp=await getSpot(sym);if(ltp>0){updatePrice(sym,ltp,'live');fetched++;}}catch{}}
+    for(const sym of['NIFTY','SENSEX','BANKNIFTY','FINNIFTY']){try{const ltp=await smartGetSpot(sym);if(ltp>0){updatePrice(sym,ltp,'live');fetched++;}}catch{}}
     const el=document.getElementById('priceStatus');
     if(fetched>0){el.textContent='✅ '+fetched+' prices';el.style.color='var(--green)';}
     else{el.textContent='Tap any price to enter manually';el.style.color='var(--dim2)';}
@@ -1329,10 +1372,9 @@ async function runTitanAI(sym,spot,atm,sc){
   const l=t[t.length-1],o=t[0];const cChg=o.cL>0?((l.cL-o.cL)/o.cL*100).toFixed(1):0;
   try{
     const prompt1=`${sym} Spot:${spot} ATM:${atm} CE:₹${l.cL.toFixed(1)} PE:₹${l.pL.toFixed(1)} CE_chg:${cChg}% Score:${sc.total}/100. 3 lines: 1.Whats happening 2.Entry good? 3.Key risk. Max 50 words.`;
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:120,messages:[{role:'user',content:'Indian options trader. Analyse: '+prompt1}]})});
-    const d=await r.json();
-    el.innerHTML='<span style="font-size:8px;color:var(--cyan);">AI -- '+ist().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</span><br><br>'+(d.content?.[0]?.text||'').replace(/\n/g,'<br>');
-  }catch(e){el.innerHTML='<span style="color:var(--dim2);">AI unavailable</span>';}
+    const r=await const d1txt=await aiChat('Indian options trader. Analyse: '+prompt1,120);
+    el.innerHTML='<span style="font-size:8px;color:var(--cyan);">AI -- '+ist().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</span><br><br>'+(d1txt||'No AI response').replace(/\n/g,'<br>');
+  }catch(e){el.innerHTML='<span style="color:var(--dim2);">AI analysis needs Anthropic key in CF Worker</span>';}
 }
 function tLog(m){const e=document.getElementById('titanLog');if(!e)return;const t=ist().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});e.innerHTML='<span style="color:var(--dim2);">['+t+']</span> '+m+'<br>'+e.innerHTML;const lines=e.innerHTML.split('<br>');if(lines.length>30)e.innerHTML=lines.slice(0,25).join('<br>');}
 
@@ -1418,10 +1460,10 @@ async function runScoutAI(sym,spot,atm,top3,exp){
   const el=document.getElementById('spVerdict');el.innerHTML='<span style="color:var(--purple);">🧠 Analysing...</span>';
   const picks=top3.map(([s,sc])=>`Strike ${s} ${sc.side}: Score=${sc.total} Signal=${sc.signal} LTP=₹${sc.ltp} Trigger=₹${sc.trigger}`).join('\n');
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:120,messages:[{role:'user',content:`Indian options expert. Auto-Scout for ${sym}:\nSpot:${spot} ATM:${atm} Expiry:${exp}\n${picks}\n3 lines: 1.Best setup & why 2.Short covering or breakout? 3.Entry trigger. Max 55 words.`}]})});
+    const r=await const d2txt=await aiChat(`Indian options expert. Auto-Scout for ${sym}: Spot:${spot} ATM:${atm} Expiry:${exp} ${picks} 3 lines: 1.Best setup & why 2.Short covering or breakout? 3.Entry trigger. Max 55 words.`,120);
     const d=await r.json();
     el.innerHTML='<span style="font-size:8px;color:var(--purple);">AI -- '+ist().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</span><br><br>'+(d.content?.[0]?.text||'').replace(/\n/g,'<br>');
-  }catch(e){el.innerHTML='<span style="color:var(--dim2);">AI unavailable</span>';}
+  }catch(e){el.innerHTML='<span style="color:var(--dim2);">AI analysis needs Anthropic key in CF Worker</span>';}
   SC.aiPending=false;
 }
 
@@ -1433,9 +1475,8 @@ async function parseFeed(){
   const el=document.getElementById('feedResult');el.style.display='block';
   el.innerHTML='<div style="font-size:10px;color:var(--cyan);">🧠 Parsing...</div>';
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:`Parse this Indian options call, return ONLY JSON:\n"${raw}"\n{"strike":<num>,"optType":"CE or PE","trigger":<num>,"signal":"SHORT_COVERING/BREAKOUT/IV_SPIKE/DIRECTIONAL","sym":"NIFTY/BANKNIFTY/SENSEX/FINNIFTY","summary":"<1 sentence>","confidence":<0-100>}`}]})});
-    const d=await r.json();
-    let txt=d.content?.[0]?.text||'{}';txt=txt.replace(/```json|```/g,'').trim();
+    const r=await const d3txt=await aiChat(`Parse this Indian options call, return ONLY JSON no markdown: "${raw}" -> {"strike":<num>,"optType":"CE or PE","trigger":<num>,"signal":"SHORT_COVERING/BREAKOUT/IV_SPIKE/DIRECTIONAL","sym":"NIFTY/BANKNIFTY/SENSEX/FINNIFTY","summary":"<1 sentence>","confidence":<0-100>}`,200);
+    let txt=d3txt||'{}'txt=txt.replace(/```json|```/g,'').trim();
     const parsed=JSON.parse(txt);IF.active={...parsed,raw,ts:Date.now()};IF.triggered=false;
     el.innerHTML=`<div style="padding:10px;border-radius:9px;background:rgba(0,0,0,.3);border:1px solid rgba(0,212,255,.15);"><div class="g2" style="margin-bottom:8px;"><div class="stat"><div class="stat-l">STRIKE</div><div class="stat-v" style="color:var(--cyan);">${parsed.strike||'?'}</div></div><div class="stat"><div class="stat-l">TYPE</div><div class="stat-v" style="color:${parsed.optType==='CE'?'var(--green)':'var(--red)'};">${parsed.optType||'?'}</div></div></div><div class="g2" style="margin-bottom:8px;"><div class="stat"><div class="stat-l">TRIGGER ₹</div><div class="stat-v" style="color:var(--green);">${parsed.trigger||'?'}</div></div><div class="stat"><div class="stat-l">SIGNAL</div><div class="stat-v" style="font-size:10px;color:var(--cyan);">${(parsed.signal||'').replace(/_/g,' ')}</div></div></div><div style="font-size:10px;color:var(--dim2);line-height:1.7;">${parsed.summary||''}<br><span style="font-size:8px;">Confidence: ${parsed.confidence||'?'}% | Index: ${parsed.sym||'?'}</span></div></div>`;
     document.getElementById('feedBadge').style.display='inline-flex';
@@ -2393,7 +2434,7 @@ async function doTRIKALTick() {
   resetIdle();
   const sym = TK.sym;
   const todayDate = isoDate(ist());
-  const spot = await getSpot(sym);
+  const spot = await smartGetSpot(sym);
   const sp = S.mp[sym] || spot || defaultSpot(sym);
 
   // Get fresh candles
@@ -2447,7 +2488,156 @@ setTimeout(()=>{
 setTimeout(function(){
   var sp = document.getElementById('splash');
   if(sp){ sp.style.transition = 'opacity 0.4s'; sp.style.opacity = '0'; }
-  setTimeout(function(){
+  
+// ============================================================
+// WEBSOCKET ENGINE -- Dhan Live Market Feed (tick-by-tick)
+// wss://api-feed.dhan.co -- Binary Little Endian protocol
+// Auto-reconnects, falls back to REST on any failure
+// ============================================================
+const WS = {
+  sock: null, on: false, mode: 'REST',
+  reconnTmr: null, reconnCnt: 0, maxReconn: 5,
+  pingTmr: null, ticks: {},
+  callbacks: []
+};
+
+function wsConnect() {
+  if(!S.cr.dc || !S.cr.dt) return;
+  if(WS.sock && WS.sock.readyState < 2) return;
+  try {
+    const url = 'wss://api-feed.dhan.co?version=2&token=' +
+      encodeURIComponent(S.cr.dt) + '&clientId=' +
+      encodeURIComponent(S.cr.dc) + '&authType=2';
+    WS.sock = new WebSocket(url);
+    WS.sock.binaryType = 'arraybuffer';
+
+    WS.sock.onopen = function() {
+      WS.on = true; WS.reconnCnt = 0; WS.mode = 'WS';
+      wsBadge('WS LIVE', 'var(--green)');
+      wsSubscribe();
+      wsPing(true);
+    };
+
+    WS.sock.onmessage = function(e) {
+      if(e.data instanceof ArrayBuffer) wsParse(e.data);
+    };
+
+    WS.sock.onerror = function() {
+      WS.mode = 'REST'; wsBadge('REST', 'var(--gold)');
+    };
+
+    WS.sock.onclose = function(e) {
+      WS.on = false; wsPing(false);
+      if(e.code !== 1000 && WS.reconnCnt < WS.maxReconn) {
+        WS.reconnCnt++;
+        WS.reconnTmr = setTimeout(wsConnect, 4000);
+        wsBadge('RECONNECTING', 'var(--orange)');
+      } else {
+        WS.mode = 'REST'; wsBadge('REST', 'var(--gold)');
+      }
+    };
+  } catch(e) {
+    WS.mode = 'REST'; wsBadge('REST', 'var(--gold)');
+  }
+}
+
+function wsSubscribe() {
+  if(!WS.sock || WS.sock.readyState !== 1) return;
+  WS.sock.send(JSON.stringify({
+    RequestCode: 17,
+    InstrumentCount: 4,
+    InstrumentList: [
+      { ExchangeSegment: 'IDX_I', SecurityId: '13' },
+      { ExchangeSegment: 'IDX_I', SecurityId: '51' },
+      { ExchangeSegment: 'IDX_I', SecurityId: '25' },
+      { ExchangeSegment: 'IDX_I', SecurityId: '27' }
+    ]
+  }));
+}
+
+function wsParse(buf) {
+  const v = new DataView(buf);
+  let o = 0;
+  while(o + 8 <= buf.byteLength) {
+    const code = v.getInt8(o);
+    const len  = v.getInt16(o + 1, true);
+    const sid  = v.getInt32(o + 4, true);
+    if(code === 2 && len >= 16 && o + 16 <= buf.byteLength) {
+      const ltp = v.getFloat32(o + 8, true);
+      if(ltp > 0) {
+        const sym = {13:'NIFTY',51:'SENSEX',25:'BANKNIFTY',27:'FINNIFTY'}[sid];
+        if(sym) {
+          S.mp[sym] = ltp;
+          WS.ticks[sym] = { ltp, ts: Date.now() };
+          updatePrice(sym, ltp, true);
+          WS.callbacks.forEach(function(cb){ try{ cb(sym,ltp); }catch(e){} });
+        }
+      }
+    }
+    o += (len > 0 ? len : 8);
+  }
+}
+
+function wsPing(start) {
+  if(WS.pingTmr){ clearInterval(WS.pingTmr); WS.pingTmr = null; }
+  if(!start) return;
+  WS.pingTmr = setInterval(function(){
+    if(WS.sock && WS.sock.readyState === 1)
+      WS.sock.send(JSON.stringify({ RequestCode: 12 }));
+  }, 25000);
+}
+
+function wsDisconnect() {
+  wsPing(false); clearTimeout(WS.reconnTmr);
+  if(WS.sock){ try{ WS.sock.close(1000,'logout'); }catch(e){} WS.sock=null; }
+  WS.on=false; WS.mode='REST';
+}
+
+function wsBadge(txt, col) {
+  const el = document.getElementById('connBadge');
+  if(el){ el.textContent = txt; el.style.color = col; }
+  const ds = document.getElementById('dataSource');
+  if(ds){ ds.textContent = txt + ' active'; ds.style.color = col; }
+}
+
+function wsOnTick(cb){ WS.callbacks.push(cb); }
+
+function wsGetLtp(sym) {
+  const t = WS.ticks[sym];
+  return (t && Date.now()-t.ts < 5000) ? t.ltp : null;
+}
+
+
+
+// ============================================================
+// UNIVERSAL AI ENGINE
+// Supports: Google Gemini (AIza...) FREE
+//           Groq (gsk_...)          FREE
+//           Anthropic (sk-ant-...)  PAID
+// Set AI_KEY in Cloudflare Worker environment variables
+// CF Worker route: /ai/chat handles all providers
+// ============================================================
+
+async function aiChat(prompt, maxTokens) {
+  maxTokens = maxTokens || 120;
+  try {
+    const r = await fetch(CF + '/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: prompt, max_tokens: maxTokens }),
+      signal: AbortSignal.timeout(15000)
+    });
+    if(!r.ok) throw new Error('AI HTTP ' + r.status);
+    const d = await r.json();
+    // Universal response parser -- handles all providers
+    return d.text || d.result || '';
+  } catch(e) {
+    console.warn('[AI]', e.message);
+    return '';
+  }
+}
+
+setTimeout(function(){
     if(sp) sp.style.display = 'none';
     var pin = document.getElementById('pin');
     if(pin) pin.style.display = 'flex';
