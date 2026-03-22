@@ -144,14 +144,14 @@ textarea{resize:none;height:70px;font-size:12px;}
 <div id="fl"></div>
 
 <div id="splash">
-  <div class="sp-shield">&#127965;</div>
+  <div class="sp-shield">&#9876;&#65039;</div>
   <div class="sp-name">GAMA-AI</div>
   <div class="sp-sub">DHANVEER v11</div>
   <div class="sp-bar"><div class="sp-fill"></div></div>
 </div>
 
-<div id="pin">
-  <div class="pin-icon">&#128272;</div>
+<div id="pin" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;">
+  <div class="pin-icon">&#128274;</div>
   <div class="pin-name">GAMA-AI</div>
   <div class="pin-sub">DHANVEER v11</div>
   <div class="pin-prompt" id="pinPrompt">ENTER YOUR PIN</div>
@@ -1437,8 +1437,8 @@ async function parseFeed(){
   const el=document.getElementById('feedResult');el.style.display='block';
   el.innerHTML='<div style="font-size:10px;color:var(--cyan);">🧠 Parsing...</div>';
   try{
-    const r=await aiChat(`Parse this Indian options call, return ONLY JSON:\n"${raw}"\n{"strike":<num>,"optType":"CE or PE","trigger":<num>,"signal":"SHORT_COVERING/BREAKOUT/IV_SPIKE/DIRECTIONAL","sym":"NIFTY/BANKNIFTY/SENSEX/FINNIFTY","summary":"<1 sentence>","confidence":<0-100>}`,200)txt=txt.replace(/```json|```/g,'').trim();
-    const parsed=JSON.parse(txt);IF.active={...parsed,raw,ts:Date.now()};IF.triggered=false;
+    const txt=(await aiChat(`Parse this Indian options call, return ONLY JSON: "${raw}" -> {"strike":<num>,"optType":"CE or PE","trigger":<num>,"signal":"SHORT_COVERING/BREAKOUT/IV_SPIKE/DIRECTIONAL","sym":"NIFTY/BANKNIFTY/SENSEX/FINNIFTY","summary":"<1 sentence>","confidence":<0-100>}`,200)||'{}';const txc=txt.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(txc||'{}');IF.active={...parsed,raw,ts:Date.now()};IF.triggered=false;
     el.innerHTML=`<div style="padding:10px;border-radius:9px;background:rgba(0,0,0,.3);border:1px solid rgba(0,212,255,.15);"><div class="g2" style="margin-bottom:8px;"><div class="stat"><div class="stat-l">STRIKE</div><div class="stat-v" style="color:var(--cyan);">${parsed.strike||'?'}</div></div><div class="stat"><div class="stat-l">TYPE</div><div class="stat-v" style="color:${parsed.optType==='CE'?'var(--green)':'var(--red)'};">${parsed.optType||'?'}</div></div></div><div class="g2" style="margin-bottom:8px;"><div class="stat"><div class="stat-l">TRIGGER ₹</div><div class="stat-v" style="color:var(--green);">${parsed.trigger||'?'}</div></div><div class="stat"><div class="stat-l">SIGNAL</div><div class="stat-v" style="font-size:10px;color:var(--cyan);">${(parsed.signal||'').replace(/_/g,' ')}</div></div></div><div style="font-size:10px;color:var(--dim2);line-height:1.7;">${parsed.summary||''}<br><span style="font-size:8px;">Confidence: ${parsed.confidence||'?'}% | Index: ${parsed.sym||'?'}</span></div></div>`;
     document.getElementById('feedBadge').style.display='inline-flex';
     startFeedMonitor();document.getElementById('feedInput').value='';
@@ -1551,7 +1551,7 @@ function updateAIAdvice(){
   else{advice='<strong style="color:var(--red);">Final Hour</strong> -- Momentum trades only. Exit all positions before 3:25 PM.';}
   el.innerHTML=advice;
 }
-setInterval(updateAIAdvice,60000);
+// updateAIAdvice interval started in unlock()
 
 
 // ================================================
@@ -2075,7 +2075,7 @@ function tkStatus(msg, color='var(--dim2)') {
   if(el) { el.textContent = msg; el.style.color = color; }
 }
 
- ENGINE -- Dr. Devendra Red Bar Theory
+// ENGINE -- Dr. Devendra Red Bar Theory
 // Institution zones + TRIKAL levels + Red Bar detection
 // ================================================
 
@@ -2528,11 +2528,11 @@ async function aiChat(prompt,maxTokens){
 }
 
 // ── PWA ────────────────────────────────────────────────────────
-if('serviceWorker' in navigator){
-  window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
-  });
-}
+
+
+
+
+
 
 
 // -- SPLASH → PIN --
