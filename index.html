@@ -991,6 +991,8 @@ function unlock(){
   pinMsg('');startIdle();
   tick();
   updateDayBadge();loadCredentials();loadTrades();buildChecklist();autoSetExpiries();
+  updateAIAdvice();
+  if(!S._aiTimer) S._aiTimer=setInterval(updateAIAdvice,60000);
   setTimeout(function(){startPriceRefresh();checkCF();autoCheckToken();},800);
   setTimeout(function(){wsConnect();},1800);
 }
@@ -1575,6 +1577,7 @@ function installApp(){
 
 // -- AI ADVICE (Fyers-style) --
 function updateAIAdvice(){
+  if(S.locked)return;
   const el=document.getElementById('aiAdviceText');if(!el)return;
   const mn=ist().getHours()*60+ist().getMinutes(),wd=ist().getDay()>=1&&ist().getDay()<=5;
   const open=wd&&mn>=555&&mn<=930;
@@ -1590,7 +1593,7 @@ function updateAIAdvice(){
   else{advice='<strong style="color:var(--red);">Final Hour</strong> -- Momentum trades only. Exit all positions before 3:25 PM.';}
   el.innerHTML=advice;
 }
-setInterval(updateAIAdvice,60000);
+// updateAIAdvice interval started after unlock
 
 
 // ================================================
@@ -2484,12 +2487,6 @@ setTimeout(()=>{
   },400);
 },2500);
 
-// ── SPLASH -> PIN ──
-setTimeout(function(){
-  var sp = document.getElementById('splash');
-  if(sp){ sp.style.transition = 'opacity 0.4s'; sp.style.opacity = '0'; }
-  
-// ============================================================
 // WEBSOCKET ENGINE -- Dhan Live Market Feed (tick-by-tick)
 // wss://api-feed.dhan.co -- Binary Little Endian protocol
 // Auto-reconnects, falls back to REST on any failure
@@ -2636,16 +2633,6 @@ async function aiChat(prompt, maxTokens) {
     return '';
   }
 }
-
-setTimeout(function(){
-    if(sp) sp.style.display = 'none';
-    var pin = document.getElementById('pin');
-    if(pin) pin.style.display = 'flex';
-    var pp = document.getElementById('pinPrompt');
-    if(pp) pp.textContent = S.pin ? 'ENTER YOUR PIN' : 'CREATE YOUR 4-DIGIT PIN';
-  }, 400);
-}, 2500);
-
 // PWA Service Worker
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
