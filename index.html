@@ -3,19 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DHANVEER v11 • Easy Live</title>
+  <title>DHANVEER v11 • All Tabs Live</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-    body { font-family: 'Inter', sans-serif; background: #000; color: #fff; }
-    .tab-content { display: none; }
+    body { font-family: 'Inter', sans-serif; background: #000; color: #fff; overflow-x: hidden; }
+    .tab-content { display: none; padding: 1rem; }
     .tab-content.active { display: block; }
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background: #0a0a0a; border-top: 1px solid #333; }
-    .main-content { padding-top: 110px; padding-bottom: 90px; overflow-y: auto; height: 100vh; }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background: #0a0a0a; border-top: 1px solid #333; padding: 0.5rem 0; }
+    .main-content { padding-top: 120px; padding-bottom: 90px; overflow-y: auto; height: 100vh; }
     .nav-item { transition: all 0.2s; }
-    .nav-item.active { color: #eab308 !important; transform: scale(1.08); }
-    .index-bar { background: #111; position: sticky; top: 0; z-index: 40; }
-    .toast { position: fixed; bottom: 100px; left: 10px; right: 10px; background: #065f46; color: white; padding: 12px; border-radius: 12px; text-align: center; z-index: 60; opacity: 0; transition: opacity 0.4s; }
+    .nav-item.active { color: #eab308 !important; transform: scale(1.1); font-weight: 600; }
+    .index-bar { background: #111; position: sticky; top: 0; z-index: 40; border-bottom: 1px solid #222; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -25,17 +24,17 @@
     <div class="flex items-center justify-between px-4 py-3">
       <div class="flex items-center gap-2">
         <div class="w-9 h-9 bg-yellow-500 rounded flex items-center justify-center text-black font-bold text-xl">DV</div>
-        <div class="font-bold text-xl">DHANVEER</div>
+        <div class="font-bold text-xl tracking-wide">DHANVEER</div>
       </div>
       <div id="market-status" class="px-4 py-1 rounded-full text-sm font-medium bg-green-600 text-black">● OPEN</div>
-      <div id="clock" class="text-base font-mono">09:30</div>
+      <div id="clock" class="text-base font-mono">09:45</div>
     </div>
 
-    <div class="index-bar grid grid-cols-4 text-center text-sm py-2 border-t border-gray-700">
-      <div><div class="text-gray-500 text-xs">NIFTY</div><div id="nifty" class="font-bold text-green-400">–</div></div>
-      <div><div class="text-gray-500 text-xs">SENSEX</div><div id="sensex" class="font-bold text-green-400">–</div></div>
-      <div><div class="text-gray-500 text-xs">BANKNIFTY</div><div id="bank" class="font-bold text-green-400">–</div></div>
-      <div><div class="text-gray-500 text-xs">FINNIFTY</div><div id="fin" class="font-bold text-green-400">–</div></div>
+    <div class="index-bar grid grid-cols-4 text-center text-sm py-2">
+      <div><div class="text-gray-500 text-xs">NIFTY</div><div id="nifty" class="font-bold text-green-400 text-lg">-</div></div>
+      <div><div class="text-gray-500 text-xs">SENSEX</div><div id="sensex" class="font-bold text-green-400 text-lg">-</div></div>
+      <div><div class="text-gray-500 text-xs">BANKNIFTY</div><div id="bank" class="font-bold text-green-400 text-lg">-</div></div>
+      <div><div class="text-gray-500 text-xs">FINNIFTY</div><div id="fin" class="font-bold text-green-400 text-lg">-</div></div>
     </div>
   </div>
 
@@ -44,76 +43,116 @@
 
     <!-- HOME -->
     <div id="home" class="tab-content active">
-      <div class="bg-gray-900 rounded-xl p-4 mb-5">
-        <div class="text-yellow-400 font-medium mb-2">Live Status</div>
-        <div id="connection-msg" class="text-sm text-gray-400">Waiting for credentials...</div>
+      <div class="bg-gray-900 rounded-xl p-5 mb-6">
+        <div class="text-yellow-400 font-medium text-lg mb-2">Live Market Overview</div>
+        <div id="connection-msg" class="text-base text-gray-300">Enter credentials in SETUP to get real Dhan prices</div>
       </div>
-
       <div class="grid grid-cols-2 gap-4">
         <div class="bg-gray-800 rounded-xl p-5 text-center">
-          <div class="text-gray-400 text-sm">NIFTY</div>
-          <div id="live-nifty" class="text-3xl font-bold text-green-400 mt-1">–</div>
+          <div class="text-gray-400 text-sm mb-1">NIFTY</div>
+          <div id="live-nifty" class="text-3xl font-bold text-green-400">-</div>
         </div>
         <div class="bg-gray-800 rounded-xl p-5 text-center">
-          <div class="text-gray-400 text-sm">SENSEX</div>
-          <div id="live-sensex" class="text-3xl font-bold text-green-400 mt-1">–</div>
+          <div class="text-gray-400 text-sm mb-1">SENSEX</div>
+          <div id="live-sensex" class="text-3xl font-bold text-green-400">-</div>
         </div>
         <div class="bg-gray-800 rounded-xl p-5 text-center">
-          <div class="text-gray-400 text-sm">BANK NIFTY</div>
-          <div id="live-bank" class="text-3xl font-bold text-green-400 mt-1">–</div>
+          <div class="text-gray-400 text-sm mb-1">BANK NIFTY</div>
+          <div id="live-bank" class="text-3xl font-bold text-green-400">-</div>
         </div>
         <div class="bg-gray-800 rounded-xl p-5 text-center">
-          <div class="text-gray-400 text-sm">FIN NIFTY</div>
-          <div id="live-fin" class="text-3xl font-bold text-green-400 mt-1">–</div>
+          <div class="text-gray-400 text-sm mb-1">FIN NIFTY</div>
+          <div id="live-fin" class="text-3xl font-bold text-green-400">-</div>
         </div>
+      </div>
+    </div>
+
+    <!-- SCANNER -->
+    <div id="scanner" class="tab-content">
+      <div class="bg-gray-900 rounded-xl p-6 text-center mt-8">
+        <div class="text-5xl mb-4">⚡</div>
+        <div class="text-xl font-bold mb-2">SCANNER</div>
+        <div class="text-gray-400">Option scanner & alerts coming soon...</div>
+      </div>
+    </div>
+
+    <!-- TITAN -->
+    <div id="titan" class="tab-content">
+      <div class="bg-gray-900 rounded-xl p-5 mt-6">
+        <div class="text-yellow-400 font-medium text-lg mb-3">TITAN LOG</div>
+        <div id="titan-log" class="bg-black rounded-lg p-4 text-sm font-mono text-green-300 h-64 overflow-y-auto">
+          [Connecting...] Waiting for Dhan data...
+        </div>
+      </div>
+    </div>
+
+    <!-- PAPER -->
+    <div id="paper" class="tab-content">
+      <div class="bg-gray-900 rounded-xl p-6 text-center mt-8">
+        <div class="text-5xl mb-4">📄</div>
+        <div class="text-xl font-bold mb-2">PAPER TRADING</div>
+        <div class="text-gray-400">Simulate trades without real money</div>
       </div>
     </div>
 
     <!-- TRIKAL -->
     <div id="trikal" class="tab-content">
-      <div class="bg-gray-900 rounded-xl p-6 text-center mt-6">
-        <div class="text-4xl mb-4">🏛️</div>
-        <div class="text-xl font-bold mb-3">TRIKAL ENGINE</div>
-        <div id="trikal-msg" class="text-green-400 text-lg">Connect in SETUP to activate</div>
+      <div class="bg-gradient-to-br from-purple-950 to-gray-900 rounded-xl p-6 text-center mt-6">
+        <div class="text-5xl mb-4">🏛️</div>
+        <div class="text-2xl font-bold mb-3">TRIKAL STRATEGY ENGINE</div>
+        <div id="trikal-msg" class="text-green-400 text-lg">Connect in SETUP to activate live engine</div>
+        <div class="mt-6 text-gray-300 text-sm">Once connected, real Dhan signals will appear here.</div>
       </div>
     </div>
 
     <!-- SETUP -->
     <div id="setup" class="tab-content">
       <div class="bg-gray-900 rounded-xl p-6 mt-6">
-        <h2 class="text-yellow-400 text-xl font-bold mb-6">SETUP - Connect Dhan</h2>
+        <h2 class="text-yellow-400 text-2xl font-bold mb-6">SETUP - Connect to Dhan</h2>
         
-        <div class="space-y-5">
+        <div class="space-y-6">
           <div>
-            <label class="text-sm text-gray-400 block mb-1">Client ID</label>
-            <input id="client-id" type="text" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-base" placeholder="Your Dhan Client ID">
+            <label class="text-base text-gray-300 block mb-2">Client ID</label>
+            <input id="client-id" type="text" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-base" placeholder="e.g. 1108067088">
           </div>
           <div>
-            <label class="text-sm text-gray-400 block mb-1">Access Token</label>
-            <input id="access-token" type="password" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-base" placeholder="Your Access Token">
+            <label class="text-base text-gray-300 block mb-2">Access Token</label>
+            <input id="access-token" type="password" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-base" placeholder="Paste your token here">
           </div>
           <div>
-            <label class="text-sm text-gray-400 block mb-1">Worker URL</label>
-            <input id="worker-url" type="text" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-base" placeholder="https://your-worker.workers.dev">
+            <label class="text-base text-gray-300 block mb-2">Worker URL</label>
+            <input id="worker-url" type="text" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-base" placeholder="https://yourname.workers.dev">
           </div>
 
-          <button onclick="saveAndConnect()" class="w-full bg-green-600 text-white font-bold py-4 rounded-lg text-lg mt-4">
+          <button onclick="saveAndConnect()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-lg text-lg">
             SAVE & CONNECT
           </button>
         </div>
 
-        <div id="setup-result" class="mt-6 text-center text-base"></div>
+        <div id="setup-result" class="mt-6 text-center text-base font-medium"></div>
       </div>
     </div>
 
   </div>
 
-  <!-- BOTTOM NAV -->
-  <div class="bottom-nav py-3">
+  <!-- BOTTOM NAV - ALL 6 TABS -->
+  <div class="bottom-nav">
     <div class="flex justify-around text-xs">
       <div id="nav-home" onclick="switchTab('home')" class="nav-item flex flex-col items-center cursor-pointer text-yellow-400">
         <div class="text-3xl mb-1">🏠</div>
         <div>HOME</div>
+      </div>
+      <div id="nav-scanner" onclick="switchTab('scanner')" class="nav-item flex flex-col items-center cursor-pointer">
+        <div class="text-3xl mb-1">⚡</div>
+        <div>SCANNER</div>
+      </div>
+      <div id="nav-titan" onclick="switchTab('titan')" class="nav-item flex flex-col items-center cursor-pointer">
+        <div class="text-3xl mb-1">🚀</div>
+        <div>TITAN</div>
+      </div>
+      <div id="nav-paper" onclick="switchTab('paper')" class="nav-item flex flex-col items-center cursor-pointer">
+        <div class="text-3xl mb-1">📄</div>
+        <div>PAPER</div>
       </div>
       <div id="nav-trikal" onclick="switchTab('trikal')" class="nav-item flex flex-col items-center cursor-pointer">
         <div class="text-3xl mb-1">🏛️</div>
@@ -126,83 +165,78 @@
     </div>
   </div>
 
-  <!-- TOAST -->
-  <div id="toast" class="toast hidden"></div>
-
   <script>
-    let connected = false;
-
-    function switchTab(tab) {
+    function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.getElementById(tab).classList.add('active');
+      document.getElementById(tabId).classList.add('active');
 
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('text-yellow-400'));
-      document.getElementById('nav-' + tab).classList.add('text-yellow-400');
-    }
-
-    function showToast(msg, isError = false) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.className = `toast ${isError ? 'bg-red-800' : 'bg-green-800'} text-white`;
-      toast.classList.remove('hidden');
-      setTimeout(() => toast.classList.add('hidden'), 4000);
+      document.getElementById('nav-' + tabId).classList.add('text-yellow-400');
     }
 
     async function fetchLiveData() {
       const worker = localStorage.getItem('workerUrl');
-      if (!worker) return;
+      const resultDiv = document.getElementById('setup-result');
+
+      if (!worker) {
+        resultDiv.innerHTML = '<span class="text-yellow-400">No Worker URL saved yet</span>';
+        return;
+      }
+
+      resultDiv.innerHTML = '<span class="text-blue-400">Fetching live prices from Dhan...</span>';
 
       try {
         const response = await fetch(worker, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'access-token': localStorage.getItem('dhanToken'),
-            'client-id': localStorage.getItem('dhanClientId')
+            'access-token': localStorage.getItem('dhanToken') || '',
+            'client-id': localStorage.getItem('dhanClientId') || ''
           },
           body: JSON.stringify({
-            RequestCode: 15,
-            InstrumentCount: 4,
-            InstrumentList: [
-              {ExchangeSegment: "IDX_I", SecurityId: "13"},   // NIFTY
-              {ExchangeSegment: "IDX_I", SecurityId: "4"},    // SENSEX (BSE)
-              {ExchangeSegment: "IDX_I", SecurityId: "25"},   // BANKNIFTY
-              {ExchangeSegment: "IDX_I", SecurityId: "27"}    // FINNIFTY
+            "RequestCode": 15,
+            "InstrumentCount": 4,
+            "InstrumentList": [
+              {"ExchangeSegment": "IDX_I", "SecurityId": "13"},  // NIFTY 50
+              {"ExchangeSegment": "IDX_I", "SecurityId": "4"},   // SENSEX (BSE)
+              {"ExchangeSegment": "IDX_I", "SecurityId": "25"},  // BANKNIFTY
+              {"ExchangeSegment": "IDX_I", "SecurityId": "27"}   // FINNIFTY
             ]
           })
         });
 
-        if (!response.ok) throw new Error('Network error');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const data = await response.json();
 
-        // Update prices (adjust keys based on your worker response format)
-        document.getElementById('nifty').textContent = data.nifty?.LTP?.toLocaleString() || '–';
-        document.getElementById('sensex').textContent = data.sensex?.LTP?.toLocaleString() || '–';
-        document.getElementById('bank').textContent = data.banknifty?.LTP?.toLocaleString() || '–';
-        document.getElementById('fin').textContent = data.finnifty?.LTP?.toLocaleString() || '–';
+        // Update UI - adjust these keys based on what your worker actually returns
+        document.getElementById('nifty').textContent = data?.nifty?.LTP?.toLocaleString() || data?.LTP?.[0] || '-';
+        document.getElementById('sensex').textContent = data?.sensex?.LTP?.toLocaleString() || data?.LTP?.[1] || '-';
+        document.getElementById('bank').textContent = data?.banknifty?.LTP?.toLocaleString() || data?.LTP?.[2] || '-';
+        document.getElementById('fin').textContent = data?.finnifty?.LTP?.toLocaleString() || data?.LTP?.[3] || '-';
 
-        document.getElementById('live-nifty').textContent = data.nifty?.LTP?.toLocaleString() || '–';
-        document.getElementById('live-sensex').textContent = data.sensex?.LTP?.toLocaleString() || '–';
-        document.getElementById('live-bank').textContent = data.banknifty?.LTP?.toLocaleString() || '–';
-        document.getElementById('live-fin').textContent = data.finnifty?.LTP?.toLocaleString() || '–';
+        document.getElementById('live-nifty').textContent = document.getElementById('nifty').textContent;
+        document.getElementById('live-sensex').textContent = document.getElementById('sensex').textContent;
+        document.getElementById('live-bank').textContent = document.getElementById('bank').textContent;
+        document.getElementById('live-fin').textContent = document.getElementById('fin').textContent;
 
-        connected = true;
-        document.getElementById('connection-msg').textContent = 'Connected to Dhan Live ✓';
-        document.getElementById('trikal-msg').textContent = 'TRIKAL ready with live data';
+        document.getElementById('connection-msg').textContent = 'Connected ✓ Real Dhan prices updating...';
+        document.getElementById('trikal-msg').textContent = 'TRIKAL ENGINE ACTIVE with live data';
+        document.getElementById('setup-result').innerHTML = '<span class="text-green-400">Success! Live prices loaded</span>';
       } catch (err) {
-        console.log(err);
-        showToast('Check Worker URL or Token', true);
+        console.error(err);
+        document.getElementById('setup-result').innerHTML = `<span class="text-red-400">Error: ${err.message} — Check Worker / Token / Subscription</span>`;
+        document.getElementById('connection-msg').textContent = 'Connection failed — check SETUP';
       }
     }
 
     function saveAndConnect() {
       const client = document.getElementById('client-id').value.trim();
       const token = document.getElementById('access-token').value.trim();
-      const worker = document.getElementById('worker-url').value.trim();
+      const worker = document.getElementById('worker-url').value.trim().replace('.de', '.dev'); // auto-fix common typo
 
       if (!client || !token || !worker) {
-        showToast('Enter all 3 fields', true);
+        document.getElementById('setup-result').innerHTML = '<span class="text-red-400">Please fill all 3 fields</span>';
         return;
       }
 
@@ -210,31 +244,27 @@
       localStorage.setItem('dhanToken', token);
       localStorage.setItem('workerUrl', worker);
 
-      showToast('Credentials saved! Connecting...');
-      document.getElementById('setup-result').innerHTML = '<span class="text-green-400">Saved ✓ Now getting live prices</span>';
-
+      document.getElementById('setup-result').innerHTML = '<span class="text-green-400">Saved! Trying to connect...</span>';
       fetchLiveData();
     }
 
     function updateClock() {
       const now = new Date();
-      document.getElementById('clock').textContent = now.toLocaleTimeString('en-IN', {hour: '2-digit', minute: '2-digit'});
+      document.getElementById('clock').textContent = now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'});
     }
 
-    // Init
+    // Start app
     switchTab('home');
     updateClock();
     setInterval(updateClock, 30000);
 
-    // Auto try connect if already saved
+    // Auto-load if already saved
     if (localStorage.getItem('workerUrl')) {
       fetchLiveData();
     }
 
-    // Poll every 10 seconds if connected
-    setInterval(() => {
-      if (connected) fetchLiveData();
-    }, 10000);
+    // Poll every 8 seconds
+    setInterval(fetchLiveData, 8000);
   </script>
 </body>
 </html>
