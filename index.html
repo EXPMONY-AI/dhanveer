@@ -14,7 +14,6 @@
     .main-content { padding-top: 125px; padding-bottom: 90px; overflow-y: auto; height: 100vh; }
     .nav-item { transition: all 0.2s; }
     .nav-item.active { color: #eab308 !important; transform: scale(1.1); }
-    .index-bar { background: #111; position: sticky; top: 0; z-index: 40; }
   </style>
 </head>
 <body>
@@ -27,10 +26,10 @@
         <div class="font-bold text-xl">DHANVEER</div>
       </div>
       <div id="market-status" class="px-4 py-1 rounded-full text-sm font-medium bg-green-600 text-black">● OPEN</div>
-      <div id="clock" class="text-base font-mono">11:12</div>
+      <div id="clock" class="text-base font-mono">05:54</div>
     </div>
 
-    <div class="index-bar grid grid-cols-4 text-center text-sm py-2">
+    <div class="grid grid-cols-4 text-center text-sm py-2 bg-zinc-900 border-b border-zinc-800">
       <div><div class="text-gray-500 text-xs">NIFTY</div><div id="nifty" class="font-bold text-green-400 text-lg">-</div></div>
       <div><div class="text-gray-500 text-xs">SENSEX</div><div id="sensex" class="font-bold text-green-400 text-lg">-</div></div>
       <div><div class="text-gray-500 text-xs">BANKNIFTY</div><div id="bank" class="font-bold text-green-400 text-lg">-</div></div>
@@ -43,65 +42,68 @@
 
     <!-- HOME -->
     <div id="home" class="tab-content active">
-      <div class="bg-gray-900 rounded-xl p-5 mb-6">
-        <div class="text-yellow-400 text-lg font-medium">Live Market</div>
-        <div id="connection-msg" class="text-green-400 mt-2">Connected to Dhan ✓ Live prices updating...</div>
+      <div class="bg-emerald-900/30 border border-emerald-500 rounded-2xl p-5 mb-6">
+        <div class="text-emerald-400 font-medium">Real-time Dhan data active ✓</div>
       </div>
+
       <div class="grid grid-cols-2 gap-4">
-        <div class="bg-gray-800 rounded-xl p-5 text-center">
-          <div class="text-gray-400 text-sm">NIFTY</div>
-          <div id="live-nifty" class="text-3xl font-bold text-green-400">-</div>
+        <div class="bg-zinc-900 rounded-2xl p-6 text-center">
+          <div class="text-gray-400 text-sm mb-1">NIFTY</div>
+          <div id="live-nifty" class="text-4xl font-bold text-green-400">-</div>
         </div>
-        <div class="bg-gray-800 rounded-xl p-5 text-center">
-          <div class="text-gray-400 text-sm">SENSEX</div>
-          <div id="live-sensex" class="text-3xl font-bold text-green-400">-</div>
+        <div class="bg-zinc-900 rounded-2xl p-6 text-center">
+          <div class="text-gray-400 text-sm mb-1">SENSEX</div>
+          <div id="live-sensex" class="text-4xl font-bold text-green-400">-</div>
         </div>
-        <div class="bg-gray-800 rounded-xl p-5 text-center">
-          <div class="text-gray-400 text-sm">BANK NIFTY</div>
-          <div id="live-bank" class="text-3xl font-bold text-green-400">-</div>
+        <div class="bg-zinc-900 rounded-2xl p-6 text-center">
+          <div class="text-gray-400 text-sm mb-1">BANK NIFTY</div>
+          <div id="live-bank" class="text-4xl font-bold text-green-400">-</div>
         </div>
-        <div class="bg-gray-800 rounded-xl p-5 text-center">
-          <div class="text-gray-400 text-sm">FIN NIFTY</div>
-          <div id="live-fin" class="text-3xl font-bold text-green-400">-</div>
+        <div class="bg-zinc-900 rounded-2xl p-6 text-center">
+          <div class="text-gray-400 text-sm mb-1">FIN NIFTY</div>
+          <div id="live-fin" class="text-4xl font-bold text-green-400">-</div>
         </div>
       </div>
     </div>
 
-    <!-- Other tabs (SCANNER, TITAN, PAPER, TRIKAL) -->
+    <!-- SCANNER -->
     <div id="scanner" class="tab-content">
-      <div class="bg-gray-900 rounded-xl p-8 text-center mt-10">
+      <div class="bg-zinc-900 rounded-2xl p-8 text-center mt-10">
         <div class="text-6xl mb-4">⚡</div>
         <div class="text-xl font-bold">SCANNER</div>
-        <div class="text-gray-400 mt-3">Coming soon...</div>
+        <div class="text-gray-400 mt-3">Advanced option scanner coming soon</div>
       </div>
     </div>
 
+    <!-- TITAN -->
     <div id="titan" class="tab-content">
-      <div class="bg-gray-900 rounded-xl p-5 mt-6">
+      <div class="bg-zinc-900 rounded-2xl p-5 mt-6">
         <div class="text-yellow-400 font-medium text-lg mb-3">TITAN LOG</div>
-        <div id="titan-log" class="bg-black rounded-lg p-4 text-sm font-mono text-green-300 h-64 overflow-y-auto">Live data flowing...</div>
+        <div id="titan-log" class="bg-black rounded-xl p-4 text-sm font-mono text-green-300 h-80 overflow-y-auto">Waiting for signals...</div>
       </div>
     </div>
 
+    <!-- PAPER -->
     <div id="paper" class="tab-content">
-      <div class="bg-gray-900 rounded-xl p-8 text-center mt-10">
+      <div class="bg-zinc-900 rounded-2xl p-8 text-center mt-10">
         <div class="text-6xl mb-4">📄</div>
         <div class="text-xl font-bold">PAPER TRADING</div>
-        <div class="text-gray-400">Practice mode</div>
+        <div class="text-gray-400">Practice without real money</div>
       </div>
     </div>
 
+    <!-- TRIKAL -->
     <div id="trikal" class="tab-content">
-      <div class="bg-gradient-to-br from-purple-950 to-gray-900 rounded-xl p-6 text-center mt-6">
+      <div class="bg-gradient-to-br from-purple-900 to-zinc-900 rounded-2xl p-6 text-center mt-6">
         <div class="text-5xl mb-4">🏛️</div>
         <div class="text-2xl font-bold">TRIKAL STRATEGY ENGINE</div>
-        <div id="trikal-msg" class="text-green-400 mt-4 text-lg">ACTIVE with Live Dhan Data</div>
+        <div id="trikal-msg" class="text-green-400 mt-4">ACTIVE with Live Dhan Data</div>
       </div>
     </div>
 
     <!-- SETUP -->
     <div id="setup" class="tab-content">
-      <div class="bg-gray-900 rounded-xl p-6 mt-6">
+      <div class="bg-zinc-900 rounded-2xl p-6 mt-6">
         <h2 class="text-yellow-400 text-2xl font-bold mb-6">SETUP - Connect Dhan</h2>
         
         <div class="space-y-6">
@@ -173,7 +175,7 @@
       localStorage.setItem('dhanToken', token);
       localStorage.setItem('workerUrl', worker);
 
-      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live data from Dhan...</span>';
+      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live prices...</span>';
 
       try {
         const res = await fetch(worker, {
@@ -195,31 +197,36 @@
           })
         });
 
-        const data = await res.json();
-
-        if (res.ok) {
-          // Updated parsing for Dhan response structure
-          const niftyLtp = data?.data?.[0]?.LTP || data?.LTP?.[0] || '-';
-          const sensexLtp = data?.data?.[1]?.LTP || data?.LTP?.[1] || '-';
-          const bankLtp = data?.data?.[2]?.LTP || data?.LTP?.[2] || '-';
-          const finLtp = data?.data?.[3]?.LTP || data?.LTP?.[3] || '-';
-
-          document.getElementById('nifty').textContent = niftyLtp;
-          document.getElementById('sensex').textContent = sensexLtp;
-          document.getElementById('bank').textContent = bankLtp;
-          document.getElementById('fin').textContent = finLtp;
-
-          document.getElementById('live-nifty').textContent = niftyLtp;
-          document.getElementById('live-sensex').textContent = sensexLtp;
-          document.getElementById('live-bank').textContent = bankLtp;
-          document.getElementById('live-fin').textContent = finLtp;
-
-          document.getElementById('setup-result').innerHTML = '<span class="text-green-400">Success! Live prices loaded</span>';
-          document.getElementById('connection-msg').textContent = 'Real-time Dhan data active';
-          document.getElementById('trikal-msg').textContent = 'TRIKAL ENGINE ACTIVE with Live Data';
-        } else {
-          throw new Error(data.error || 'Failed to load data');
+        const rawData = await res.text();
+        let data;
+        try {
+          data = JSON.parse(rawData);
+        } catch (e) {
+          throw new Error("Invalid response from Worker");
         }
+
+        if (!res.ok) throw new Error(data.error || "Dhan API error");
+
+        // Improved parsing - trying multiple possible structures
+        const items = data.data || data || [];
+
+        const nifty = items[0]?.LTP || items.find(i => i.SecurityId === "13")?.LTP || "-";
+        const sensex = items[1]?.LTP || items.find(i => i.SecurityId === "4")?.LTP || "-";
+        const bank = items[2]?.LTP || items.find(i => i.SecurityId === "25")?.LTP || "-";
+        const fin = items[3]?.LTP || items.find(i => i.SecurityId === "27")?.LTP || "-";
+
+        document.getElementById('live-nifty').textContent = nifty;
+        document.getElementById('live-sensex').textContent = sensex;
+        document.getElementById('live-bank').textContent = bank;
+        document.getElementById('live-fin').textContent = fin;
+
+        document.getElementById('nifty').textContent = nifty;
+        document.getElementById('sensex').textContent = sensex;
+        document.getElementById('bank').textContent = bank;
+        document.getElementById('fin').textContent = fin;
+
+        document.getElementById('setup-result').innerHTML = '<span class="text-green-400">Success! Live prices loaded</span>';
+
       } catch (err) {
         document.getElementById('setup-result').innerHTML = `<span class="text-red-400">Error: ${err.message}</span>`;
       }
@@ -233,12 +240,11 @@
     setInterval(updateClock, 30000);
     updateClock();
 
-    // Auto load if already saved
+    // Auto connect if saved
     if (localStorage.getItem('workerUrl')) {
-      saveAndConnect();
+      setTimeout(saveAndConnect, 800);
     }
 
-    // Start with HOME tab
     switchTab('home');
   </script>
 </body>
