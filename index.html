@@ -43,9 +43,8 @@
     <!-- HOME -->
     <div id="home" class="tab-content active">
       <div class="bg-emerald-900/30 border border-emerald-500 rounded-2xl p-5 mb-6">
-        <div id="connection-msg" class="text-emerald-400 font-medium">Real-time Dhan data active ✓</div>
+        <div id="connection-msg" class="text-emerald-400 font-medium">Waiting for live data...</div>
       </div>
-
       <div class="grid grid-cols-2 gap-4">
         <div class="bg-zinc-900 rounded-2xl p-6 text-center">
           <div class="text-gray-400 text-sm mb-1">NIFTY</div>
@@ -175,7 +174,7 @@
       localStorage.setItem('dhanToken', token);
       localStorage.setItem('workerUrl', worker);
 
-      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live prices...</span>';
+      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live prices from Dhan...</span>';
 
       try {
         const res = await fetch(worker, {
@@ -203,10 +202,10 @@
         if (!res.ok) throw new Error(data.error || "Dhan error");
 
         const items = data.data || data || [];
-        const nifty = items[0]?.LTP || items.find?.(i => i.SecurityId === "13")?.LTP || "—";
-        const sensex = items[1]?.LTP || items.find?.(i => i.SecurityId === "4")?.LTP || "—";
-        const bank = items[2]?.LTP || items.find?.(i => i.SecurityId === "25")?.LTP || "—";
-        const fin = items[3]?.LTP || items.find?.(i => i.SecurityId === "27")?.LTP || "—";
+        const nifty = items[0]?.LTP || "—";
+        const sensex = items[1]?.LTP || "—";
+        const bank = items[2]?.LTP || "—";
+        const fin = items[3]?.LTP || "—";
 
         document.getElementById('live-nifty').textContent = nifty;
         document.getElementById('live-sensex').textContent = sensex;
@@ -225,14 +224,14 @@
       }
     }
 
-    // Load saved token on page load
+    // Load saved token on start
     window.onload = () => {
       const savedToken = localStorage.getItem('dhanToken');
       if (savedToken) {
         document.getElementById('access-token').value = savedToken;
       }
       if (localStorage.getItem('workerUrl')) {
-        setTimeout(saveAndConnect, 800);
+        setTimeout(saveAndConnect, 1000);
       }
       switchTab('home');
     };
