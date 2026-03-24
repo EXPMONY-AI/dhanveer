@@ -26,7 +26,7 @@
         <div class="font-bold text-xl">DHANVEER</div>
       </div>
       <div id="market-status" class="px-4 py-1 rounded-full text-sm font-medium bg-green-600 text-black">● OPEN</div>
-      <div id="clock" class="text-base font-mono">05:54</div>
+      <div id="clock" class="text-base font-mono">06:01</div>
     </div>
 
     <div class="grid grid-cols-4 text-center text-sm py-2 bg-zinc-900 border-b border-zinc-800">
@@ -43,7 +43,7 @@
     <!-- HOME -->
     <div id="home" class="tab-content active">
       <div class="bg-emerald-900/30 border border-emerald-500 rounded-2xl p-5 mb-6">
-        <div class="text-emerald-400 font-medium">Real-time Dhan data active ✓</div>
+        <div class="text-emerald-400 font-medium">Real-time Dhan data active</div>
       </div>
 
       <div class="grid grid-cols-2 gap-4">
@@ -66,38 +66,35 @@
       </div>
     </div>
 
-    <!-- SCANNER -->
+    <!-- SCANNER, TITAN, PAPER, TRIKAL (short versions) -->
     <div id="scanner" class="tab-content">
       <div class="bg-zinc-900 rounded-2xl p-8 text-center mt-10">
         <div class="text-6xl mb-4">⚡</div>
         <div class="text-xl font-bold">SCANNER</div>
-        <div class="text-gray-400 mt-3">Advanced option scanner coming soon</div>
+        <div class="text-gray-400 mt-3">Coming soon...</div>
       </div>
     </div>
 
-    <!-- TITAN -->
     <div id="titan" class="tab-content">
       <div class="bg-zinc-900 rounded-2xl p-5 mt-6">
         <div class="text-yellow-400 font-medium text-lg mb-3">TITAN LOG</div>
-        <div id="titan-log" class="bg-black rounded-xl p-4 text-sm font-mono text-green-300 h-80 overflow-y-auto">Waiting for signals...</div>
+        <div id="titan-log" class="bg-black rounded-xl p-4 text-sm font-mono text-green-300 h-64 overflow-y-auto">Waiting for signals...</div>
       </div>
     </div>
 
-    <!-- PAPER -->
     <div id="paper" class="tab-content">
       <div class="bg-zinc-900 rounded-2xl p-8 text-center mt-10">
         <div class="text-6xl mb-4">📄</div>
         <div class="text-xl font-bold">PAPER TRADING</div>
-        <div class="text-gray-400">Practice without real money</div>
+        <div class="text-gray-400">Practice mode</div>
       </div>
     </div>
 
-    <!-- TRIKAL -->
     <div id="trikal" class="tab-content">
       <div class="bg-gradient-to-br from-purple-900 to-zinc-900 rounded-2xl p-6 text-center mt-6">
         <div class="text-5xl mb-4">🏛️</div>
         <div class="text-2xl font-bold">TRIKAL STRATEGY ENGINE</div>
-        <div id="trikal-msg" class="text-green-400 mt-4">ACTIVE with Live Dhan Data</div>
+        <div id="trikal-msg" class="text-green-400 mt-4">ACTIVE with Live Data</div>
       </div>
     </div>
 
@@ -175,7 +172,7 @@
       localStorage.setItem('dhanToken', token);
       localStorage.setItem('workerUrl', worker);
 
-      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live prices...</span>';
+      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live prices from Dhan...</span>';
 
       try {
         const res = await fetch(worker, {
@@ -197,23 +194,26 @@
           })
         });
 
-        const rawData = await res.text();
+        const text = await res.text();
         let data;
         try {
-          data = JSON.parse(rawData);
+          data = JSON.parse(text);
         } catch (e) {
-          throw new Error("Invalid response from Worker");
+          throw new Error("Worker returned invalid data");
         }
 
         if (!res.ok) throw new Error(data.error || "Dhan API error");
 
-        // Improved parsing - trying multiple possible structures
-        const items = data.data || data || [];
+        // Safe parsing - handle multiple possible structures
+        let items = [];
+        if (data.data && Array.isArray(data.data)) items = data.data;
+        else if (Array.isArray(data)) items = data;
+        else if (data.LTP) items = [data];
 
-        const nifty = items[0]?.LTP || items.find(i => i.SecurityId === "13")?.LTP || "-";
-        const sensex = items[1]?.LTP || items.find(i => i.SecurityId === "4")?.LTP || "-";
-        const bank = items[2]?.LTP || items.find(i => i.SecurityId === "25")?.LTP || "-";
-        const fin = items[3]?.LTP || items.find(i => i.SecurityId === "27")?.LTP || "-";
+        const nifty = items[0]?.LTP || '-';
+        const sensex = items[1]?.LTP || '-';
+        const bank = items[2]?.LTP || '-';
+        const fin = items[3]?.LTP || '-';
 
         document.getElementById('live-nifty').textContent = nifty;
         document.getElementById('live-sensex').textContent = sensex;
@@ -240,9 +240,9 @@
     setInterval(updateClock, 30000);
     updateClock();
 
-    // Auto connect if saved
+    // Auto load if saved
     if (localStorage.getItem('workerUrl')) {
-      setTimeout(saveAndConnect, 800);
+      setTimeout(saveAndConnect, 1000);
     }
 
     switchTab('home');
