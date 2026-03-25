@@ -42,155 +42,123 @@
 
     <!-- HOME -->
     <div id="home" class="tab-content active">
-      <div class="bg-gray-900 rounded-2xl p-4 mb-4 flex items-center gap-3">
-        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl">🤖</div>
-        <div>
-          <div class="text-yellow-400 font-medium">Lunch Zone — Low liquidity</div>
-          <div class="text-xs text-gray-400">Avoid new entries. Manage open positions.</div>
-        </div>
+      <div class="bg-emerald-900/30 border border-emerald-500 rounded-2xl p-5 mb-6">
+        <div id="connection-msg" class="text-emerald-400 font-medium">Real-time Dhan data active ✓</div>
       </div>
 
-      <div class="flex gap-2 mb-4">
-        <div class="bg-green-900 text-green-400 text-xs px-3 py-1 rounded-full flex-1 text-center">REST active</div>
-        <div id="market-pill" class="bg-green-500 text-black text-xs px-3 py-1 rounded-full flex-1 text-center font-medium">MARKET OPEN</div>
-      </div>
-
-      <div class="bg-gray-900 rounded-3xl p-4 mb-6">
-        <div class="flex justify-between items-center mb-3">
-          <div class="flex items-center gap-2 text-yellow-400">
-            <span>📊</span>
-            <span class="font-medium">LIVE PRICES</span>
-          </div>
-          <button onclick="saveAndConnect()" class="bg-blue-600 text-white text-xs px-4 py-1 rounded-full">REFRESH</button>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-zinc-900 rounded-2xl p-6 text-center">
+          <div class="text-gray-400 text-sm mb-1">NIFTY</div>
+          <div id="live-nifty" class="text-4xl font-bold text-green-400">—</div>
         </div>
-        
-        <div class="grid grid-cols-2 gap-3">
-          <div class="bg-black rounded-2xl p-4 text-center">
-            <div class="text-gray-400 text-xs">NIFTY</div>
-            <div id="live-nifty" class="text-3xl font-bold text-green-400">—</div>
-          </div>
-          <div class="bg-black rounded-2xl p-4 text-center">
-            <div class="text-gray-400 text-xs">SENSEX</div>
-            <div id="live-sensex" class="text-3xl font-bold text-green-400">—</div>
-          </div>
-          <div class="bg-black rounded-2xl p-4 text-center">
-            <div class="text-gray-400 text-xs">BANK NIFTY</div>
-            <div id="live-bank" class="text-3xl font-bold text-green-400">—</div>
-          </div>
-          <div class="bg-black rounded-2xl p-4 text-center">
-            <div class="text-gray-400 text-xs">FIN NIFTY</div>
-            <div id="live-fin" class="text-3xl font-bold text-green-400">—</div>
-          </div>
+        <div class="bg-zinc-900 rounded-2xl p-6 text-center">
+          <div class="text-gray-400 text-sm mb-1">SENSEX</div>
+          <div id="live-sensex" class="text-4xl font-bold text-green-400">—</div>
+        </div>
+        <div class="bg-zinc-900 rounded-2xl p-6 text-center">
+          <div class="text-gray-400 text-sm mb-1">BANK NIFTY</div>
+          <div id="live-bank" class="text-4xl font-bold text-green-400">—</div>
+        </div>
+        <div class="bg-zinc-900 rounded-2xl p-6 text-center">
+          <div class="text-gray-400 text-sm mb-1">FIN NIFTY</div>
+          <div id="live-fin" class="text-4xl font-bold text-green-400">—</div>
         </div>
       </div>
     </div>
 
     <!-- SCANNER -->
     <div id="scanner" class="tab-content">
-      <div class="bg-gray-900 rounded-3xl p-6 text-center">
+      <div class="bg-zinc-900 rounded-2xl p-8 text-center mt-10">
         <div class="text-6xl mb-4">⚡</div>
-        <div class="text-xl font-medium">SCANNER</div>
-        <div class="text-gray-400 mt-2">Advanced option scanner coming soon...</div>
+        <div class="text-xl font-bold">SCANNER</div>
+        <div class="text-gray-400 mt-3">Advanced scanner coming soon...</div>
       </div>
     </div>
 
     <!-- TITAN -->
     <div id="titan" class="tab-content">
-      <div class="bg-gray-900 rounded-3xl p-4">
-        <div class="flex justify-between mb-3">
-          <div class="text-yellow-400 font-medium">TITAN LOG</div>
-          <div class="text-xs bg-gray-800 px-3 py-1 rounded">LIVE</div>
-        </div>
-        <div id="titan-log" class="bg-black rounded-2xl p-4 text-xs font-mono text-green-300 h-96 overflow-y-auto">Waiting for signals...</div>
+      <div class="bg-zinc-900 rounded-2xl p-5 mt-6">
+        <div class="text-yellow-400 font-medium text-lg mb-3">TITAN LOG</div>
+        <div id="titan-log" class="bg-black rounded-xl p-4 text-sm font-mono text-green-300 h-64 overflow-y-auto">Waiting for signals...</div>
       </div>
     </div>
 
     <!-- PAPER -->
     <div id="paper" class="tab-content">
-      <div class="bg-gray-900 rounded-3xl p-8 text-center">
+      <div class="bg-zinc-900 rounded-2xl p-8 text-center mt-10">
         <div class="text-6xl mb-4">📄</div>
-        <div class="text-xl font-medium">PAPER TRADING MODE</div>
-        <div class="text-gray-400">Practice without real money</div>
+        <div class="text-xl font-bold">PAPER TRADING</div>
+        <div class="text-gray-400">Practice mode</div>
       </div>
     </div>
 
     <!-- TRIKAL -->
     <div id="trikal" class="tab-content">
-      <div class="bg-gradient-to-br from-purple-900 to-gray-900 rounded-3xl p-6 text-center">
-        <div class="text-5xl mb-6">🏛️</div>
+      <div class="bg-gradient-to-br from-purple-900 to-zinc-900 rounded-2xl p-6 text-center mt-6">
+        <div class="text-5xl mb-4">🏛️</div>
         <div class="text-2xl font-bold">TRIKAL STRATEGY ENGINE</div>
-        <div id="trikal-msg" class="mt-4 text-green-400">Ready with Live Data</div>
+        <div id="trikal-msg" class="text-green-400 mt-4">Ready with Live Data</div>
       </div>
     </div>
 
     <!-- SETUP -->
     <div id="setup" class="tab-content">
-      <div class="bg-gray-900 rounded-3xl p-6">
-        <h2 class="text-yellow-400 text-xl font-medium mb-6">🔧 SETUP - Connect to Dhan</h2>
+      <div class="bg-zinc-900 rounded-2xl p-6 mt-6">
+        <h2 class="text-yellow-400 text-2xl font-bold mb-6">SETUP - Connect to Dhan</h2>
         
-        <div class="space-y-5">
+        <div class="space-y-6">
           <div>
-            <label class="text-xs text-gray-400 block mb-1">DHAN CLIENT ID</label>
-            <input id="client-id" type="text" value="1108067088" class="w-full bg-black border border-gray-700 rounded-2xl px-4 py-3 text-sm">
+            <label class="block text-gray-300 mb-2">Client ID</label>
+            <input id="client-id" type="text" value="1108067088" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3">
           </div>
           <div>
-            <label class="text-xs text-gray-400 block mb-1">DHAN ACCESS TOKEN</label>
-            <input id="access-token" type="password" class="w-full bg-black border border-gray-700 rounded-2xl px-4 py-3 text-sm" placeholder="Paste new token here">
+            <label class="block text-gray-300 mb-2">Access Token</label>
+            <input id="access-token" type="password" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3" placeholder="Paste new token here">
           </div>
           <div>
-            <label class="text-xs text-gray-400 block mb-1">CLOUDFLARE WORKER URL</label>
-            <input id="worker-url" type="text" value="https://dhan-proxy.sridharsrtips.workers.dev" class="w-full bg-black border border-gray-700 rounded-2xl px-4 py-3 text-sm">
+            <label class="block text-gray-300 mb-2">Worker URL</label>
+            <input id="worker-url" type="text" value="https://dhan-proxy.sridharsrtips.workers.dev" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3">
           </div>
 
-          <button onclick="saveAndConnect()" class="w-full bg-green-500 text-black font-medium py-4 rounded-2xl mt-4">
-            SAVE &amp; CONNECT TO DHAN
+          <button onclick="saveAndConnect()" class="w-full bg-green-600 text-white font-bold py-4 rounded-lg text-lg">
+            SAVE & CONNECT
           </button>
         </div>
 
-        <div id="setup-result" class="mt-6 text-center text-sm"></div>
+        <div id="setup-result" class="mt-6 text-center text-base"></div>
       </div>
     </div>
 
   </div>
 
   <!-- BOTTOM NAV -->
-  <div class="bottom-nav bg-black border-t border-gray-800 py-2">
-    <div class="flex justify-around items-center text-xs">
-      <div onclick="switchTab(0)" class="nav-item flex flex-col items-center cursor-pointer active">
-        <div class="text-2xl mb-1">🏠</div>
-        <div class="text-gray-400">HOME</div>
+  <div class="bottom-nav">
+    <div class="flex justify-around text-xs">
+      <div onclick="switchTab('home')" class="nav-item flex flex-col items-center cursor-pointer text-yellow-400">
+        <div class="text-3xl mb-1">🏠</div><div>HOME</div>
       </div>
-      <div onclick="switchTab(1)" class="nav-item flex flex-col items-center cursor-pointer">
-        <div class="text-2xl mb-1">⚡</div>
-        <div class="text-gray-400">SCANNER</div>
+      <div onclick="switchTab('scanner')" class="nav-item flex flex-col items-center cursor-pointer">
+        <div class="text-3xl mb-1">⚡</div><div>SCANNER</div>
       </div>
-      <div onclick="switchTab(2)" class="nav-item flex flex-col items-center cursor-pointer">
-        <div class="text-2xl mb-1">🚀</div>
-        <div class="text-gray-400">TITAN</div>
+      <div onclick="switchTab('titan')" class="nav-item flex flex-col items-center cursor-pointer">
+        <div class="text-3xl mb-1">🚀</div><div>TITAN</div>
       </div>
-      <div onclick="switchTab(3)" class="nav-item flex flex-col items-center cursor-pointer">
-        <div class="text-2xl mb-1">📄</div>
-        <div class="text-gray-400">PAPER</div>
+      <div onclick="switchTab('paper')" class="nav-item flex flex-col items-center cursor-pointer">
+        <div class="text-3xl mb-1">📄</div><div>PAPER</div>
       </div>
-      <div onclick="switchTab(4)" class="nav-item flex flex-col items-center cursor-pointer">
-        <div class="text-2xl mb-1">🏛️</div>
-        <div class="text-gray-400">TRIKAL</div>
+      <div onclick="switchTab('trikal')" class="nav-item flex flex-col items-center cursor-pointer">
+        <div class="text-3xl mb-1">🏛️</div><div>TRIKAL</div>
       </div>
-      <div onclick="switchTab(5)" class="nav-item flex flex-col items-center cursor-pointer">
-        <div class="text-2xl mb-1">⚙️</div>
-        <div class="text-gray-400">SETUP</div>
+      <div onclick="switchTab('setup')" class="nav-item flex flex-col items-center cursor-pointer">
+        <div class="text-3xl mb-1">⚙️</div><div>SETUP</div>
       </div>
     </div>
   </div>
 
   <script>
-    let currentTab = 0;
-    const tabs = ['home','scanner','titan','paper','trikal','setup'];
-
-    function switchTab(n) {
+    function switchTab(tab) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabs[n]).classList.add('active');
-      currentTab = n;
+      document.getElementById(tab).classList.add('active');
     }
 
     async function saveAndConnect() {
@@ -207,7 +175,7 @@
       localStorage.setItem('dhanToken', token);
       localStorage.setItem('workerUrl', worker);
 
-      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live prices...</span>';
+      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live prices from Dhan...</span>';
 
       try {
         const res = await fetch(worker, {
@@ -257,14 +225,13 @@
       }
     }
 
-    // On page load - do NOT auto-fill token (so you can easily change it)
+    // On page load - clear token field so you can easily paste new one
     window.onload = () => {
-      // Clear the token field so you can paste new one every day
       document.getElementById('access-token').value = '';
       if (localStorage.getItem('workerUrl')) {
         setTimeout(saveAndConnect, 800);
       }
-      switchTab(0);
+      switchTab('home');
     };
 
     // Clock
