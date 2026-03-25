@@ -26,7 +26,7 @@
         <div class="font-bold text-xl">DHANVEER</div>
       </div>
       <div id="market-status" class="px-4 py-1 rounded-full text-sm font-medium bg-green-600 text-black">● OPEN</div>
-      <div id="clock" class="text-base font-mono">04:55</div>
+      <div id="clock" class="text-base font-mono">06:42</div>
     </div>
 
     <div class="grid grid-cols-4 text-center text-sm py-2 bg-zinc-900 border-b border-zinc-800">
@@ -71,7 +71,7 @@
       <div class="bg-zinc-900 rounded-2xl p-8 text-center mt-10">
         <div class="text-6xl mb-4">⚡</div>
         <div class="text-xl font-bold">SCANNER</div>
-        <div class="text-gray-400 mt-3">Advanced scanner coming soon...</div>
+        <div class="text-gray-400 mt-3">Advanced option scanner coming soon...</div>
       </div>
     </div>
 
@@ -175,7 +175,16 @@
       localStorage.setItem('dhanToken', token);
       localStorage.setItem('workerUrl', worker);
 
-      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live prices from Dhan...</span>';
+      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Connecting...</span>';
+      fetchLiveData();
+    }
+
+    async function fetchLiveData() {
+      const client = localStorage.getItem('dhanClientId');
+      const token = localStorage.getItem('dhanToken');
+      const worker = localStorage.getItem('workerUrl');
+
+      if (!client || !token || !worker) return;
 
       try {
         const res = await fetch(worker, {
@@ -202,10 +211,9 @@
 
         if (!res.ok) throw new Error(data.error || "Dhan error");
 
-        // Robust parsing for Dhan's actual response structure
+        // Robust parsing for Dhan's real response
         let items = [];
         if (data.data) {
-          // Flatten nested structure if present (e.g., NSE_IDX -> securityId -> last_price or LTP)
           Object.values(data.data).forEach(segment => {
             if (typeof segment === 'object') {
               Object.values(segment).forEach(instrument => {
@@ -221,10 +229,10 @@
           items = [data];
         }
 
-        const nifty = items[0]?.LTP || items[0]?.last_price || "—";
-        const sensex = items[1]?.LTP || items[1]?.last_price || "—";
-        const bank = items[2]?.LTP || items[2]?.last_price || "—";
-        const fin = items[3]?.LTP || items[3]?.last_price || "—";
+        const nifty = items[0]?.LTP || "—";
+        const sensex = items[1]?.LTP || "—";
+        const bank = items[2]?.LTP || "—";
+        const fin = items[3]?.LTP || "—";
 
         document.getElementById('live-nifty').textContent = nifty;
         document.getElementById('live-sensex').textContent = sensex;
@@ -243,13 +251,17 @@
       }
     }
 
-    // On load - token field empty for easy daily update, but saved data used for connection
+    // On load - pre-fill token for easy editing, auto-connect
     window.onload = () => {
-      document.getElementById('access-token').value = '';
+      const savedToken = localStorage.getItem('dhanToken');
+      if (savedToken) document.getElementById('access-token').value = savedToken;
       if (localStorage.getItem('workerUrl')) {
-        setTimeout(saveAndConnect, 800);
+        setTimeout(fetchLiveData, 800);
       }
       switchTab('home');
+
+      // Poll every 5 seconds for live data
+      setInterval(fetchLiveData, 5000);
     };
 
     // Clock
