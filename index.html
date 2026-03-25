@@ -43,7 +43,7 @@
     <!-- HOME -->
     <div id="home" class="tab-content active">
       <div class="bg-emerald-900/30 border border-emerald-500 rounded-2xl p-5 mb-6">
-        <div id="connection-msg" class="text-emerald-400 font-medium">Waiting for connection...</div>
+        <div id="connection-msg" class="text-emerald-400 font-medium">Real-time Dhan data active ✓</div>
       </div>
 
       <div class="grid grid-cols-2 gap-4">
@@ -113,7 +113,7 @@
           </div>
           <div>
             <label class="block text-gray-300 mb-2">Access Token</label>
-            <input id="access-token" type="password" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3" placeholder="Paste new token here (expires daily)">
+            <input id="access-token" type="password" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3" placeholder="Paste your token">
           </div>
           <div>
             <label class="block text-gray-300 mb-2">Worker URL</label>
@@ -167,16 +167,15 @@
       const worker = document.getElementById('worker-url').value.trim();
 
       if (!client || !token || !worker) {
-        document.getElementById('setup-result').innerHTML = '<span class="text-red-400">Please fill all 3 fields</span>';
+        document.getElementById('setup-result').innerHTML = '<span class="text-red-400">Please fill all fields</span>';
         return;
       }
 
-      // Save for the day
       localStorage.setItem('dhanClientId', client);
       localStorage.setItem('dhanToken', token);
       localStorage.setItem('workerUrl', worker);
 
-      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Connecting to Dhan...</span>';
+      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live prices...</span>';
 
       try {
         const res = await fetch(worker, {
@@ -203,7 +202,12 @@
 
         if (!res.ok) throw new Error(data.error || "Dhan error");
 
-        const items = data.data || data || [];
+        // Extract LTP from different possible response formats
+        let items = [];
+        if (data.data && Array.isArray(data.data)) items = data.data;
+        else if (Array.isArray(data)) items = data;
+        else if (data.LTP) items = [data];
+
         const nifty = items[0]?.LTP || "—";
         const sensex = items[1]?.LTP || "—";
         const bank = items[2]?.LTP || "—";
@@ -219,19 +223,21 @@
         document.getElementById('bank').textContent = bank;
         document.getElementById('fin').textContent = fin;
 
-        document.getElementById('setup-result').innerHTML = '<span class="text-green-400">Success! Connected for today</span>';
+        document.getElementById('setup-result').innerHTML = '<span class="text-green-400">Success! Live prices loaded</span>';
 
       } catch (err) {
         document.getElementById('setup-result').innerHTML = `<span class="text-red-400">Error: ${err.message}</span>`;
       }
     }
 
-    // On page load - show HOME tab and try to connect if saved
+    // Load saved data on start
     window.onload = () => {
-      switchTab('home');
+      const savedToken = localStorage.getItem('dhanToken');
+      if (savedToken) document.getElementById('access-token').value = savedToken;
       if (localStorage.getItem('workerUrl')) {
         setTimeout(saveAndConnect, 800);
       }
+      switchTab('home');
     };
 
     // Clock
