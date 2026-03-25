@@ -202,11 +202,29 @@
 
         if (!res.ok) throw new Error(data.error || "Dhan error");
 
-        const items = data.data || data || [];
-        const nifty = items[0]?.LTP || "—";
-        const sensex = items[1]?.LTP || "—";
-        const bank = items[2]?.LTP || "—";
-        const fin = items[3]?.LTP || "—";
+        // Robust parsing for Dhan's actual response structure
+        let items = [];
+        if (data.data) {
+          // Flatten nested structure if present (e.g., NSE_IDX -> securityId -> last_price or LTP)
+          Object.values(data.data).forEach(segment => {
+            if (typeof segment === 'object') {
+              Object.values(segment).forEach(instrument => {
+                if (instrument.last_price || instrument.LTP) {
+                  items.push({LTP: instrument.last_price || instrument.LTP});
+                }
+              });
+            }
+          });
+        } else if (Array.isArray(data)) {
+          items = data;
+        } else {
+          items = [data];
+        }
+
+        const nifty = items[0]?.LTP || items[0]?.last_price || "—";
+        const sensex = items[1]?.LTP || items[1]?.last_price || "—";
+        const bank = items[2]?.LTP || items[2]?.last_price || "—";
+        const fin = items[3]?.LTP || items[3]?.last_price || "—";
 
         document.getElementById('live-nifty').textContent = nifty;
         document.getElementById('live-sensex').textContent = sensex;
@@ -218,14 +236,14 @@
         document.getElementById('bank').textContent = bank;
         document.getElementById('fin').textContent = fin;
 
-        document.getElementById('setup-result').innerHTML = '<span class="text-green-400">Success! Connected for today</span>';
+        document.getElementById('setup-result').innerHTML = '<span class="text-green-400">Success! Live prices loaded</span>';
 
       } catch (err) {
         document.getElementById('setup-result').innerHTML = `<span class="text-red-400">Error: ${err.message}</span>`;
       }
     }
 
-    // On page load - clear token field so you can easily paste new one
+    // On load - token field empty for easy daily update, but saved data used for connection
     window.onload = () => {
       document.getElementById('access-token').value = '';
       if (localStorage.getItem('workerUrl')) {
