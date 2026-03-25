@@ -6,27 +6,41 @@
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="GAMA-AI"/>
+<meta name="apple-mobile-web-app-title" content="Dhanveer"/>
+<meta name="application-name" content="Dhanveer"/>
 <meta name="theme-color" content="#030508"/>
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta http-equiv="Pragma" content="no-cache"/>
-<meta http-equiv="Expires" content="0"/>
+<meta name="description" content="Dhanveer — Professional Options Trading System"/>
 <link rel="manifest" href="manifest.json"/>
-<title>GAMA-AI Dhanveer v11.1</title>
+<link rel="apple-touch-icon" href="icon.png"/>
+<title>Dhanveer v10</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#030508;--s1:#06090f;--s2:#090e18;--b1:#0f1e30;--b2:#182840;--gold:#f0a500;--g2:#ffd060;--green:#00e676;--red:#ff3060;--cyan:#00d4ff;--purple:#a855f7;--orange:#f97316;--blue:#3b82f6;--tx:#94b8d0;--dim:#162330;--dim2:#2a4560;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);}
+:root{
+  --bg:#030508;--s1:#06090f;--s2:#090e18;--b1:#0f1e30;--b2:#182840;
+  --gold:#f0a500;--g2:#ffd060;--green:#00e676;--red:#ff3060;
+  --cyan:#00d4ff;--purple:#a855f7;--orange:#f97316;--blue:#3b82f6;
+  --tx:#94b8d0;--dim:#162330;--dim2:#2a4560;
+  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;}
 body{padding-top:var(--sat);}
-#app{height:100%;display:none;flex-direction:column;}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(3,5,8,.97);border-bottom:1px solid rgba(240,165,0,.08);flex-shrink:0;}
+#app{height:100%;display:flex;flex-direction:column;}
+
+/* TOP BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;background:rgba(3,5,8,.97);
+  border-bottom:1px solid rgba(240,165,0,.08);flex-shrink:0;}
 .logo{display:flex;align-items:center;gap:10px;}
-.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--gold),#d4891a);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#000;}
-.logo-name{font-size:17px;font-weight:800;letter-spacing:2px;color:var(--gold);}
+.logo-mark{width:28px;height:28px;background:linear-gradient(135deg,var(--gold),#d4891a);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:#000;letter-spacing:-1px;}
+.logo-name{font-size:18px;font-weight:800;letter-spacing:3px;color:var(--gold);}
 .logo-ver{font-size:8px;letter-spacing:2px;color:var(--dim2);margin-top:1px;}
 .topbar-r{display:flex;align-items:center;gap:8px;}
-.mkt-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:1px;}
+.mkt-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;
+  border-radius:20px;font-size:9px;font-weight:700;letter-spacing:1px;}
 .mkt-open{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);color:var(--green);}
 .mkt-close{background:rgba(255,48,96,.08);border:1px solid rgba(255,48,96,.2);color:var(--red);}
 .mkt-dot{width:5px;height:5px;border-radius:50%;}
@@ -35,34 +49,66 @@ body{padding-top:var(--sat);}
 @keyframes blink{50%{opacity:.2;}}
 .clk{font-family:'DM Mono',monospace;font-size:14px;color:var(--cyan);letter-spacing:1px;}
 .lock-btn{background:none;border:none;color:var(--dim2);font-size:18px;cursor:pointer;padding:4px;}
+
+/* SCROLL */
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
-.bnav{display:flex;width:100%;padding:4px 0 calc(4px + var(--sab));background:rgba(3,5,8,.98);border-top:1px solid var(--b1);flex-shrink:0;}
-.nb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;border:none;background:none;cursor:pointer;flex:1;position:relative;min-width:0;}
-.nb-i{font-size:17px;line-height:1;transition:transform .15s;}
-.nb-l{font-size:6.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--dim2);transition:color .15s;white-space:nowrap;}
+::-webkit-scrollbar{width:2px;}::-webkit-scrollbar-thumb{background:var(--b2);}
+
+/* BOTTOM NAV */
+.bnav{display:flex;padding:6px 0 calc(6px + var(--sab));background:rgba(3,5,8,.98);
+  border-top:1px solid var(--b1);flex-shrink:0;overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;gap:0;}
+.bnav::-webkit-scrollbar{display:none;}
+.nb{display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:5px 6px;border:none;background:none;cursor:pointer;
+  min-width:52px;flex-shrink:0;position:relative;}
+.nb-i{font-size:18px;transition:transform .15s;}
+.nb-l{font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:var(--dim2);transition:color .15s;}
 .nb.on .nb-l{color:var(--gold);}
 .nb.on .nb-i{transform:translateY(-2px);}
-.nb.on::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--gold);border-radius:0 0 3px 3px;box-shadow:0 0 6px rgba(240,165,0,.6);}
-.pg{display:none;padding:10px 14px calc(70px + var(--sab));}
+.nb.on::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:24px;height:2px;background:var(--gold);border-radius:0 0 3px 3px;
+  box-shadow:0 0 8px rgba(240,165,0,.6);}
+
+/* PAGES */
+.pg{display:none;padding:12px 14px calc(70px + var(--sab));}
 .pg.on{display:block;animation:pgIn .2s ease;}
 @keyframes pgIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
-.card{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(240,165,0,.1),transparent);}
-.ct{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;color:var(--dim2);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:14px;
+  padding:14px;margin-bottom:10px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(240,165,0,.1),transparent);}
+.ct{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;
+  color:var(--dim2);text-transform:uppercase;margin-bottom:12px;
+  display:flex;align-items:center;gap:6px;}
 .hl{color:var(--gold);}
+
+/* STAT BOXES */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
-.stat{background:rgba(0,0,0,.35);border:1px solid var(--b1);border-radius:10px;padding:10px 8px;text-align:center;}
+.stat{background:rgba(0,0,0,.35);border:1px solid var(--b1);border-radius:10px;
+  padding:10px 8px;text-align:center;}
 .stat-l{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--dim2);margin-bottom:4px;}
 .stat-v{font-family:'DM Mono',monospace;font-size:16px;color:var(--gold);}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:8px;font-size:9px;font-weight:700;}
+.stat-s{font-size:8px;color:var(--dim2);margin-top:2px;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;
+  border-radius:8px;font-size:9px;font-weight:700;}
 .badge-g{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.18);color:var(--green);}
 .badge-r{background:rgba(255,48,96,.08);border:1px solid rgba(255,48,96,.18);color:var(--red);}
 .badge-o{background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.18);color:var(--orange);}
 .badge-c{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.18);color:var(--cyan);}
 .badge-p{background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.18);color:var(--purple);}
-.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:13px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .1s;}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;
+  padding:13px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;
+  font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .1s;}
 .btn:active{transform:scale(.97);}
 .btn-gold{background:linear-gradient(135deg,var(--gold),#d4891a);color:#000;}
 .btn-green{background:linear-gradient(135deg,var(--green),#00a855);color:#000;}
@@ -70,99 +116,194 @@ body{padding-top:var(--sat);}
 .btn-ol{background:transparent;border:1.5px solid var(--gold);color:var(--gold);}
 .btn-dim{background:var(--s2);border:1px solid var(--b1);color:var(--tx);}
 .btn-sm{padding:9px 14px;font-size:11px;width:auto;}
-.btn-purple{background:linear-gradient(135deg,var(--purple),#7c3aed);color:#fff;}
 .btn-row{display:flex;gap:8px;margin-top:8px;}
 .btn-row .btn{flex:1;}
-label{display:block;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--dim2);margin-bottom:5px;}
-input,select,textarea{width:100%;background:#020408;border:1px solid var(--b1);border-radius:10px;padding:11px 13px;color:var(--tx);font-family:'DM Mono',monospace;font-size:14px;outline:none;margin-bottom:10px;-webkit-appearance:none;}
+
+/* INPUTS */
+label{display:block;font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--dim2);margin-bottom:5px;}
+input,select,textarea{width:100%;background:#020408;border:1px solid var(--b1);
+  border-radius:10px;padding:11px 13px;color:var(--tx);
+  font-family:'DM Mono',monospace;font-size:14px;
+  outline:none;margin-bottom:10px;}
 input:focus,select:focus,textarea:focus{border-color:var(--gold);}
 select option{background:var(--s1);}
 textarea{resize:none;height:70px;font-size:12px;}
+
+/* PROGRESS */
+.prog{height:4px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden;margin:5px 0;}
+.pf{height:100%;border-radius:2px;transition:width .6s;}
+
+/* SIGNAL */
 .signal{border-radius:12px;padding:12px 14px;border-left:4px solid;margin-bottom:10px;}
 .sig-bull{background:rgba(0,230,118,.04);border-color:var(--green);}
 .sig-bear{background:rgba(255,48,96,.04);border-color:var(--red);}
 .sig-neu{background:rgba(0,212,255,.04);border-color:var(--cyan);}
+.sig-warn{background:rgba(249,115,22,.04);border-color:var(--orange);}
 .sig-t{font-size:18px;font-weight:800;letter-spacing:1px;}
-.sig-d{font-size:10px;color:var(--dim2);margin-top:3px;line-height:1.6;font-family:'DM Mono',monospace;}
-.prog{height:4px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden;margin:5px 0;}
-.pf{height:100%;border-radius:2px;transition:width .6s;}
+.sig-d{font-size:10px;color:var(--dim2);margin-top:3px;line-height:1.6;
+  font-family:'DM Mono',monospace;}
+
+/* LOG */
+.logbox{background:#010305;border:1px solid var(--b1);border-radius:8px;
+  padding:9px;height:120px;overflow-y:auto;
+  font-family:'DM Mono',monospace;font-size:9px;line-height:1.9;}
+
+/* OI BARS */
 .oibar{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
-.oil{font-family:'DM Mono',monospace;font-size:9px;width:64px;text-align:right;flex-shrink:0;}
+.oil{font-family:'DM Mono',monospace;font-size:9px;width:64px;
+  text-align:right;flex-shrink:0;}
 .oitrack{flex:1;height:5px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden;}
 .oifill{height:100%;border-radius:3px;transition:width .5s;}
 .oival{font-family:'DM Mono',monospace;font-size:9px;color:var(--dim2);width:38px;}
-.scout-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;background:rgba(0,0,0,.3);border:1px solid var(--b1);margin-bottom:5px;}
-.scout-row.hot{border-color:rgba(240,165,0,.3);}
-.scout-row.alert{border-color:var(--red);animation:alertp .5s infinite alternate;}
-@keyframes alertp{to{background:rgba(255,48,96,.07);}}
-.tbar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-.tbar-label{font-size:8px;letter-spacing:1px;color:var(--dim2);width:72px;flex-shrink:0;}
-.tbar-track{flex:1;height:6px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden;}
-.tbar-fill{height:100%;border-radius:3px;transition:width .2s;}
-.tbar-val{font-family:'DM Mono',monospace;font-size:10px;width:28px;text-align:right;flex-shrink:0;}
-.ptrade{background:rgba(0,0,0,.3);border:1px solid var(--b1);border-radius:10px;padding:11px;margin-bottom:7px;}
+
+/* CHAIN TABLE */
+.chain-tbl{width:100%;border-collapse:collapse;font-size:11px;
+  font-family:'DM Mono',monospace;}
+.chain-tbl th{padding:7px 5px;font-size:7px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--dim2);border-bottom:1px solid var(--b1);}
+.chain-tbl td{padding:8px 5px;border-bottom:1px solid rgba(15,30,48,.5);}
+.chain-tbl tr.atm{background:rgba(240,165,0,.06);}
+.chain-tbl tr.maxpain{background:rgba(255,48,96,.04);}
+
+/* PAPER TRADE */
+.ptrade{background:rgba(0,0,0,.3);border:1px solid var(--b1);
+  border-radius:10px;padding:11px;margin-bottom:7px;}
 .ptrade-open{border-color:rgba(0,230,118,.2);}
-.logbox{background:#010305;border:1px solid var(--b1);border-radius:8px;padding:9px;height:120px;overflow-y:auto;font-family:'DM Mono',monospace;font-size:9px;line-height:1.9;}
-.price-tile{background:rgba(0,0,0,.3);border:1px solid var(--b1);border-radius:10px;padding:12px;text-align:center;cursor:pointer;}
-.price-sym{font-size:8px;letter-spacing:2px;color:var(--dim2);margin-bottom:4px;}
-.price-val{font-family:'DM Mono',monospace;font-size:18px;color:var(--gold);}
-.price-val.live{color:var(--green);}
-.chk-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b1);cursor:pointer;}
-.chk-box{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
-.tk-row{display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid rgba(15,30,48,.5);gap:8px;}
-.tk-name{font-size:11px;font-weight:600;min-width:110px;flex-shrink:0;}
-.tk-status{font-size:9px;font-weight:700;padding:3px 8px;border-radius:8px;min-width:68px;text-align:center;}
-.sec{font-size:14px;font-weight:800;letter-spacing:2px;color:var(--gold);margin:14px 0 9px;display:flex;align-items:center;gap:8px;}
-.sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--b2),transparent);}
-#fl{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:0;transition:opacity .05s;background:rgba(240,165,0,.05);}
-#splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.sp-shield{font-size:60px;animation:shieldIn .8s cubic-bezier(.34,1.56,.64,1);}
-@keyframes shieldIn{from{transform:scale(0) rotate(-10deg);opacity:0;}to{transform:scale(1);opacity:1;}}
-.sp-name{font-size:48px;font-weight:800;letter-spacing:6px;color:var(--gold);margin-top:12px;opacity:0;animation:rise .5s ease .7s forwards;}
-.sp-sub{font-size:9px;letter-spacing:5px;color:var(--dim2);margin-top:4px;opacity:0;animation:rise .5s ease .9s forwards;}
-.sp-bar{width:130px;height:2px;background:var(--b1);border-radius:2px;margin-top:32px;overflow:hidden;opacity:0;animation:rise .3s ease 1.1s forwards;}
-.sp-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--g2));animation:fillBar 1.4s ease 1.1s forwards;width:0%;}
-@keyframes fillBar{to{width:100%;}}
-@keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
-#pin{position:fixed;inset:0;z-index:900;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;}
-.pin-icon{font-size:50px;animation:float 3s ease-in-out infinite;}
+.ptrade-win{border-color:rgba(0,230,118,.3);}
+.ptrade-loss{border-color:rgba(255,48,96,.3);}
+
+/* FLASH */
+#fl{position:fixed;inset:0;pointer-events:none;z-index:9998;
+  opacity:0;transition:opacity .05s;background:rgba(240,165,0,.05);}
+
+/* PIN SCREEN */
+#pin{position:fixed;inset:0;z-index:900;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px 20px;}
+.pin-icon{font-size:52px;animation:float 3s ease-in-out infinite;}
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
-.pin-name{font-size:34px;font-weight:800;letter-spacing:5px;color:var(--gold);margin-top:10px;}
+.pin-name{font-size:36px;font-weight:800;letter-spacing:6px;color:var(--gold);margin-top:10px;}
 .pin-sub{font-size:8px;letter-spacing:4px;color:var(--dim2);margin-bottom:28px;}
-.pin-prompt{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--dim2);margin-bottom:18px;text-transform:uppercase;}
+.pin-prompt{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;
+  color:var(--dim2);margin-bottom:18px;}
 .pin-dots{display:flex;gap:16px;margin-bottom:26px;}
 .pd{width:14px;height:14px;border-radius:50%;border:2px solid var(--b2);transition:all .15s;}
 .pd.on{background:var(--gold);border-color:var(--gold);box-shadow:0 0 14px rgba(240,165,0,.6);}
 .pd.er{background:var(--red);border-color:var(--red);}
 .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:260px;}
-.pk{height:66px;border-radius:50%;background:var(--s2);border:1.5px solid var(--b1);font-family:'DM Sans',sans-serif;font-size:26px;font-weight:700;color:var(--tx);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;}
+.pk{height:66px;border-radius:50%;background:var(--s2);border:1.5px solid var(--b1);
+  font-family:'DM Sans',sans-serif;font-size:26px;font-weight:700;color:var(--tx);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(0,0,0,.5);transition:all .1s;}
 .pk:active{background:rgba(240,165,0,.12);border-color:var(--gold);color:var(--gold);transform:scale(.9);}
 .pin-msg{font-size:11px;letter-spacing:1px;height:18px;margin-top:12px;text-align:center;}
 .pin-msg.ok{color:var(--green);}.pin-msg.er{color:var(--red);}
-.green{color:var(--green)!important;}.red{color:var(--red)!important;}.cyan{color:var(--cyan)!important;}.gold{color:var(--gold)!important;}.dim{color:var(--dim2)!important;}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;z-index:9999;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.sp-shield{font-size:64px;animation:shieldIn 1s cubic-bezier(.34,1.56,.64,1) forwards;}
+@keyframes shieldIn{from{transform:scale(0) rotate(-10deg);opacity:0;}to{transform:scale(1) rotate(0);opacity:1;}}
+.sp-name{font-size:52px;font-weight:800;letter-spacing:8px;color:var(--gold);
+  opacity:0;animation:riseUp .5s ease .8s forwards;}
+.sp-sub{font-size:9px;letter-spacing:5px;color:var(--dim2);
+  opacity:0;animation:riseUp .5s ease 1s forwards;}
+.sp-bar{width:140px;height:2px;background:var(--b1);border-radius:2px;
+  margin-top:32px;overflow:hidden;opacity:0;animation:riseUp .3s ease 1.2s forwards;}
+.sp-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--g2));
+  animation:fillBar 1.5s ease 1.2s forwards;width:0%;}
+@keyframes fillBar{to{width:100%;}}
+@keyframes riseUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+/* HOME specific */
+.price-tile{background:rgba(0,0,0,.3);border:1px solid var(--b1);border-radius:10px;
+  padding:12px;text-align:center;cursor:pointer;transition:border-color .2s;}
+.price-tile:active{border-color:var(--gold);}
+.price-sym{font-size:8px;letter-spacing:2px;color:var(--dim2);margin-bottom:4px;}
+.price-val{font-family:'DM Mono',monospace;font-size:16px;color:var(--gold);}
+.price-chg{font-size:9px;margin-top:2px;}
+.price-val.live{color:var(--green);}
+.price-val.manual{color:var(--orange);}
+
+/* SECTION HEADER */
+.sec{font-size:15px;font-weight:800;letter-spacing:2px;color:var(--gold);
+  margin:14px 0 9px;display:flex;align-items:center;gap:8px;}
+.sec::after{content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,var(--b2),transparent);}
+
+/* SCANNER SIGNAL HERO */
+.hero-score{font-family:'DM Mono',monospace;font-size:48px;font-weight:700;
+  text-align:center;line-height:1;}
+.hero-label{text-align:center;font-size:12px;letter-spacing:2px;margin-top:4px;}
+
+/* AUTO-SCOUT ROW */
+.scout-row{display:flex;align-items:center;gap:8px;padding:8px 10px;
+  border-radius:9px;background:rgba(0,0,0,.3);border:1px solid var(--b1);margin-bottom:5px;}
+.scout-row.hot{border-color:rgba(240,165,0,.3);background:rgba(240,165,0,.03);}
+.scout-row.alert{border-color:var(--red);animation:alertpulse .5s infinite alternate;}
+@keyframes alertpulse{to{background:rgba(255,48,96,.07);}}
+
+/* TITAN BARS */
+.tbar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.tbar-label{font-size:8px;letter-spacing:1px;color:var(--dim2);width:72px;flex-shrink:0;}
+.tbar-track{flex:1;height:6px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden;}
+.tbar-fill{height:100%;border-radius:3px;transition:width .2s;}
+.tbar-val{font-family:'DM Mono',monospace;font-size:10px;width:28px;text-align:right;flex-shrink:0;}
+
+/* GREEN/RED text helpers */
+.green{color:var(--green)!important;}.red{color:var(--red)!important;}
+.cyan{color:var(--cyan)!important;}.orange{color:var(--orange)!important;}
+.gold{color:var(--gold)!important;}.purple{color:var(--purple)!important;}
+.dim{color:var(--dim2)!important;}
+
+/* ── TRIKAL ENGINE ── */
+.trikal-panel{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin:0 12px 10px;}
+.trikal-header{background:var(--s3);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.trikal-title{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--gold);}
+.trikal-table{width:100%;border-collapse:collapse;}
+.trikal-row{display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid rgba(30,30,48,.5);gap:8px;}
+.trikal-name{font-size:11px;font-weight:700;min-width:90px;color:var(--tx2);}
+.trikal-status{font-size:9px;font-weight:700;letter-spacing:.5px;padding:3px 8px;border-radius:10px;min-width:70px;text-align:center;}
+.st-locked{background:rgba(245,166,35,.1);color:var(--gold);}
+.st-waiting{background:rgba(77,159,255,.08);color:var(--blue);}
+.st-active{background:rgba(0,200,150,.1);color:var(--green);animation:stBlink 1s infinite alternate;}
+.st-broken{background:rgba(255,77,109,.08);color:var(--red);}
+@keyframes stBlink{to{background:rgba(0,200,150,.2);}}
+.trikal-hl{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);flex:1;text-align:right;}
+.trikal-signal{margin:0 12px 10px;border-radius:var(--r);padding:14px;border-left:4px solid;}
+.sig-buy{background:rgba(0,200,150,.05);border-color:var(--green);}
+.sig-sell{background:rgba(255,77,109,.05);border-color:var(--red);}
+.sig-wait{background:rgba(0,212,255,.04);border-color:var(--cyan);}
+.trikal-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:0 12px 10px;}
+.trikal-stat{background:var(--s3);border-radius:var(--r2);padding:10px 12px;}
+.trikal-stat-label{font-size:8px;font-weight:700;letter-spacing:.8px;color:var(--tx3);text-transform:uppercase;margin-bottom:4px;}
+.trikal-stat-val{font-family:'DM Mono',monospace;font-size:15px;font-weight:700;}
+.candle-chart{width:100%;height:100px;display:block;border-radius:var(--r2);background:var(--s3);}
+.zone-line{position:absolute;left:0;right:0;height:1px;pointer-events:none;}
 </style>
 </head>
 <body>
 
 <div id="fl"></div>
 
+<!-- SPLASH -->
 <div id="splash">
-  <div class="sp-shield">&#9876;&#65039;</div>
-  <div class="sp-name">GAMA-AI</div>
-  <div class="sp-sub">DHANVEER v11</div>
+  <div class="sp-shield">⚔️</div>
+  <div class="sp-name">DHANVEER</div>
+  <div class="sp-sub">TRADING SYSTEM V10</div>
   <div class="sp-bar"><div class="sp-fill"></div></div>
 </div>
 
-<div id="pin" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;">
-  <div class="pin-icon">&#128274;</div>
-  <div class="pin-name">GAMA-AI</div>
-  <div class="pin-sub">DHANVEER v11</div>
+<!-- PIN -->
+<div id="pin" style="display:none;">
+  <div class="pin-icon">⚔️</div>
+  <div class="pin-name">DHANVEER</div>
+  <div class="pin-sub">TRADING SYSTEM V10</div>
   <div class="pin-prompt" id="pinPrompt">ENTER YOUR PIN</div>
   <div class="pin-dots">
-    <div class="pd" id="pd0"></div>
-    <div class="pd" id="pd1"></div>
-    <div class="pd" id="pd2"></div>
-    <div class="pd" id="pd3"></div>
+    <div class="pd" id="pd0"></div><div class="pd" id="pd1"></div>
+    <div class="pd" id="pd2"></div><div class="pd" id="pd3"></div>
   </div>
   <div class="pin-pad">
     <button class="pk" ontouchend="pk(1)">1</button>
@@ -174,15 +315,15 @@ textarea{resize:none;height:70px;font-size:12px;}
     <button class="pk" ontouchend="pk(7)">7</button>
     <button class="pk" ontouchend="pk(8)">8</button>
     <button class="pk" ontouchend="pk(9)">9</button>
-    <button class="pk" ontouchend="pk('C')" style="font-size:13px;font-family:DM Sans,sans-serif;">CLR</button>
+    <button class="pk" ontouchend="pk('C')" style="font-size:14px;">CLR</button>
     <button class="pk" ontouchend="pk(0)">0</button>
-    <button class="pk" ontouchend="pk('D')" style="font-size:20px;">&#9003;</button>
+    <button class="pk" ontouchend="pk('D')" style="font-size:20px;">⌫</button>
   </div>
   <div class="pin-msg" id="pinMsg"></div>
 </div>
 
-
-<div id="app" style="display:none;flex-direction:column;height:100%;">
+<!-- APP -->
+<div id="app" style="display:none;">
 
   <!-- TOP BAR -->
   <div class="topbar">
@@ -190,7 +331,7 @@ textarea{resize:none;height:70px;font-size:12px;}
       <div class="logo-mark">DV</div>
       <div>
         <div class="logo-name">DHANVEER</div>
-        <div class="logo-ver">DHANVEER v11</div>
+        <div class="logo-ver">V10 — TRADING SYSTEM</div>
       </div>
     </div>
     <div class="topbar-r">
@@ -622,7 +763,7 @@ textarea{resize:none;height:70px;font-size:12px;}
     </div><!-- end trikal -->
 
 
-<div class="pg" id="pg-setup">
+id="pg-setup">
       <!-- Status -->
       <div class="card" id="setupStatus">
         <div class="ct">📡 <span class="hl">CONNECTION STATUS</span></div>
@@ -717,7 +858,6 @@ textarea{resize:none;height:70px;font-size:12px;}
 </div><!-- end app -->
 
 <script>
-
 'use strict';
 // DHANVEER v10
 // ====================================================
@@ -994,13 +1134,11 @@ function unlock(){
   tick(); // Start clock now that DOM is visible
   updateDayBadge();loadCredentials();loadTrades();buildChecklist();autoSetExpiries();
   setTimeout(()=>{startPriceRefresh();checkCF();autoCheckToken();},800);
-  setTimeout(wsConnect,1800);
-  if(!S._aiTmr)S._aiTmr=setInterval(function(){if(!S.locked)updateAIAdvice();},60000);
 }
 
 function lockApp(){
   S.locked=true;S.pb='';S.npb='';upd();
-  stopScan();stopTitan();scoutStop();stopFeedMonitor();stopPriceRefresh();wsDisconnect();if(TK.on)stopTRIKAL();
+  stopScan();stopTitan();scoutStop();stopFeedMonitor();stopPriceRefresh();if(TK.on)stopTRIKAL();
   document.getElementById('pin').style.display='flex';
   document.getElementById('app').style.display='none';
   clearInterval(S.idle);
@@ -1340,7 +1478,9 @@ async function runTitanAI(sym,spot,atm,sc){
   const l=t[t.length-1],o=t[0];const cChg=o.cL>0?((l.cL-o.cL)/o.cL*100).toFixed(1):0;
   try{
     const prompt1=`${sym} Spot:${spot} ATM:${atm} CE:₹${l.cL.toFixed(1)} PE:₹${l.pL.toFixed(1)} CE_chg:${cChg}% Score:${sc.total}/100. 3 lines: 1.Whats happening 2.Entry good? 3.Key risk. Max 50 words.`;
-    const r=await aiChat('Indian options trader. Analyse: '+prompt1,120)
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:120,messages:[{role:'user',content:'Indian options trader. Analyse: '+prompt1}]})});
+    const d=await r.json();
+    el.innerHTML='<span style="font-size:8px;color:var(--cyan);">AI -- '+ist().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</span><br><br>'+(d.content?.[0]?.text||'').replace(/\n/g,'<br>');
   }catch(e){el.innerHTML='<span style="color:var(--dim2);">AI unavailable</span>';}
 }
 function tLog(m){const e=document.getElementById('titanLog');if(!e)return;const t=ist().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});e.innerHTML='<span style="color:var(--dim2);">['+t+']</span> '+m+'<br>'+e.innerHTML;const lines=e.innerHTML.split('<br>');if(lines.length>30)e.innerHTML=lines.slice(0,25).join('<br>');}
@@ -1427,7 +1567,9 @@ async function runScoutAI(sym,spot,atm,top3,exp){
   const el=document.getElementById('spVerdict');el.innerHTML='<span style="color:var(--purple);">🧠 Analysing...</span>';
   const picks=top3.map(([s,sc])=>`Strike ${s} ${sc.side}: Score=${sc.total} Signal=${sc.signal} LTP=₹${sc.ltp} Trigger=₹${sc.trigger}`).join('\n');
   try{
-    const r=await aiChat(`Indian options expert. Auto-Scout for ${sym}:\nSpot:${spot} ATM:${atm} Expiry:${exp}\n${picks}\n3 lines: 1.Best setup & why 2.Short covering or breakout? 3.Entry trigger. Max 55 words.`,120)
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:120,messages:[{role:'user',content:`Indian options expert. Auto-Scout for ${sym}:\nSpot:${spot} ATM:${atm} Expiry:${exp}\n${picks}\n3 lines: 1.Best setup & why 2.Short covering or breakout? 3.Entry trigger. Max 55 words.`}]})});
+    const d=await r.json();
+    el.innerHTML='<span style="font-size:8px;color:var(--purple);">AI -- '+ist().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</span><br><br>'+(d.content?.[0]?.text||'').replace(/\n/g,'<br>');
   }catch(e){el.innerHTML='<span style="color:var(--dim2);">AI unavailable</span>';}
   SC.aiPending=false;
 }
@@ -1440,8 +1582,10 @@ async function parseFeed(){
   const el=document.getElementById('feedResult');el.style.display='block';
   el.innerHTML='<div style="font-size:10px;color:var(--cyan);">🧠 Parsing...</div>';
   try{
-    const txt=((await aiChat(`Parse this Indian options call, return ONLY JSON: "${raw}" -> {"strike":<num>,"optType":"CE or PE","trigger":<num>,"signal":"SHORT_COVERING/BREAKOUT/IV_SPIKE/DIRECTIONAL","sym":"NIFTY/BANKNIFTY/SENSEX/FINNIFTY","summary":"<1 sentence>","confidence":<0-100>}`,200))||'{}');const txc=txt.replace(/```json|```/g,'').trim();
-    const parsed=JSON.parse(txc||'{}');IF.active={...parsed,raw,ts:Date.now()};IF.triggered=false;
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:`Parse this Indian options call, return ONLY JSON:\n"${raw}"\n{"strike":<num>,"optType":"CE or PE","trigger":<num>,"signal":"SHORT_COVERING/BREAKOUT/IV_SPIKE/DIRECTIONAL","sym":"NIFTY/BANKNIFTY/SENSEX/FINNIFTY","summary":"<1 sentence>","confidence":<0-100>}`}]})});
+    const d=await r.json();
+    let txt=d.content?.[0]?.text||'{}';txt=txt.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(txt);IF.active={...parsed,raw,ts:Date.now()};IF.triggered=false;
     el.innerHTML=`<div style="padding:10px;border-radius:9px;background:rgba(0,0,0,.3);border:1px solid rgba(0,212,255,.15);"><div class="g2" style="margin-bottom:8px;"><div class="stat"><div class="stat-l">STRIKE</div><div class="stat-v" style="color:var(--cyan);">${parsed.strike||'?'}</div></div><div class="stat"><div class="stat-l">TYPE</div><div class="stat-v" style="color:${parsed.optType==='CE'?'var(--green)':'var(--red)'};">${parsed.optType||'?'}</div></div></div><div class="g2" style="margin-bottom:8px;"><div class="stat"><div class="stat-l">TRIGGER ₹</div><div class="stat-v" style="color:var(--green);">${parsed.trigger||'?'}</div></div><div class="stat"><div class="stat-l">SIGNAL</div><div class="stat-v" style="font-size:10px;color:var(--cyan);">${(parsed.signal||'').replace(/_/g,' ')}</div></div></div><div style="font-size:10px;color:var(--dim2);line-height:1.7;">${parsed.summary||''}<br><span style="font-size:8px;">Confidence: ${parsed.confidence||'?'}% | Index: ${parsed.sym||'?'}</span></div></div>`;
     document.getElementById('feedBadge').style.display='inline-flex';
     startFeedMonitor();document.getElementById('feedInput').value='';
@@ -1528,6 +1672,7 @@ function flash(){const f=document.getElementById('fl');if(!f)return;f.style.opac
 
 // -- PWA Service Worker --
 if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(e=>console.log('SW:',e));});
 }
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;const btn=document.getElementById('installBtn');if(btn)btn.style.display='flex';});
@@ -1553,7 +1698,7 @@ function updateAIAdvice(){
   else{advice='<strong style="color:var(--red);">Final Hour</strong> -- Momentum trades only. Exit all positions before 3:25 PM.';}
   el.innerHTML=advice;
 }
-// updateAIAdvice interval started in unlock()
+setInterval(updateAIAdvice,60000);
 
 
 // ================================================
@@ -1562,7 +1707,20 @@ function updateAIAdvice(){
 // Dhan Historical API → PDH/PDL → Zones → Red Bar Detection
 // ================================================
 
-
+const TK = {
+  on: false,
+  timer: null,
+  candleTimer: null,
+  sym: 'SENSEX',
+  interval: '1',
+  zones: null,
+  candles: [],       // today's 1-min candles from Dhan API
+  pdh: 0, pdl: 0,   // auto-fetched from Dhan API
+  signal: null,
+  signalBar: 0,
+  totalBars: 0,
+  lastSignalType: null,
+};
 
 // -- Dhan historical candles (needs Data API) --
 async function dhanCandles(sym, fromDate, toDate, interval) {
@@ -2077,7 +2235,7 @@ function tkStatus(msg, color='var(--dim2)') {
   if(el) { el.textContent = msg; el.style.color = color; }
 }
 
-// ENGINE -- Dr. Devendra Red Bar Theory
+ ENGINE -- Dr. Devendra Red Bar Theory
 // Institution zones + TRIKAL levels + Red Bar detection
 // ================================================
 
@@ -2436,107 +2594,6 @@ function stopTRIKAL() {
 
 
 
-// ── WEBSOCKET ENGINE ──────────────────────────────────────────
-const WS = {
-  sock:null, on:false, mode:'REST',
-  reconnTmr:null, reconnCnt:0, maxReconn:5,
-  pingTmr:null, ticks:{}, callbacks:[]
-};
-function wsConnect(){
-  if(!S.cr||!S.cr.dc||!S.cr.dt)return;
-  if(WS.sock&&WS.sock.readyState<2)return;
-  try{
-    var url='wss://api-feed.dhan.co?version=2&token='+
-      encodeURIComponent(S.cr.dt)+'&clientId='+
-      encodeURIComponent(S.cr.dc)+'&authType=2';
-    WS.sock=new WebSocket(url);
-    WS.sock.binaryType='arraybuffer';
-    WS.sock.onopen=function(){
-      WS.on=true;WS.reconnCnt=0;WS.mode='WS';
-      wsBadge('WS LIVE','var(--green)');
-      WS.sock.send(JSON.stringify({RequestCode:17,InstrumentCount:4,InstrumentList:[
-        {ExchangeSegment:'IDX_I',SecurityId:'13'},
-        {ExchangeSegment:'IDX_I',SecurityId:'51'},
-        {ExchangeSegment:'IDX_I',SecurityId:'25'},
-        {ExchangeSegment:'IDX_I',SecurityId:'27'}
-      ]}));
-      WS.pingTmr=setInterval(function(){
-        if(WS.sock&&WS.sock.readyState===1)
-          WS.sock.send(JSON.stringify({RequestCode:12}));
-      },25000);
-    };
-    WS.sock.onmessage=function(e){
-      if(!(e.data instanceof ArrayBuffer))return;
-      var v=new DataView(e.data),o=0,buf=e.data;
-      while(o+8<=buf.byteLength){
-        var code=v.getInt8(o),len=v.getInt16(o+1,true),sid=v.getInt32(o+4,true);
-        if(code===2&&len>=16&&o+16<=buf.byteLength){
-          var ltp=v.getFloat32(o+8,true);
-          if(ltp>0){
-            var sym={13:'NIFTY',51:'SENSEX',25:'BANKNIFTY',27:'FINNIFTY'}[sid];
-            if(sym){S.mp[sym]=ltp;WS.ticks[sym]={ltp:ltp,ts:Date.now()};updatePrice(sym,ltp,true);}
-          }
-        }
-        o+=(len>0?len:8);
-      }
-    };
-    WS.sock.onerror=function(){WS.mode='REST';wsBadge('REST','var(--gold)');};
-    WS.sock.onclose=function(e){
-      WS.on=false;
-      if(WS.pingTmr){clearInterval(WS.pingTmr);WS.pingTmr=null;}
-      if(e.code!==1000&&WS.reconnCnt<WS.maxReconn){
-        WS.reconnCnt++;WS.reconnTmr=setTimeout(wsConnect,4000);
-        wsBadge('RECONNECTING','var(--orange)');
-      }else{WS.mode='REST';wsBadge('REST','var(--gold)');}
-    };
-  }catch(e){WS.mode='REST';wsBadge('REST','var(--gold)');}
-}
-function wsDisconnect(){
-  if(WS.pingTmr){clearInterval(WS.pingTmr);WS.pingTmr=null;}
-  clearTimeout(WS.reconnTmr);
-  if(WS.sock){try{WS.sock.close(1000,'logout');}catch(e){}WS.sock=null;}
-  WS.on=false;WS.mode='REST';
-}
-function wsBadge(txt,col){
-  var el=document.getElementById('connBadge');
-  if(el){el.textContent=txt;el.style.color=col;}
-  var ds=document.getElementById('dataSource');
-  if(ds){ds.textContent=txt+' active';ds.style.color=col;}
-}
-function wsGetLtp(sym){
-  var t=WS.ticks[sym];
-  return(t&&Date.now()-t.ts<5000)?t.ltp:null;
-}
-async function smartGetSpot(sym){
-  var cached=wsGetLtp(sym);
-  if(cached)return cached;
-  return getSpot(sym);
-}
-
-// ── UNIVERSAL AI ENGINE ────────────────────────────────────────
-async function aiChat(prompt,maxTokens){
-  maxTokens=maxTokens||120;
-  try{
-    var r=await fetch(CF+'/ai/chat',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({prompt:prompt,max_tokens:maxTokens}),
-      signal:AbortSignal.timeout(15000)
-    });
-    if(!r.ok)return '';
-    var d=await r.json();
-    return d.text||'';
-  }catch(e){return '';}
-}
-
-// ── PWA ────────────────────────────────────────────────────────
-
-
-
-
-
-
-
 // -- SPLASH → PIN --
 setTimeout(()=>{
   document.getElementById('splash').style.transition='opacity .4s';
@@ -2547,33 +2604,6 @@ setTimeout(()=>{
     document.getElementById('pinPrompt').textContent=S.pin?'ENTER YOUR PIN':'CREATE YOUR 4-DIGIT PIN';
   },400);
 },2500);
-
-
-const CODE=`export default{async fetch(r,env,c){
-const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type,access-token,client-id'};
-if(r.method==='OPTIONS')return new Response(null,{headers:cors});
-const u=new URL(r.url),p=u.pathname;
-let b=null;if(r.method==='POST'){try{b=await r.json();}catch(e){}}
-if(p==='/health')return Response.json({status:'ok',proxy:'dhan-proxy',version:'3.0',ai:!!(env.GEMINI_KEY||env.GROQ_KEY||env.ANTHROPIC_KEY),ts:Date.now()},{headers:cors});
-if(p==='/ai/chat'){
-  const prompt=b&&b.prompt?b.prompt:'';const maxTok=b&&b.max_tokens?b.max_tokens:120;
-  const gKey=env.GEMINI_KEY||'';const rKey=env.GROQ_KEY||'';const aKey=env.ANTHROPIC_KEY||'';
-  try{
-    if(gKey){const gr=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+gKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:maxTok}})});const gd=await gr.json();return Response.json({text:gd&&gd.candidates&&gd.candidates[0]&&gd.candidates[0].content&&gd.candidates[0].content.parts&&gd.candidates[0].content.parts[0]?gd.candidates[0].content.parts[0].text:''},{headers:cors});}
-    if(rKey){const rr=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+rKey},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],max_tokens:maxTok})});const rd=await rr.json();return Response.json({text:rd&&rd.choices&&rd.choices[0]&&rd.choices[0].message?rd.choices[0].message.content:''},{headers:cors});}
-    if(aKey){const ar=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':aKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTok,messages:[{role:'user',content:prompt}]})});const ad=await ar.json();return Response.json({text:ad&&ad.content&&ad.content[0]?ad.content[0].text:''},{headers:cors});}
-    return Response.json({text:'',error:'No AI key'},{headers:cors});
-  }catch(err){return Response.json({text:'',error:err.message},{status:500,headers:cors});}
-}
-const t=r.headers.get('access-token')||'',i=r.headers.get('client-id')||'';
-if(!t||!i)return Response.json({error:'Missing credentials'},{status:401,headers:cors});
-const dH={'access-token':t,'client-id':i,'Content-Type':'application/json'};
-const routes={'/dhan/ltp':'https://api.dhan.co/v2/marketfeed/ltp','/dhan/quote':'https://api.dhan.co/v2/marketfeed/quote','/dhan/optionchain':'https://api.dhan.co/v2/optionchain','/dhan/expirylist':'https://api.dhan.co/v2/optionchain/expirylist','/dhan/candles':'https://api.dhan.co/v2/charts/intraday','/dhan/prevday':'https://api.dhan.co/v2/charts/historical','/dhan/orders':'https://api.dhan.co/v2/orders','/dhan/positions':'https://api.dhan.co/v2/positions','/dhan/holdings':'https://api.dhan.co/v2/holdings','/dhan/funds':'https://api.dhan.co/v2/fundlimit'};
-const dU=routes[p];if(!dU)return Response.json({error:'Unknown: '+p},{status:404,headers:cors});
-try{const resp=await fetch(dU,{method:b?'POST':'GET',headers:dH,body:b?JSON.stringify(b):undefined});const data=await resp.json();return Response.json(data,{headers:cors});}
-catch(err){return Response.json({error:err.message},{status:500,headers:cors});}
-}}`;
-
 </script>
 </body>
 </html>
