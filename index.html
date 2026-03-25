@@ -26,7 +26,7 @@
         <div class="font-bold text-xl">DHANVEER</div>
       </div>
       <div id="market-status" class="px-4 py-1 rounded-full text-sm font-medium bg-green-600 text-black">● OPEN</div>
-      <div id="clock" class="text-base font-mono">04:48</div>
+      <div id="clock" class="text-base font-mono">04:55</div>
     </div>
 
     <div class="grid grid-cols-4 text-center text-sm py-2 bg-zinc-900 border-b border-zinc-800">
@@ -207,7 +207,7 @@
       localStorage.setItem('dhanToken', token);
       localStorage.setItem('workerUrl', worker);
 
-      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live prices...</span>';
+      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live prices from Dhan...</span>';
 
       try {
         const res = await fetch(worker, {
@@ -234,8 +234,10 @@
 
         if (!res.ok) throw new Error(data.error || "Dhan error");
 
-        // Improved parsing
-        const items = data.data || data || [];
+        // Final robust parsing
+        let items = data.data || data || [];
+        if (!Array.isArray(items)) items = [items];
+
         const nifty = items[0]?.LTP || "—";
         const sensex = items[1]?.LTP || "—";
         const bank = items[2]?.LTP || "—";
