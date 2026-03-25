@@ -43,7 +43,7 @@
     <!-- HOME -->
     <div id="home" class="tab-content active">
       <div class="bg-emerald-900/30 border border-emerald-500 rounded-2xl p-5 mb-6">
-        <div id="connection-msg" class="text-emerald-400 font-medium">Real-time Dhan data active</div>
+        <div id="connection-msg" class="text-emerald-400 font-medium">Real-time Dhan data active ✓</div>
       </div>
 
       <div class="grid grid-cols-2 gap-4">
@@ -113,7 +113,7 @@
           </div>
           <div>
             <label class="block text-gray-300 mb-2">Access Token</label>
-            <input id="access-token" type="password" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3" placeholder="Paste new token here">
+            <input id="access-token" type="password" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3" placeholder="Paste your new token here">
           </div>
           <div>
             <label class="block text-gray-300 mb-2">Worker URL</label>
@@ -175,7 +175,7 @@
       localStorage.setItem('dhanToken', token);
       localStorage.setItem('workerUrl', worker);
 
-      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Connecting to Dhan...</span>';
+      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live prices from Dhan...</span>';
 
       try {
         const res = await fetch(worker, {
@@ -225,12 +225,11 @@
       }
     }
 
-    // Load saved data on start (but keep token field empty for easy change)
+    // Load saved data on start
     window.onload = () => {
       const savedToken = localStorage.getItem('dhanToken');
       if (savedToken) {
-        // Token is saved but field is left empty so you can easily change it
-        document.getElementById('access-token').value = '';
+        document.getElementById('access-token').value = savedToken;
       }
       if (localStorage.getItem('workerUrl')) {
         setTimeout(saveAndConnect, 800);
