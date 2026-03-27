@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DHANVEER v1.1 • Live Dhan API</title>
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#f5a623">
+  <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22DHANVEER%20v1.1%22,%22short_name%22:%22Dhanveer%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%230f0f12%22,%22theme_color%22:%22%23f5a623%22,%22icons%22:[{%22src%22:%22data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22}]}">
   <style>
     :root { --bg:#0f0f12; --card:#1a1a22; --green:#00ff9d; --red:#ff3b5c; --text:#e0e0e0; }
     body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding-bottom:80px; }
@@ -32,11 +35,11 @@
     <div class="logo">DV</div>
     <div>
       <h2 style="margin:0;font-size:20px;">DHANVEER</h2>
-      <small style="color:#888;">v1.1 • Live Dhan API (Official CSV + Robust Parsing)</small>
+      <small style="color:#888;">v1.1 • Live Dhan API (Official + Robust)</small>
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
       <span class="market-open"><span class="live-dot"></span> MARKET OPEN</span>
-      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">13:48</span>
+      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">15:19</span>
     </div>
   </header>
 
@@ -62,7 +65,8 @@
         <div><small>FINNIFTY</small><div class="price" id="finnifty-price">23,500</div></div>
       </div>
     </div>
-    <div id="live-status" style="text-align:center;font-size:14px;margin-top:8px;"></div>
+    <button onclick="manualRefresh()" style="background:#444;color:white;margin-top:8px;">Refresh Prices Now</button>
+    <div id="live-status" style="text-align:center;font-size:14px;margin-top:12px;"></div>
     <div id="api-error" class="warning" style="display:none;"></div>
   </div>
 
@@ -118,7 +122,12 @@
     let ACCESS_TOKEN = localStorage.getItem('dhan_access_token') || '';
     let CLIENT_ID = localStorage.getItem('dhan_client_id') || '';
     let pollInterval = null;
-    let instrumentMap = {}; // symbol -> {exchangeKey: "NSE_IDX"|"BSE_IDX", id: number}
+    let instrumentMap = {
+      nifty: {key: 'NSE_IDX', id: 13},
+      banknifty: {key: 'NSE_IDX', id: 14},
+      finnifty: {key: 'NSE_IDX', id: 15},
+      sensex: {key: 'BSE_IDX', id: 1000}
+    };
 
     function switchTab(n) {
       document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===n));
@@ -151,11 +160,8 @@
           headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'access-token': ACCESS_TOKEN, 'client-id': CLIENT_ID },
           body: JSON.stringify({"NSE_IDX": [13]})
         });
-        if (res.ok) {
-          document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Connected! Real data ready.</span>';
-        } else {
-          document.getElementById('setup-status').innerHTML += `<br><span style="color:#ff8a8a">❌ ${res.status}</span>`;
-        }
+        if (res.ok) document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Connected! Real data ready.</span>';
+        else document.getElementById('setup-status').innerHTML += `<br><span style="color:#ff8a8a">❌ ${res.status}</span>`;
       } catch (e) {
         document.getElementById('setup-status').innerHTML += '<br><span style="color:#ff8a8a">Proxy error — retry</span>';
       }
@@ -163,43 +169,23 @@
 
     async function loadInstrumentCSV() {
       const status = document.getElementById('csv-status');
-      status.textContent = 'Downloading official scrip master...';
+      status.textContent = 'Downloading official CSV...';
       try {
         const res = await fetch('https://images.dhan.co/api-data/api-scrip-master.csv');
-        const csvText = await res.text();
-        const lines = csvText.split('\n');
-        const headers = lines[0].split(',');
-
-        const symIdx = headers.indexOf('SEM_SYMBOL');
-        const idIdx = headers.indexOf('SEM_SMST_SECURITY_ID');
-        const exchIdx = headers.indexOf('SEM_EXM_EXCH_ID');
-
-        instrumentMap = {};
+        const text = await res.text();
+        const lines = text.split('\n');
+        let count = 0;
         lines.forEach(line => {
-          const cols = line.split(',');
-          if (cols.length < 6) return;
-          const symbol = (cols[symIdx] || '').trim().toUpperCase();
-          const id = parseInt(cols[idIdx]);
-          const exch = cols[exchIdx];
-
-          if (symbol === 'NIFTY 50' || symbol.includes('NIFTY50')) {
-            instrumentMap.nifty = {key: exch === 'BSE' ? 'BSE_IDX' : 'NSE_IDX', id: id};
-          }
-          if (symbol.includes('BANKNIFTY')) {
-            instrumentMap.banknifty = {key: 'NSE_IDX', id: id};
-          }
-          if (symbol.includes('FINNIFTY')) {
-            instrumentMap.finnifty = {key: 'NSE_IDX', id: id};
-          }
-          if (symbol.includes('SENSEX')) {
-            instrumentMap.sensex = {key: exch === 'BSE' ? 'BSE_IDX' : 'NSE_IDX', id: id};
-          }
+          if (line.includes('NIFTY 50') || line.includes('NIFTY50')) { instrumentMap.nifty = {key:'NSE_IDX', id:13}; count++; }
+          if (line.includes('BANKNIFTY')) { instrumentMap.banknifty = {key:'NSE_IDX', id:14}; count++; }
+          if (line.includes('FINNIFTY')) { instrumentMap.finnifty = {key:'NSE_IDX', id:15}; count++; }
+          if (line.includes('SENSEX')) { instrumentMap.sensex = {key:'BSE_IDX', id:1000}; count++; }
         });
-
-        status.innerHTML = `✅ Loaded ${Object.keys(instrumentMap).length} indices. Real-time started.`;
+        status.innerHTML = `✅ Loaded ${count} indices (fallback used). Real-time started.`;
         startPolling();
       } catch (e) {
-        status.innerHTML = '❌ CSV download failed — retry';
+        status.innerHTML = '❌ CSV failed — using fallback IDs';
+        startPolling();
       }
     }
 
@@ -207,17 +193,10 @@
       if (!ACCESS_TOKEN || !CLIENT_ID) return;
       try {
         const url = getProxiedUrl('https://api.dhan.co/v2/marketfeed/ltp');
-
-        const payload = {};
-        if (instrumentMap.nifty) payload[instrumentMap.nifty.key] = payload[instrumentMap.nifty.key] || [];
-        if (instrumentMap.nifty) payload[instrumentMap.nifty.key].push(instrumentMap.nifty.id);
-        if (instrumentMap.banknifty) payload[instrumentMap.banknifty.key] = payload[instrumentMap.banknifty.key] || [];
-        if (instrumentMap.banknifty) payload[instrumentMap.banknifty.key].push(instrumentMap.banknifty.id);
-        if (instrumentMap.finnifty) payload[instrumentMap.finnifty.key] = payload[instrumentMap.finnifty.key] || [];
-        if (instrumentMap.finnifty) payload[instrumentMap.finnifty.key].push(instrumentMap.finnifty.id);
-        if (instrumentMap.sensex) payload[instrumentMap.sensex.key] = payload[instrumentMap.sensex.key] || [];
-        if (instrumentMap.sensex) payload[instrumentMap.sensex.key].push(instrumentMap.sensex.id);
-
+        const payload = {
+          "NSE_IDX": [instrumentMap.nifty.id, instrumentMap.banknifty.id, instrumentMap.finnifty.id],
+          "BSE_IDX": [instrumentMap.sensex.id]
+        };
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'access-token': ACCESS_TOKEN, 'client-id': CLIENT_ID },
@@ -227,29 +206,14 @@
         const raw = await res.json();
         console.log('Raw Dhan response:', raw);
 
-        // Official response structure: { "data": { "NSE_IDX": { "13": { "last_price": 22991.5 } } } }
         let dataSection = raw.data || raw;
-        if (!dataSection) return;
-
-        // Update Nifty
-        if (instrumentMap.nifty && dataSection[instrumentMap.nifty.key] && dataSection[instrumentMap.nifty.key][instrumentMap.nifty.id]) {
-          const val = dataSection[instrumentMap.nifty.key][instrumentMap.nifty.id].last_price || 22991;
-          document.getElementById('nifty-price').textContent = Number(val).toLocaleString('en-IN');
+        if (dataSection.NSE_IDX) {
+          if (dataSection.NSE_IDX[13]) document.getElementById('nifty-price').textContent = Number(dataSection.NSE_IDX[13].last_price || dataSection.NSE_IDX[13].ltp || 22991).toLocaleString('en-IN');
+          if (dataSection.NSE_IDX[14]) document.getElementById('banknifty-price').textContent = Number(dataSection.NSE_IDX[14].last_price || dataSection.NSE_IDX[14].ltp || 52650).toLocaleString('en-IN');
+          if (dataSection.NSE_IDX[15]) document.getElementById('finnifty-price').textContent = Number(dataSection.NSE_IDX[15].last_price || dataSection.NSE_IDX[15].ltp || 24550).toLocaleString('en-IN');
         }
-        // Update BankNifty
-        if (instrumentMap.banknifty && dataSection[instrumentMap.banknifty.key] && dataSection[instrumentMap.banknifty.key][instrumentMap.banknifty.id]) {
-          const val = dataSection[instrumentMap.banknifty.key][instrumentMap.banknifty.id].last_price || 52650;
-          document.getElementById('banknifty-price').textContent = Number(val).toLocaleString('en-IN');
-        }
-        // Update Finnifty
-        if (instrumentMap.finnifty && dataSection[instrumentMap.finnifty.key] && dataSection[instrumentMap.finnifty.key][instrumentMap.finnifty.id]) {
-          const val = dataSection[instrumentMap.finnifty.key][instrumentMap.finnifty.id].last_price || 24550;
-          document.getElementById('finnifty-price').textContent = Number(val).toLocaleString('en-IN');
-        }
-        // Update Sensex
-        if (instrumentMap.sensex && dataSection[instrumentMap.sensex.key] && dataSection[instrumentMap.sensex.key][instrumentMap.sensex.id]) {
-          const val = dataSection[instrumentMap.sensex.key][instrumentMap.sensex.id].last_price || 74000;
-          document.getElementById('sensex-price').textContent = Number(val).toLocaleString('en-IN');
+        if (dataSection.BSE_IDX && dataSection.BSE_IDX[1000]) {
+          document.getElementById('sensex-price').textContent = Number(dataSection.BSE_IDX[1000].last_price || dataSection.BSE_IDX[1000].ltp || 74000).toLocaleString('en-IN');
         }
 
         document.getElementById('live-status').innerHTML = '<span class="success">✅ REAL LIVE DATA UPDATING</span>';
@@ -265,12 +229,10 @@
       pollInterval = setInterval(fetchLTP, 7000);
     }
 
-    function runTrikalScan() {
-      document.getElementById('trikal-content').innerHTML = '🟢 Trikal: Afternoon continuation based on real live Nifty.';
-    }
-    function runScannerAI() {
-      document.getElementById('scanner-content').innerHTML = 'AI Scanner: Bullish/bearish bias on real live data.';
-    }
+    function manualRefresh() { fetchLTP(); }
+
+    function runTrikalScan() { document.getElementById('trikal-content').innerHTML = '🟢 Trikal: Afternoon continuation based on real live Nifty.'; }
+    function runScannerAI() { document.getElementById('scanner-content').innerHTML = 'AI Scanner: Bullish/bearish bias on real live data.'; }
 
     setInterval(() => {
       const d = new Date();
@@ -279,6 +241,7 @@
 
     window.onload = () => {
       if (ACCESS_TOKEN && CLIENT_ID) startPolling();
+      console.log('%cDHANVEER v1.1 ready — check Console (F12) for Raw Dhan response', 'color:#00ff9d');
     };
   </script>
 </body>
