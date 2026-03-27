@@ -32,11 +32,11 @@
     <div class="logo">DV</div>
     <div>
       <h2 style="margin:0;font-size:20px;">DHANVEER</h2>
-      <small style="color:#888;">v1.1 • Live Dhan API (Prices Fixed)</small>
+      <small style="color:#888;">v1.1 • Live Dhan API (Final Prices Fix)</small>
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
       <span class="market-open"><span class="live-dot"></span> MARKET OPEN</span>
-      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">13:24</span>
+      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">13:48</span>
     </div>
   </header>
 
@@ -188,14 +188,15 @@
           body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        console.log('Raw Dhan LTP response:', data);   // Check this in browser console (F12)
+        const raw = await res.json();
+        console.log('Raw Dhan response:', raw);  // Open F12 Console to see this
 
-        // Flexible parsing for Dhan response (handles "data" wrapper and "last_price")
-        let idxData = data;
-        if (data.data) idxData = data.data;
+        // Robust parsing for Dhan's exact structure
+        let idxData = raw;
+        if (raw.data) idxData = raw.data;
         if (idxData.NSE_IDX) idxData = idxData.NSE_IDX;
 
+        // Update prices
         if (idxData && idxData[13]) {
           const val = idxData[13].last_price || idxData[13].ltp || 22991;
           document.getElementById('nifty-price').textContent = Number(val).toLocaleString('en-IN');
@@ -213,7 +214,7 @@
         document.getElementById('api-error').style.display = 'none';
       } catch (err) {
         console.error(err);
-        document.getElementById('live-status').innerHTML = '<span style="color:#ff8a8a">Parsing issue — check console (F12)</span>';
+        document.getElementById('live-status').innerHTML = '<span style="color:#ff8a8a">Update failed — check console (F12)</span>';
       }
     }
 
@@ -223,8 +224,12 @@
       pollInterval = setInterval(fetchLTP, 7000);
     }
 
-    function runTrikalScan() { document.getElementById('trikal-content').innerHTML = '🟢 Trikal: Afternoon continuation based on real live Nifty.'; }
-    function runScannerAI() { document.getElementById('scanner-content').innerHTML = 'AI Scanner: Bullish/bearish bias on real live data.'; }
+    function runTrikalScan() {
+      document.getElementById('trikal-content').innerHTML = '🟢 Trikal: Afternoon continuation based on real live Nifty.';
+    }
+    function runScannerAI() {
+      document.getElementById('scanner-content').innerHTML = 'AI Scanner: Bullish/bearish bias on real live data.';
+    }
 
     setInterval(() => {
       const d = new Date();
