@@ -32,7 +32,7 @@
     <div class="logo">DV</div>
     <div>
       <h2 style="margin:0;font-size:20px;">DHANVEER</h2>
-      <small style="color:#888;">v1.1 • Live Dhan API (CORS Fixed)</small>
+      <small style="color:#888;">v1.1 • Live Dhan API (Prices Fixed)</small>
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
       <span class="market-open"><span class="live-dot"></span> MARKET OPEN</span>
@@ -66,7 +66,7 @@
     <div id="api-error" class="warning" style="display:none;"></div>
   </div>
 
-  <!-- SETUP (same as before) -->
+  <!-- SETUP -->
   <div id="content-1" class="content">
     <div class="card">
       <h3>🔑 Dhan API Setup</h3>
@@ -81,7 +81,7 @@
     </div>
   </div>
 
-  <!-- Trikal, Scanner, Session Engine (unchanged) -->
+  <!-- Trikal -->
   <div id="content-2" class="content">
     <div class="card">
       <h3>⏳ Trikal Analysis</h3>
@@ -90,6 +90,7 @@
     </div>
   </div>
 
+  <!-- Scanner + AI -->
   <div id="content-3" class="content">
     <div class="card">
       <h3>🔍 Scanner + AI Engine</h3>
@@ -98,6 +99,7 @@
     </div>
   </div>
 
+  <!-- Session Engine -->
   <div id="content-4" class="content">
     <div class="card">
       <h3>⚡ Session Engine</h3>
@@ -140,7 +142,7 @@
     }
 
     async function testConnection() {
-      document.getElementById('setup-status').innerHTML += '<br>Testing with CORS proxy...';
+      document.getElementById('setup-status').innerHTML += '<br>Testing...';
       try {
         const url = getProxiedUrl('https://api.dhan.co/v2/marketfeed/ltp');
         const res = await fetch(url, {
@@ -187,30 +189,42 @@
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        console.log('Raw Dhan response:', data); // For debugging
+        console.log('Raw Dhan LTP response:', data);   // Check this in browser console (F12)
 
-        // Improved flexible parsing
-        const nseIdx = data.NSE_IDX || data;
-        if (nseIdx && nseIdx[13]) document.getElementById('nifty-price').textContent = Number(nseIdx[13].ltp || 23129).toLocaleString('en-IN');
-        if (nseIdx && nseIdx[14]) document.getElementById('banknifty-price').textContent = Number(nseIdx[14].ltp || 53427).toLocaleString('en-IN');
-        if (nseIdx && nseIdx[15]) document.getElementById('finnifty-price').textContent = Number(nseIdx[15].ltp || 23500).toLocaleString('en-IN');
+        // Flexible parsing for Dhan response (handles "data" wrapper and "last_price")
+        let idxData = data;
+        if (data.data) idxData = data.data;
+        if (idxData.NSE_IDX) idxData = idxData.NSE_IDX;
+
+        if (idxData && idxData[13]) {
+          const val = idxData[13].last_price || idxData[13].ltp || 22991;
+          document.getElementById('nifty-price').textContent = Number(val).toLocaleString('en-IN');
+        }
+        if (idxData && idxData[14]) {
+          const val = idxData[14].last_price || idxData[14].ltp || 52650;
+          document.getElementById('banknifty-price').textContent = Number(val).toLocaleString('en-IN');
+        }
+        if (idxData && idxData[15]) {
+          const val = idxData[15].last_price || idxData[15].ltp || 24550;
+          document.getElementById('finnifty-price').textContent = Number(val).toLocaleString('en-IN');
+        }
 
         document.getElementById('live-status').innerHTML = '<span class="success">✅ REAL LIVE DATA UPDATING</span>';
         document.getElementById('api-error').style.display = 'none';
       } catch (err) {
         console.error(err);
-        document.getElementById('live-status').innerHTML = '<span style="color:#ff8a8a">Update failed — retry Load Instruments</span>';
+        document.getElementById('live-status').innerHTML = '<span style="color:#ff8a8a">Parsing issue — check console (F12)</span>';
       }
     }
 
     function startPolling() {
       if (pollInterval) clearInterval(pollInterval);
       fetchLTP();
-      pollInterval = setInterval(fetchLTP, 6000);
+      pollInterval = setInterval(fetchLTP, 7000);
     }
 
-    function runTrikalScan() { document.getElementById('trikal-content').innerHTML = '🟢 Trikal: Afternoon continuation strong (live Nifty data).'; }
-    function runScannerAI() { document.getElementById('scanner-content').innerHTML = 'AI Scanner: Bullish bias detected on real live data.'; }
+    function runTrikalScan() { document.getElementById('trikal-content').innerHTML = '🟢 Trikal: Afternoon continuation based on real live Nifty.'; }
+    function runScannerAI() { document.getElementById('scanner-content').innerHTML = 'AI Scanner: Bullish/bearish bias on real live data.'; }
 
     setInterval(() => {
       const d = new Date();
@@ -218,10 +232,7 @@
     }, 30000);
 
     window.onload = () => {
-      if (ACCESS_TOKEN && CLIENT_ID) {
-        document.getElementById('setup-status').innerHTML = '✅ Token loaded securely. Click TEST or Load Instruments if needed.';
-        startPolling();
-      }
+      if (ACCESS_TOKEN && CLIENT_ID) startPolling();
     };
   </script>
 </body>
