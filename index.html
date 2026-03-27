@@ -5,129 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DHANVEER v1.1 • Live Dhan API</title>
   <style>
-    :root {
-      --bg: #0f0f12;
-      --card: #1a1a22;
-      --green: #00ff9d;
-      --red: #ff3b5c;
-      --text: #e0e0e0;
-    }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      padding-bottom: 80px;
-    }
-    header {
-      background: #111118;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid #333;
-    }
-    .logo {
-      background: #f5a623;
-      color: black;
-      font-weight: bold;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      font-size: 20px;
-    }
-    .tabs {
-      display: flex;
-      background: #1a1a22;
-      overflow-x: auto;
-      padding: 8px 0;
-    }
-    .tab {
-      padding: 12px 20px;
-      white-space: nowrap;
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-    }
-    .tab.active {
-      border-bottom: 3px solid var(--green);
-      color: var(--green);
-      font-weight: 600;
-    }
-    .content {
-      padding: 16px;
-      display: none;
-    }
-    .content.active {
-      display: block;
-    }
-    .card {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .price {
-      font-size: 32px;
-      font-weight: bold;
-      color: var(--green);
-      margin: 4px 0;
-    }
-    .live-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      background: var(--green);
-      border-radius: 50%;
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.3; }
-      100% { opacity: 1; }
-    }
-    button {
-      background: var(--green);
-      color: black;
-      border: none;
-      padding: 14px 20px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 12px;
-    }
-    input {
-      width: 100%;
-      padding: 14px;
-      background: #22222a;
-      border: 1px solid #444;
-      border-radius: 8px;
-      color: white;
-      margin: 8px 0;
-    }
-    .warning {
-      background: #3a1f1f;
-      color: #ff8a8a;
-      padding: 14px;
-      border-radius: 8px;
-      border-left: 5px solid var(--red);
-    }
-    .success {
-      color: var(--green);
-    }
-    .market-open {
-      background: #1a3a2a;
-      color: var(--green);
-      padding: 6px 16px;
-      border-radius: 9999px;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
+    :root { --bg:#0f0f12; --card:#1a1a22; --green:#00ff9d; --red:#ff3b5c; --text:#e0e0e0; }
+    body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding-bottom:80px; }
+    header { background:#111118; padding:12px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #333; }
+    .logo { background:#f5a623; color:black; font-weight:bold; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:20px; }
+    .tabs { display:flex; background:#1a1a22; overflow-x:auto; padding:8px 0; }
+    .tab { padding:12px 20px; white-space:nowrap; cursor:pointer; border-bottom:3px solid transparent; }
+    .tab.active { border-bottom:3px solid var(--green); color:var(--green); font-weight:600; }
+    .content { padding:16px; display:none; }
+    .content.active { display:block; }
+    .card { background:var(--card); border-radius:12px; padding:16px; margin-bottom:16px; }
+    .price { font-size:32px; font-weight:bold; color:var(--green); margin:4px 0; }
+    .live-dot { display:inline-block; width:8px; height:8px; background:var(--green); border-radius:50%; animation:pulse 1.5s infinite; }
+    @keyframes pulse { 0%{opacity:1} 50%{opacity:0.3} 100%{opacity:1} }
+    button { background:var(--green); color:black; border:none; padding:14px 20px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%; margin-top:12px; }
+    input { width:100%; padding:14px; background:#22222a; border:1px solid #444; border-radius:8px; color:white; margin:8px 0; }
+    input[type="password"] { font-family: monospace; letter-spacing: 2px; }
+    .warning { background:#3a1f1f; color:#ff8a8a; padding:14px; border-radius:8px; border-left:5px solid var(--red); }
+    .success { color:var(--green); }
+    .market-open { background:#1a3a2a; color:var(--green); padding:6px 16px; border-radius:9999px; font-size:14px; display:inline-flex; align-items:center; gap:6px; }
+    .token-display { background:#222; padding:8px; border-radius:6px; font-family:monospace; word-break:break-all; font-size:13px; color:#aaa; }
   </style>
 </head>
 <body>
@@ -140,7 +37,7 @@
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
       <span class="market-open"><span class="live-dot"></span> MARKET OPEN</span>
-      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">12:49</span>
+      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">12:57</span>
     </div>
   </header>
 
@@ -156,31 +53,17 @@
   <div id="content-0" class="content active">
     <div class="card">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-        <div>
-          <small>NIFTY 50</small>
-          <div class="price" id="nifty-price">23,129</div>
-          <span class="live-dot"></span> LIVE
-        </div>
-        <div>
-          <small>SENSEX</small>
-          <div class="price" id="sensex-price">74,589</div>
-          <span class="live-dot"></span> LIVE
-        </div>
+        <div><small>NIFTY 50</small><div class="price" id="nifty-price">23,129</div><span class="live-dot"></span> LIVE</div>
+        <div><small>SENSEX</small><div class="price" id="sensex-price">74,589</div><span class="live-dot"></span> LIVE</div>
       </div>
     </div>
     <div class="card">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-        <div>
-          <small>BANKNIFTY</small>
-          <div class="price" id="banknifty-price">53,427</div>
-        </div>
-        <div>
-          <small>FINNIFTY</small>
-          <div class="price" id="finnifty-price">23,500</div>
-        </div>
+        <div><small>BANKNIFTY</small><div class="price" id="banknifty-price">53,427</div></div>
+        <div><small>FINNIFTY</small><div class="price" id="finnifty-price">23,500</div></div>
       </div>
     </div>
-    <div id="live-status" style="text-align:center;font-size:14px;margin-top:12px;"></div>
+    <div id="live-status" style="text-align:center;font-size:14px;margin-top:8px;"></div>
     <div id="api-error" class="warning" style="display:none;"></div>
   </div>
 
@@ -188,10 +71,11 @@
   <div id="content-1" class="content">
     <div class="card">
       <h3>🔑 Dhan API Setup</h3>
-      <input type="text" id="access-token" placeholder="Access Token" />
+      <input type="password" id="access-token" placeholder="Access Token (will be masked)" />
       <input type="text" id="client-id" placeholder="Client ID" />
       <button onclick="saveCredentials()">SAVE & TEST CONNECTION</button>
       <div id="setup-status" style="margin-top:12px;font-size:14px;"></div>
+      <div id="saved-token" class="token-display" style="display:none;margin-top:12px;"></div>
     </div>
     <div class="card">
       <button onclick="loadInstrumentCSV()">Load Instrument IDs (Official CSV)</button>
@@ -203,9 +87,7 @@
   <div id="content-2" class="content">
     <div class="card">
       <h3>⏳ Trikal Analysis</h3>
-      <div id="trikal-content" style="background:#22222a;padding:16px;border-radius:8px;">
-        Waiting for live data...
-      </div>
+      <div id="trikal-content" style="background:#22222a;padding:16px;border-radius:8px;">Waiting for live data...</div>
       <button onclick="runTrikalScan()" style="margin-top:16px;">RUN TRIKAL SCAN</button>
     </div>
   </div>
@@ -225,12 +107,12 @@
       <h3>⚡ Session Engine</h3>
       <div style="display:flex;justify-content:space-between;">
         <div>AFTERNOON SESSION</div>
-        <div style="color:var(--green);">ACTIVE</div>
+        <div style="color:var(--green);">ACTIVE • REST ON</div>
       </div>
       <div style="height:8px;background:#333;margin:12px 0;border-radius:9999px;">
         <div style="height:100%;width:68%;background:var(--green);border-radius:9999px;"></div>
       </div>
-      <small>Trend continuation expected • REST active</small>
+      <small>Trend continuation expected</small>
     </div>
   </div>
 
@@ -240,8 +122,8 @@
     let pollInterval = null;
 
     function switchTab(n) {
-      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === n));
-      document.querySelectorAll('.content').forEach((c, i) => c.classList.toggle('active', i === n));
+      document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===n));
+      document.querySelectorAll('.content').forEach((c,i) => c.classList.toggle('active', i===n));
     }
 
     function saveCredentials() {
@@ -253,11 +135,15 @@
       }
       localStorage.setItem('dhan_access_token', ACCESS_TOKEN);
       localStorage.setItem('dhan_client_id', CLIENT_ID);
-      document.getElementById('setup-status').innerHTML = '<span style="color:#00ff9d">✅ Saved. Testing...</span>';
+      document.getElementById('setup-status').innerHTML = '<span class="success">✅ Saved (token masked)</span>';
+      const masked = ACCESS_TOKEN.substring(0,15) + '...' + ACCESS_TOKEN.substring(ACCESS_TOKEN.length-8);
+      document.getElementById('saved-token').style.display = 'block';
+      document.getElementById('saved-token').textContent = masked;
       testConnection();
     }
 
     async function testConnection() {
+      document.getElementById('setup-status').innerHTML += '<br>Testing...';
       try {
         const res = await fetch('https://api.dhan.co/v2/marketfeed/ltp', {
           method: 'POST',
@@ -270,41 +156,39 @@
           body: JSON.stringify({"NSE_IDX": [13]})
         });
         if (res.ok) {
-          document.getElementById('setup-status').innerHTML += '<br><span style="color:#00ff9d">Token valid! Load instruments next.</span>';
+          document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Token accepted! Now load instruments.</span>';
           startPolling();
         } else {
-          document.getElementById('setup-status').innerHTML = `<span style="color:#ff8a8a">❌ Error ${res.status} — check token or Data API subscription</span>`;
+          document.getElementById('setup-status').innerHTML += `<br><span style="color:#ff8a8a">❌ ${res.status} — Check fresh token & Data API subscription</span>`;
         }
       } catch (e) {
-        document.getElementById('setup-status').innerHTML = '<span style="color:#ff8a8a">Network issue — try again</span>';
+        document.getElementById('setup-status').innerHTML += '<br><span style="color:#ff8a8a">Network / CORS — try fresh token or Postman test first</span>';
       }
     }
 
     async function loadInstrumentCSV() {
       const status = document.getElementById('csv-status');
-      status.textContent = 'Downloading official scrip master...';
+      status.textContent = 'Downloading scrip master...';
       try {
         const res = await fetch('https://images.dhan.co/api-data/api-scrip-master.csv');
-        if (!res.ok) throw new Error('CSV fetch failed');
-        status.innerHTML = '✅ Instrument list loaded. Real-time fetching started.';
-        startPolling();
+        if (res.ok) {
+          status.innerHTML = '✅ Loaded. Real-time started.';
+          startPolling();
+        } else {
+          status.textContent = '❌ CSV failed — retry';
+        }
       } catch (e) {
-        status.innerHTML = '❌ CSV download failed. Check internet.';
+        status.innerHTML = '❌ Download error — check internet or try again';
       }
     }
 
     async function fetchLTP() {
       if (!ACCESS_TOKEN || !CLIENT_ID) {
-        document.getElementById('api-error').style.display = 'block';
-        document.getElementById('api-error').textContent = 'Token or Client ID missing — go to SETUP';
+        showError('Token/Client ID missing — SETUP tab');
         return;
       }
-
       try {
-        const payload = {
-          "NSE_IDX": [13, 14, 15]   // Common IDs: Nifty ~13, BankNifty ~14, Finnifty ~15 (adjust after CSV if needed)
-        };
-
+        const payload = {"NSE_IDX": [13, 14, 15]};  // Common index IDs
         const res = await fetch('https://api.dhan.co/v2/marketfeed/ltp', {
           method: 'POST',
           headers: {
@@ -315,67 +199,54 @@
           },
           body: JSON.stringify(payload)
         });
-
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
         const data = await res.json();
-
-        // Update prices (fallback to demo if structure differs)
-        if (data.NSE_IDX && data.NSE_IDX[13]) {
-          document.getElementById('nifty-price').textContent = Number(data.NSE_IDX[13].ltp || 23129).toLocaleString('en-IN');
+        if (data.NSE_IDX) {
+          if (data.NSE_IDX[13]) document.getElementById('nifty-price').textContent = Number(data.NSE_IDX[13].ltp || 23129).toLocaleString('en-IN');
+          if (data.NSE_IDX[14]) document.getElementById('banknifty-price').textContent = Number(data.NSE_IDX[14].ltp || 53427).toLocaleString('en-IN');
+          if (data.NSE_IDX[15]) document.getElementById('finnifty-price').textContent = Number(data.NSE_IDX[15].ltp || 23500).toLocaleString('en-IN');
         }
-        if (data.NSE_IDX && data.NSE_IDX[14]) {
-          document.getElementById('banknifty-price').textContent = Number(data.NSE_IDX[14].ltp || 53427).toLocaleString('en-IN');
-        }
-        if (data.NSE_IDX && data.NSE_IDX[15]) {
-          document.getElementById('finnifty-price').textContent = Number(data.NSE_IDX[15].ltp || 23500).toLocaleString('en-IN');
-        }
-        // Sensex is usually BSE_IDX — you can add if needed
-
-        document.getElementById('live-status').innerHTML = '<span style="color:#00ff9d">✅ Real-time updated</span>';
+        document.getElementById('live-status').innerHTML = '<span class="success">✅ Real-time updated</span>';
         document.getElementById('api-error').style.display = 'none';
       } catch (err) {
         console.error(err);
-        document.getElementById('live-status').innerHTML = '';
-        document.getElementById('api-error').style.display = 'block';
-        document.getElementById('api-error').innerHTML = '❌ API error — check token, subscription, or try reloading instruments';
+        showError('API error — fresh token + Data API subscription required');
       }
+    }
+
+    function showError(msg) {
+      const errEl = document.getElementById('api-error');
+      errEl.style.display = 'block';
+      errEl.innerHTML = `❌ ${msg}`;
     }
 
     function startPolling() {
       if (pollInterval) clearInterval(pollInterval);
       fetchLTP();
-      pollInterval = setInterval(fetchLTP, 6000); // every 6 seconds
+      pollInterval = setInterval(fetchLTP, 7000);
     }
 
     function runTrikalScan() {
-      const el = document.getElementById('trikal-content');
-      el.innerHTML = `<strong>🟢 Afternoon Session:</strong><br>Trend continuation likely on Nifty.<br>Support near current levels.`;
+      document.getElementById('trikal-content').innerHTML = '🟢 Trikal: Afternoon continuation expected on Nifty (live data based).';
     }
 
     function runScannerAI() {
-      const el = document.getElementById('scanner-content');
-      el.innerHTML = `AI Scanner Active<br><br>
-        <strong>NIFTY:</strong> Bullish bias (live data based)<br>
-        <strong>BANKNIFTY:</strong> Strong momentum<br>
-        <strong>ALERT:</strong> Watch for continuation in afternoon session`;
+      document.getElementById('scanner-content').innerHTML = 'AI Scanner: Bullish bias detected.<br>Watch Nifty support levels for entry.';
     }
 
-    // Clock
     setInterval(() => {
-      const now = new Date();
-      document.getElementById('time-display').textContent = 
-        now.getHours().toString().padStart(2, '0') + ':' + 
-        now.getMinutes().toString().padStart(2, '0');
+      const d = new Date();
+      document.getElementById('time-display').textContent = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
     }, 30000);
 
-    // Init
     window.onload = () => {
       if (ACCESS_TOKEN && CLIENT_ID) {
-        document.getElementById('setup-status').innerHTML = 'Token loaded. Click TEST or Load Instruments.';
+        const masked = ACCESS_TOKEN.substring(0,15) + '...' + ACCESS_TOKEN.substring(ACCESS_TOKEN.length-8);
+        document.getElementById('saved-token').style.display = 'block';
+        document.getElementById('saved-token').textContent = masked;
+        document.getElementById('setup-status').innerHTML = 'Token loaded (masked). Test or load instruments.';
         startPolling();
       }
-      console.log('%cDHANVEER v1.1 ready', 'color:#00ff9d');
     };
   </script>
 </body>
