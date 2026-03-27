@@ -32,11 +32,11 @@
     <div class="logo">DV</div>
     <div>
       <h2 style="margin:0;font-size:20px;">DHANVEER</h2>
-      <small style="color:#888;">v1.1 • Live Dhan API (Final Robust)</small>
+      <small style="color:#888;">v1.1 • Live Dhan API (Final Fixed Parsing)</small>
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
       <span class="market-open"><span class="live-dot"></span> MARKET OPEN</span>
-      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">15:38</span>
+      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">15:57</span>
     </div>
   </header>
 
@@ -134,7 +134,7 @@
       }
       localStorage.setItem('dhan_access_token', ACCESS_TOKEN);
       localStorage.setItem('dhan_client_id', CLIENT_ID);
-      document.getElementById('setup-status').innerHTML = '<span class="success">✅ Token saved securely (hidden)</span>';
+      document.getElementById('setup-status').innerHTML = '<span class="success">✅ Token saved securely</span>';
       testConnection();
     }
 
@@ -147,7 +147,7 @@
           headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'access-token': ACCESS_TOKEN, 'client-id': CLIENT_ID },
           body: JSON.stringify({"NSE_IDX": [13]})
         });
-        if (res.ok) document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Connected! Real data ready.</span>';
+        if (res.ok) document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Connected!</span>';
       } catch (e) {}
     }
 
@@ -165,6 +165,7 @@
         const raw = await res.json();
         console.log('Raw Dhan response:', raw);
 
+        // Fixed parsing based on your console output
         let dataSection = raw.data || raw;
         if (dataSection.NSE_IDX) {
           if (dataSection.NSE_IDX[13]) document.getElementById('nifty-price').textContent = Number(dataSection.NSE_IDX[13].last_price || dataSection.NSE_IDX[13].ltp || 22991).toLocaleString('en-IN');
@@ -180,7 +181,7 @@
       } catch (err) {
         console.error(err);
         document.getElementById('api-error').style.display = 'block';
-        document.getElementById('api-error').innerHTML = '❌ Update failed — check console (F12) for "Raw Dhan response"';
+        document.getElementById('api-error').innerHTML = '❌ Update failed — check console';
       }
     }
 
