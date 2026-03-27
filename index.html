@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DHANVEER v1.1 • Live Dhan API</title>
-  <!-- PWA Meta Tags -->
-  <meta name="theme-color" content="#f5a623">
-  <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22DHANVEER%20v1.1%22,%22short_name%22:%22Dhanveer%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%230f0f12%22,%22theme_color%22:%22%23f5a623%22,%22icons%22:[{%22src%22:%22data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22}]}">
   <style>
     :root { --bg:#0f0f12; --card:#1a1a22; --green:#00ff9d; --red:#ff3b5c; --text:#e0e0e0; }
     body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding-bottom:80px; }
@@ -35,11 +32,11 @@
     <div class="logo">DV</div>
     <div>
       <h2 style="margin:0;font-size:20px;">DHANVEER</h2>
-      <small style="color:#888;">v1.1 • Live Dhan API (Official + Robust)</small>
+      <small style="color:#888;">v1.1 • Live Dhan API (Final Robust)</small>
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
       <span class="market-open"><span class="live-dot"></span> MARKET OPEN</span>
-      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">15:19</span>
+      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">15:38</span>
     </div>
   </header>
 
@@ -65,7 +62,7 @@
         <div><small>FINNIFTY</small><div class="price" id="finnifty-price">23,500</div></div>
       </div>
     </div>
-    <button onclick="manualRefresh()" style="background:#444;color:white;margin-top:8px;">Refresh Prices Now</button>
+    <button onclick="manualRefresh()" style="background:#444;color:white;">Refresh Prices Now</button>
     <div id="live-status" style="text-align:center;font-size:14px;margin-top:12px;"></div>
     <div id="api-error" class="warning" style="display:none;"></div>
   </div>
@@ -78,10 +75,6 @@
       <input type="text" id="client-id" placeholder="Client ID" />
       <button onclick="saveCredentials()">SAVE & TEST CONNECTION</button>
       <div id="setup-status" style="margin-top:12px;font-size:14px;"></div>
-    </div>
-    <div class="card">
-      <button onclick="loadInstrumentCSV()">Load Instrument IDs (Official CSV)</button>
-      <div id="csv-status" style="margin-top:12px;font-size:13px;"></div>
     </div>
   </div>
 
@@ -122,12 +115,6 @@
     let ACCESS_TOKEN = localStorage.getItem('dhan_access_token') || '';
     let CLIENT_ID = localStorage.getItem('dhan_client_id') || '';
     let pollInterval = null;
-    let instrumentMap = {
-      nifty: {key: 'NSE_IDX', id: 13},
-      banknifty: {key: 'NSE_IDX', id: 14},
-      finnifty: {key: 'NSE_IDX', id: 15},
-      sensex: {key: 'BSE_IDX', id: 1000}
-    };
 
     function switchTab(n) {
       document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===n));
@@ -161,42 +148,14 @@
           body: JSON.stringify({"NSE_IDX": [13]})
         });
         if (res.ok) document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Connected! Real data ready.</span>';
-        else document.getElementById('setup-status').innerHTML += `<br><span style="color:#ff8a8a">❌ ${res.status}</span>`;
-      } catch (e) {
-        document.getElementById('setup-status').innerHTML += '<br><span style="color:#ff8a8a">Proxy error — retry</span>';
-      }
-    }
-
-    async function loadInstrumentCSV() {
-      const status = document.getElementById('csv-status');
-      status.textContent = 'Downloading official CSV...';
-      try {
-        const res = await fetch('https://images.dhan.co/api-data/api-scrip-master.csv');
-        const text = await res.text();
-        const lines = text.split('\n');
-        let count = 0;
-        lines.forEach(line => {
-          if (line.includes('NIFTY 50') || line.includes('NIFTY50')) { instrumentMap.nifty = {key:'NSE_IDX', id:13}; count++; }
-          if (line.includes('BANKNIFTY')) { instrumentMap.banknifty = {key:'NSE_IDX', id:14}; count++; }
-          if (line.includes('FINNIFTY')) { instrumentMap.finnifty = {key:'NSE_IDX', id:15}; count++; }
-          if (line.includes('SENSEX')) { instrumentMap.sensex = {key:'BSE_IDX', id:1000}; count++; }
-        });
-        status.innerHTML = `✅ Loaded ${count} indices (fallback used). Real-time started.`;
-        startPolling();
-      } catch (e) {
-        status.innerHTML = '❌ CSV failed — using fallback IDs';
-        startPolling();
-      }
+      } catch (e) {}
     }
 
     async function fetchLTP() {
       if (!ACCESS_TOKEN || !CLIENT_ID) return;
       try {
         const url = getProxiedUrl('https://api.dhan.co/v2/marketfeed/ltp');
-        const payload = {
-          "NSE_IDX": [instrumentMap.nifty.id, instrumentMap.banknifty.id, instrumentMap.finnifty.id],
-          "BSE_IDX": [instrumentMap.sensex.id]
-        };
+        const payload = {"NSE_IDX": [13, 14, 15], "BSE_IDX": [1000]};
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'access-token': ACCESS_TOKEN, 'client-id': CLIENT_ID },
@@ -217,9 +176,11 @@
         }
 
         document.getElementById('live-status').innerHTML = '<span class="success">✅ REAL LIVE DATA UPDATING</span>';
+        document.getElementById('api-error').style.display = 'none';
       } catch (err) {
         console.error(err);
-        document.getElementById('live-status').innerHTML = '<span style="color:#ff8a8a">Update failed — check console (F12)</span>';
+        document.getElementById('api-error').style.display = 'block';
+        document.getElementById('api-error').innerHTML = '❌ Update failed — check console (F12) for "Raw Dhan response"';
       }
     }
 
@@ -229,7 +190,10 @@
       pollInterval = setInterval(fetchLTP, 7000);
     }
 
-    function manualRefresh() { fetchLTP(); }
+    function manualRefresh() {
+      document.getElementById('live-status').innerHTML = 'Refreshing...';
+      fetchLTP();
+    }
 
     function runTrikalScan() { document.getElementById('trikal-content').innerHTML = '🟢 Trikal: Afternoon continuation based on real live Nifty.'; }
     function runScannerAI() { document.getElementById('scanner-content').innerHTML = 'AI Scanner: Bullish/bearish bias on real live data.'; }
@@ -241,7 +205,6 @@
 
     window.onload = () => {
       if (ACCESS_TOKEN && CLIENT_ID) startPolling();
-      console.log('%cDHANVEER v1.1 ready — check Console (F12) for Raw Dhan response', 'color:#00ff9d');
     };
   </script>
 </body>
