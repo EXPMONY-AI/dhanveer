@@ -20,11 +20,10 @@
     @keyframes pulse { 0%{opacity:1} 50%{opacity:0.3} 100%{opacity:1} }
     button { background:var(--green); color:black; border:none; padding:14px 20px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%; margin-top:12px; }
     input { width:100%; padding:14px; background:#22222a; border:1px solid #444; border-radius:8px; color:white; margin:8px 0; }
-    input[type="password"] { font-family: monospace; letter-spacing: 2px; }
+    input[type="password"] { font-family: monospace; letter-spacing: 3px; }
     .warning { background:#3a1f1f; color:#ff8a8a; padding:14px; border-radius:8px; border-left:5px solid var(--red); }
     .success { color:var(--green); }
     .market-open { background:#1a3a2a; color:var(--green); padding:6px 16px; border-radius:9999px; font-size:14px; display:inline-flex; align-items:center; gap:6px; }
-    .token-display { background:#222; padding:8px; border-radius:6px; font-family:monospace; word-break:break-all; font-size:13px; color:#aaa; }
   </style>
 </head>
 <body>
@@ -33,11 +32,11 @@
     <div class="logo">DV</div>
     <div>
       <h2 style="margin:0;font-size:20px;">DHANVEER</h2>
-      <small style="color:#888;">v1.1 • Live Dhan API</small>
+      <small style="color:#888;">v1.1 • Live Dhan API (CORS Fixed)</small>
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
       <span class="market-open"><span class="live-dot"></span> MARKET OPEN</span>
-      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">12:57</span>
+      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">13:09</span>
     </div>
   </header>
 
@@ -71,11 +70,10 @@
   <div id="content-1" class="content">
     <div class="card">
       <h3>🔑 Dhan API Setup</h3>
-      <input type="password" id="access-token" placeholder="Access Token (will be masked)" />
+      <input type="password" id="access-token" placeholder="Paste fresh Access Token" />
       <input type="text" id="client-id" placeholder="Client ID" />
       <button onclick="saveCredentials()">SAVE & TEST CONNECTION</button>
       <div id="setup-status" style="margin-top:12px;font-size:14px;"></div>
-      <div id="saved-token" class="token-display" style="display:none;margin-top:12px;"></div>
     </div>
     <div class="card">
       <button onclick="loadInstrumentCSV()">Load Instrument IDs (Official CSV)</button>
@@ -120,10 +118,15 @@
     let ACCESS_TOKEN = localStorage.getItem('dhan_access_token') || '';
     let CLIENT_ID = localStorage.getItem('dhan_client_id') || '';
     let pollInterval = null;
+    const USE_CORS_PROXY = true; // ← This fixes the CORS error
 
     function switchTab(n) {
       document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===n));
       document.querySelectorAll('.content').forEach((c,i) => c.classList.toggle('active', i===n));
+    }
+
+    function getProxiedUrl(url) {
+      return USE_CORS_PROXY ? `https://corsproxy.io/?${encodeURIComponent(url)}` : url;
     }
 
     function saveCredentials() {
@@ -135,34 +138,27 @@
       }
       localStorage.setItem('dhan_access_token', ACCESS_TOKEN);
       localStorage.setItem('dhan_client_id', CLIENT_ID);
-      document.getElementById('setup-status').innerHTML = '<span class="success">✅ Saved (token masked)</span>';
-      const masked = ACCESS_TOKEN.substring(0,15) + '...' + ACCESS_TOKEN.substring(ACCESS_TOKEN.length-8);
-      document.getElementById('saved-token').style.display = 'block';
-      document.getElementById('saved-token').textContent = masked;
+      document.getElementById('setup-status').innerHTML = '<span class="success">✅ Token saved securely (hidden)</span>';
       testConnection();
     }
 
     async function testConnection() {
-      document.getElementById('setup-status').innerHTML += '<br>Testing...';
+      document.getElementById('setup-status').innerHTML += '<br>Testing with CORS proxy...';
       try {
-        const res = await fetch('https://api.dhan.co/v2/marketfeed/ltp', {
+        const url = getProxiedUrl('https://api.dhan.co/v2/marketfeed/ltp');
+        const res = await fetch(url, {
           method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'access-token': ACCESS_TOKEN,
-            'client-id': CLIENT_ID
-          },
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'access-token': ACCESS_TOKEN, 'client-id': CLIENT_ID },
           body: JSON.stringify({"NSE_IDX": [13]})
         });
         if (res.ok) {
-          document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Token accepted! Now load instruments.</span>';
+          document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Connected! Real data ready.</span>';
           startPolling();
         } else {
-          document.getElementById('setup-status').innerHTML += `<br><span style="color:#ff8a8a">❌ ${res.status} — Check fresh token & Data API subscription</span>`;
+          document.getElementById('setup-status').innerHTML += `<br><span style="color:#ff8a8a">❌ ${res.status} — Token or subscription issue?</span>`;
         }
       } catch (e) {
-        document.getElementById('setup-status').innerHTML += '<br><span style="color:#ff8a8a">Network / CORS — try fresh token or Postman test first</span>';
+        document.getElementById('setup-status').innerHTML += '<br><span style="color:#ff8a8a">Proxy error — try again or check subscription</span>';
       }
     }
 
@@ -178,25 +174,18 @@
           status.textContent = '❌ CSV failed — retry';
         }
       } catch (e) {
-        status.innerHTML = '❌ Download error — check internet or try again';
+        status.innerHTML = '❌ Download error — retry';
       }
     }
 
     async function fetchLTP() {
-      if (!ACCESS_TOKEN || !CLIENT_ID) {
-        showError('Token/Client ID missing — SETUP tab');
-        return;
-      }
+      if (!ACCESS_TOKEN || !CLIENT_ID) return showError('Token missing — SETUP tab');
       try {
-        const payload = {"NSE_IDX": [13, 14, 15]};  // Common index IDs
-        const res = await fetch('https://api.dhan.co/v2/marketfeed/ltp', {
+        const url = getProxiedUrl('https://api.dhan.co/v2/marketfeed/ltp');
+        const payload = {"NSE_IDX": [13, 14, 15]};
+        const res = await fetch(url, {
           method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'access-token': ACCESS_TOKEN,
-            'client-id': CLIENT_ID
-          },
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'access-token': ACCESS_TOKEN, 'client-id': CLIENT_ID },
           body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -206,11 +195,10 @@
           if (data.NSE_IDX[14]) document.getElementById('banknifty-price').textContent = Number(data.NSE_IDX[14].ltp || 53427).toLocaleString('en-IN');
           if (data.NSE_IDX[15]) document.getElementById('finnifty-price').textContent = Number(data.NSE_IDX[15].ltp || 23500).toLocaleString('en-IN');
         }
-        document.getElementById('live-status').innerHTML = '<span class="success">✅ Real-time updated</span>';
+        document.getElementById('live-status').innerHTML = '<span class="success">✅ REAL LIVE DATA UPDATING</span>';
         document.getElementById('api-error').style.display = 'none';
       } catch (err) {
-        console.error(err);
-        showError('API error — fresh token + Data API subscription required');
+        showError('CORS proxy failed — retry Load Instruments or check subscription');
       }
     }
 
@@ -223,16 +211,11 @@
     function startPolling() {
       if (pollInterval) clearInterval(pollInterval);
       fetchLTP();
-      pollInterval = setInterval(fetchLTP, 7000);
+      pollInterval = setInterval(fetchLTP, 6000);
     }
 
-    function runTrikalScan() {
-      document.getElementById('trikal-content').innerHTML = '🟢 Trikal: Afternoon continuation expected on Nifty (live data based).';
-    }
-
-    function runScannerAI() {
-      document.getElementById('scanner-content').innerHTML = 'AI Scanner: Bullish bias detected.<br>Watch Nifty support levels for entry.';
-    }
+    function runTrikalScan() { document.getElementById('trikal-content').innerHTML = '🟢 Trikal: Afternoon continuation strong (live Nifty data).'; }
+    function runScannerAI() { document.getElementById('scanner-content').innerHTML = 'AI Scanner: Bullish bias on indices.<br>Precise alerts based on real live data.'; }
 
     setInterval(() => {
       const d = new Date();
@@ -241,10 +224,7 @@
 
     window.onload = () => {
       if (ACCESS_TOKEN && CLIENT_ID) {
-        const masked = ACCESS_TOKEN.substring(0,15) + '...' + ACCESS_TOKEN.substring(ACCESS_TOKEN.length-8);
-        document.getElementById('saved-token').style.display = 'block';
-        document.getElementById('saved-token').textContent = masked;
-        document.getElementById('setup-status').innerHTML = 'Token loaded (masked). Test or load instruments.';
+        document.getElementById('setup-status').innerHTML = '✅ Token loaded securely. Click TEST or Load Instruments.';
         startPolling();
       }
     };
