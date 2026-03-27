@@ -32,7 +32,7 @@
     <div class="logo">DV</div>
     <div>
       <h2 style="margin:0;font-size:20px;">DHANVEER</h2>
-      <small style="color:#888;">v1.1 • Live Dhan API (Final Fixed Parsing)</small>
+      <small style="color:#888;">v1.1 • Live Dhan API (Fixed Parsing)</small>
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
       <span class="market-open"><span class="live-dot"></span> MARKET OPEN</span>
@@ -165,14 +165,14 @@
         const raw = await res.json();
         console.log('Raw Dhan response:', raw);
 
-        // Fixed parsing based on your console output
+        // Fixed parsing based on your console screenshot
         let dataSection = raw.data || raw;
-        if (dataSection.NSE_IDX) {
+        if (dataSection && dataSection.NSE_IDX) {
           if (dataSection.NSE_IDX[13]) document.getElementById('nifty-price').textContent = Number(dataSection.NSE_IDX[13].last_price || dataSection.NSE_IDX[13].ltp || 22991).toLocaleString('en-IN');
           if (dataSection.NSE_IDX[14]) document.getElementById('banknifty-price').textContent = Number(dataSection.NSE_IDX[14].last_price || dataSection.NSE_IDX[14].ltp || 52650).toLocaleString('en-IN');
           if (dataSection.NSE_IDX[15]) document.getElementById('finnifty-price').textContent = Number(dataSection.NSE_IDX[15].last_price || dataSection.NSE_IDX[15].ltp || 24550).toLocaleString('en-IN');
         }
-        if (dataSection.BSE_IDX && dataSection.BSE_IDX[1000]) {
+        if (dataSection && dataSection.BSE_IDX && dataSection.BSE_IDX[1000]) {
           document.getElementById('sensex-price').textContent = Number(dataSection.BSE_IDX[1000].last_price || dataSection.BSE_IDX[1000].ltp || 74000).toLocaleString('en-IN');
         }
 
