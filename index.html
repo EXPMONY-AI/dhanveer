@@ -32,7 +32,7 @@
     <div class="logo">DV</div>
     <div>
       <h2 style="margin:0;font-size:20px;">DHANVEER</h2>
-      <small style="color:#888;">v1.1 • Live Dhan API (Fixed Parsing)</small>
+      <small style="color:#888;">v1.1 • Live Dhan API</small>
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
       <span class="market-open"><span class="live-dot"></span> MARKET OPEN</span>
@@ -45,7 +45,6 @@
     <div class="tab" onclick="switchTab(1)">SETUP</div>
     <div class="tab" onclick="switchTab(2)">Trikal</div>
     <div class="tab" onclick="switchTab(3)">Scanner + AI</div>
-    <div class="tab" onclick="switchTab(4)">Session Engine</div>
   </div>
 
   <!-- Live Prices -->
@@ -71,7 +70,8 @@
   <div id="content-1" class="content">
     <div class="card">
       <h3>🔑 Dhan API Setup</h3>
-      <input type="password" id="access-token" placeholder="Paste fresh Access Token" />
+      <p style="font-size:14px;color:#aaa;">1. Paste fresh token from Dhan App → Profile → API<br>2. Click Save & Test<br>3. If 401 error, generate new token</p>
+      <input type="password" id="access-token" placeholder="Access Token" />
       <input type="text" id="client-id" placeholder="Client ID" />
       <button onclick="saveCredentials()">SAVE & TEST CONNECTION</button>
       <div id="setup-status" style="margin-top:12px;font-size:14px;"></div>
@@ -93,21 +93,6 @@
       <h3>🔍 Scanner + AI Engine</h3>
       <div id="scanner-content" style="min-height:180px;"></div>
       <button onclick="runScannerAI()">RUN SCANNER + AI ALERTS</button>
-    </div>
-  </div>
-
-  <!-- Session Engine -->
-  <div id="content-4" class="content">
-    <div class="card">
-      <h3>⚡ Session Engine</h3>
-      <div style="display:flex;justify-content:space-between;">
-        <div>AFTERNOON SESSION</div>
-        <div style="color:var(--green);">ACTIVE • REST ON</div>
-      </div>
-      <div style="height:8px;background:#333;margin:12px 0;border-radius:9999px;">
-        <div style="height:100%;width:68%;background:var(--green);border-radius:9999px;"></div>
-      </div>
-      <small>Trend continuation expected</small>
     </div>
   </div>
 
@@ -134,7 +119,7 @@
       }
       localStorage.setItem('dhan_access_token', ACCESS_TOKEN);
       localStorage.setItem('dhan_client_id', CLIENT_ID);
-      document.getElementById('setup-status').innerHTML = '<span class="success">✅ Token saved securely</span>';
+      document.getElementById('setup-status').innerHTML = '<span class="success">✅ Token saved</span>';
       testConnection();
     }
 
@@ -147,8 +132,17 @@
           headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'access-token': ACCESS_TOKEN, 'client-id': CLIENT_ID },
           body: JSON.stringify({"NSE_IDX": [13]})
         });
-        if (res.ok) document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Connected!</span>';
-      } catch (e) {}
+        if (res.ok) {
+          document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Token valid</span>';
+          startPolling();
+        } else if (res.status === 401) {
+          document.getElementById('setup-status').innerHTML += '<br><span style="color:#ff8a8a">❌ 401 Unauthorized — Generate a fresh token from Dhan App</span>';
+        } else {
+          document.getElementById('setup-status').innerHTML += `<br><span style="color:#ff8a8a">❌ Error ${res.status}</span>`;
+        }
+      } catch (e) {
+        document.getElementById('setup-status').innerHTML += '<br><span style="color:#ff8a8a">Proxy error — try fresh token</span>';
+      }
     }
 
     async function fetchLTP() {
@@ -161,18 +155,20 @@
           headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'access-token': ACCESS_TOKEN, 'client-id': CLIENT_ID },
           body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) {
+          if (res.status === 401) throw new Error('401 Unauthorized — fresh token needed');
+          throw new Error(`HTTP ${res.status}`);
+        }
         const raw = await res.json();
         console.log('Raw Dhan response:', raw);
 
-        // Fixed parsing based on your console screenshot
         let dataSection = raw.data || raw;
-        if (dataSection && dataSection.NSE_IDX) {
+        if (dataSection.NSE_IDX) {
           if (dataSection.NSE_IDX[13]) document.getElementById('nifty-price').textContent = Number(dataSection.NSE_IDX[13].last_price || dataSection.NSE_IDX[13].ltp || 22991).toLocaleString('en-IN');
           if (dataSection.NSE_IDX[14]) document.getElementById('banknifty-price').textContent = Number(dataSection.NSE_IDX[14].last_price || dataSection.NSE_IDX[14].ltp || 52650).toLocaleString('en-IN');
           if (dataSection.NSE_IDX[15]) document.getElementById('finnifty-price').textContent = Number(dataSection.NSE_IDX[15].last_price || dataSection.NSE_IDX[15].ltp || 24550).toLocaleString('en-IN');
         }
-        if (dataSection && dataSection.BSE_IDX && dataSection.BSE_IDX[1000]) {
+        if (dataSection.BSE_IDX && dataSection.BSE_IDX[1000]) {
           document.getElementById('sensex-price').textContent = Number(dataSection.BSE_IDX[1000].last_price || dataSection.BSE_IDX[1000].ltp || 74000).toLocaleString('en-IN');
         }
 
@@ -181,14 +177,14 @@
       } catch (err) {
         console.error(err);
         document.getElementById('api-error').style.display = 'block';
-        document.getElementById('api-error').innerHTML = '❌ Update failed — check console';
+        document.getElementById('api-error').innerHTML = err.message.includes('401') ? '❌ 401 Unauthorized — Generate fresh token from Dhan App' : '❌ Update failed — check console';
       }
     }
 
     function startPolling() {
       if (pollInterval) clearInterval(pollInterval);
       fetchLTP();
-      pollInterval = setInterval(fetchLTP, 7000);
+      pollInterval = setInterval(fetchLTP, 8000);
     }
 
     function manualRefresh() {
