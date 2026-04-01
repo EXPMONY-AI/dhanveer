@@ -36,7 +36,7 @@
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
       <span class="market-open"><span class="live-dot"></span> MARKET OPEN</span>
-      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">15:57</span>
+      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">16:10</span>
     </div>
   </header>
 
@@ -70,7 +70,7 @@
   <div id="content-1" class="content">
     <div class="card">
       <h3>🔑 Dhan API Setup</h3>
-      <p style="font-size:14px;color:#aaa;">1. Paste fresh token from Dhan App → Profile → API<br>2. Click Save & Test<br>3. If 401 error, generate new token</p>
+      <p style="font-size:14px;color:#aaa;">1. Open Dhan App → Profile → API<br>2. Generate a **fresh** token<br>3. Paste below and click Save & Test</p>
       <input type="password" id="access-token" placeholder="Access Token" />
       <input type="text" id="client-id" placeholder="Client ID" />
       <button onclick="saveCredentials()">SAVE & TEST CONNECTION</button>
@@ -119,7 +119,7 @@
       }
       localStorage.setItem('dhan_access_token', ACCESS_TOKEN);
       localStorage.setItem('dhan_client_id', CLIENT_ID);
-      document.getElementById('setup-status').innerHTML = '<span class="success">✅ Token saved</span>';
+      document.getElementById('setup-status').innerHTML = '<span class="success">✅ Token saved securely</span>';
       testConnection();
     }
 
@@ -133,10 +133,10 @@
           body: JSON.stringify({"NSE_IDX": [13]})
         });
         if (res.ok) {
-          document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Token valid</span>';
+          document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Token valid — click Refresh Prices</span>';
           startPolling();
         } else if (res.status === 401) {
-          document.getElementById('setup-status').innerHTML += '<br><span style="color:#ff8a8a">❌ 401 Unauthorized — Generate a fresh token from Dhan App</span>';
+          document.getElementById('setup-status').innerHTML += '<br><span style="color:#ff8a8a">❌ 401 Unauthorized — Generate a **fresh** token from Dhan App (Profile → API)</span>';
         } else {
           document.getElementById('setup-status').innerHTML += `<br><span style="color:#ff8a8a">❌ Error ${res.status}</span>`;
         }
@@ -156,7 +156,7 @@
           body: JSON.stringify(payload)
         });
         if (!res.ok) {
-          if (res.status === 401) throw new Error('401 Unauthorized — fresh token needed');
+          if (res.status === 401) throw new Error('401 Unauthorized — generate fresh token');
           throw new Error(`HTTP ${res.status}`);
         }
         const raw = await res.json();
@@ -177,7 +177,7 @@
       } catch (err) {
         console.error(err);
         document.getElementById('api-error').style.display = 'block';
-        document.getElementById('api-error').innerHTML = err.message.includes('401') ? '❌ 401 Unauthorized — Generate fresh token from Dhan App' : '❌ Update failed — check console';
+        document.getElementById('api-error').innerHTML = err.message.includes('401') ? '❌ 401 Unauthorized — Generate fresh token from Dhan App' : '❌ Update failed';
       }
     }
 
