@@ -3,198 +3,331 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DHANVEER v1.1 • Live Dhan API</title>
+  <title>GAMA-AI Dhanveer v11</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root { --bg:#0f0f12; --card:#1a1a22; --green:#00ff9d; --red:#ff3b5c; --text:#e0e0e0; }
-    body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding-bottom:80px; }
-    header { background:#111118; padding:12px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #333; }
-    .logo { background:#f5a623; color:black; font-weight:bold; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:20px; }
-    .tabs { display:flex; background:#1a1a22; overflow-x:auto; padding:8px 0; }
-    .tab { padding:12px 20px; white-space:nowrap; cursor:pointer; border-bottom:3px solid transparent; }
-    .tab.active { border-bottom:3px solid var(--green); color:var(--green); font-weight:600; }
-    .content { padding:16px; display:none; }
-    .content.active { display:block; }
-    .card { background:var(--card); border-radius:12px; padding:16px; margin-bottom:16px; }
-    .price { font-size:32px; font-weight:bold; color:var(--green); margin:4px 0; }
-    .live-dot { display:inline-block; width:8px; height:8px; background:var(--green); border-radius:50%; animation:pulse 1.5s infinite; }
-    @keyframes pulse { 0%{opacity:1} 50%{opacity:0.3} 100%{opacity:1} }
-    button { background:var(--green); color:black; border:none; padding:14px 20px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%; margin-top:12px; }
-    input { width:100%; padding:14px; background:#22222a; border:1px solid #444; border-radius:8px; color:white; margin:8px 0; }
-    input[type="password"] { font-family: monospace; letter-spacing: 3px; }
-    .warning { background:#3a1f1f; color:#ff8a8a; padding:14px; border-radius:8px; border-left:5px solid var(--red); }
-    .success { color:var(--green); }
-    .market-open { background:#1a3a2a; color:var(--green); padding:6px 16px; border-radius:9999px; font-size:14px; display:inline-flex; align-items:center; gap:6px; }
+    :root {
+      --bg: #030508;
+      --s1: #06090f;
+      --s2: #090e18;
+      --b1: #0f1e30;
+      --b2: #182840;
+      --gold: #f0a500;
+      --g2: #ffd060;
+      --green: #00e676;
+      --red: #ff3060;
+      --cyan: #00d4ff;
+      --purple: #a855f7;
+      --tx: #94b8d0;
+      --dim: #162330;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx); font-family:'DM Sans',sans-serif; }
+    body { padding-top: env(safe-area-inset-top,0px); }
+    #app { height:100%; display:flex; flex-direction:column; }
+
+    .topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:rgba(0,0,0,.97); border-bottom:1px solid rgba(240,165,0,.1); flex-shrink:0; }
+    .logo-mark { width:34px; height:34px; background:linear-gradient(135deg,#f0a500,#d4891a); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:#000; }
+    .mkt-pill { display:flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:9px; font-weight:700; }
+    .mkt-open { background:rgba(0,230,118,.1); border:1px solid rgba(0,230,118,.25); color:#00e676; }
+    .mkt-close { background:rgba(255,48,96,.08); border:1px solid rgba(255,48,96,.2); color:#ff3060; }
+    .ticker { display:grid; grid-template-columns:repeat(4,1fr); background:rgba(6,9,15,.95); border-bottom:1px solid #0f1e30; flex-shrink:0; }
+    .tick-item { display:flex; flex-direction:column; align-items:center; padding:5px 3px; border-right:1px solid #0f1e30; }
+    .tick-item:last-child { border-right:none; }
+    .tick-sym { font-size:7px; font-weight:700; letter-spacing:1px; color:#2a4560; }
+    .tick-val { font-family:'DM Mono',monospace; font-size:12px; font-weight:700; color:#94b8d0; margin-top:1px; }
+    .tick-val.live { color:#00e676; }
+
+    .main-scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+    .bnav { display:flex; width:100%; padding:4px 0 calc(4px + env(safe-area-inset-bottom,0px)); background:rgba(0,0,0,.98); border-top:1px solid #0f1e30; flex-shrink:0; }
+    .nb { display:flex; flex-direction:column; align-items:center; gap:2px; padding:5px 2px; border:none; background:none; cursor:pointer; flex:1; position:relative; min-width:0; }
+    .nb-i { font-size:18px; line-height:1; transition:transform .15s; }
+    .nb-l { font-size:6.5px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:#2a4560; white-space:nowrap; }
+    .nb.on .nb-l { color:#f0a500; }
+    .nb.on .nb-i { transform:translateY(-2px); }
+    .nb.on::after { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:20px; height:2px; background:#f0a500; border-radius:0 0 3px 3px; box-shadow:0 0 8px rgba(240,165,0,.5); }
+
+    .card { background:#06090f; border:1px solid #0f1e30; border-radius:14px; padding:14px; margin-bottom:10px; position:relative; overflow:hidden; }
+    .ct { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:3px; color:#2a4560; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+    .hl { color:#f0a500; }
+    .g2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .price-tile { background:rgba(0,0,0,.3); border:1px solid #0f1e30; border-radius:10px; padding:12px; text-align:center; cursor:pointer; }
+    .price-sym { font-size:8px; letter-spacing:2px; color:#2a4560; margin-bottom:4px; }
+    .price-val { font-family:'DM Mono',monospace; font-size:18px; color:#f0a500; }
+    .price-val.live { color:#00e676; }
+
+    .btn { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; padding:13px; border-radius:12px; border:none; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; cursor:pointer; transition:all .1s; }
+    .btn:active { transform:scale(.97); opacity:.9; }
+    .btn-gold { background:linear-gradient(135deg,#f0a500,#d4891a); color:#000; }
+    .btn-green { background:linear-gradient(135deg,#00e676,#00a855); color:#000; }
+
+    input, select { width:100%; background:#020408; border:1px solid #0f1e30; border-radius:10px; padding:11px 13px; color:#94b8d0; font-family:'DM Mono',monospace; font-size:14px; outline:none; margin-bottom:10px; }
+    input:focus, select:focus { border-color:#f0a500; }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="logo">DV</div>
-    <div>
-      <h2 style="margin:0;font-size:20px;">DHANVEER</h2>
-      <small style="color:#888;">v1.1 • Live Dhan API</small>
-    </div>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
-      <span class="market-open"><span class="live-dot"></span> MARKET OPEN</span>
-      <span id="time-display" style="background:#222;color:#0f0;padding:4px 12px;border-radius:6px;">16:33</span>
-    </div>
-  </header>
+<div id="app">
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab(0)">Live Prices</div>
-    <div class="tab" onclick="switchTab(1)">SETUP</div>
-    <div class="tab" onclick="switchTab(2)">Trikal</div>
-    <div class="tab" onclick="switchTab(3)">Scanner + AI</div>
-  </div>
-
-  <!-- Live Prices -->
-  <div id="content-0" class="content active">
-    <div class="card">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-        <div><small>NIFTY 50</small><div class="price" id="nifty-price">23,129</div><span class="live-dot"></span> LIVE</div>
-        <div><small>SENSEX</small><div class="price" id="sensex-price">74,589</div><span class="live-dot"></span> LIVE</div>
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="flex items-center gap-2">
+      <div class="logo-mark">DV</div>
+      <div>
+        <div class="text-xl font-bold tracking-widest" style="color:#f0a500;">DHANVEER</div>
+        <div class="text-xs" style="color:#2a4560;letter-spacing:2px;">v11 • LIVE</div>
       </div>
     </div>
-    <div class="card">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-        <div><small>BANKNIFTY</small><div class="price" id="banknifty-price">53,427</div></div>
-        <div><small>FINNIFTY</small><div class="price" id="finnifty-price">23,500</div></div>
+    <div class="flex items-center gap-2">
+      <div class="mkt-pill mkt-open" id="mktPill">
+        <div class="mkt-dot mkt-dot-o"></div>
+        <span id="mktTxt">OPEN</span>
+      </div>
+      <div class="font-mono text-sm" id="clk" style="color:#00d4ff;">--:--</div>
+    </div>
+  </div>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="tick-item"><div class="tick-sym">NIFTY</div><div class="tick-val live" id="tNIFTY">—</div></div>
+    <div class="tick-item"><div class="tick-sym">SENSEX</div><div class="tick-val live" id="tSENSEX">—</div></div>
+    <div class="tick-item"><div class="tick-sym">BANKNIFTY</div><div class="tick-val live" id="tBANKNIFTY">—</div></div>
+    <div class="tick-item"><div class="tick-sym">FINNIFTY</div><div class="tick-val live" id="tFINNIFTY">—</div></div>
+  </div>
+
+  <!-- MAIN SCROLL -->
+  <div class="main-scroll">
+
+    <!-- HOME -->
+    <div class="tab-content active" id="pg-home">
+      <div style="height:8px;"></div>
+
+      <!-- Status -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="badge badge-g" id="connBadge">✅ CONNECTED</span>
+          </div>
+        </div>
+        <div style="padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.3);font-size:9px;color:#2a4560;" id="dataSource">Real-time Dhan data active</div>
+      </div>
+
+      <!-- Live Prices -->
+      <div class="ct">📊 <span class="hl">LIVE PRICES</span>
+        <button class="btn btn-dim btn-sm" style="margin-left:auto;padding:4px 10px;font-size:9px;" onclick="saveAndConnect()">REFRESH</button>
+      </div>
+      <div class="g2" style="margin-bottom:10px;">
+        <div class="price-tile" onclick="enterPrice('NIFTY')">
+          <div class="price-sym">NIFTY</div>
+          <div class="price-val" id="pNIFTY">—</div>
+          <div style="font-size:9px;color:#2a4560;" id="cNIFTY">tap to enter</div>
+        </div>
+        <div class="price-tile" onclick="enterPrice('SENSEX')">
+          <div class="price-sym">SENSEX</div>
+          <div class="price-val" id="pSENSEX">—</div>
+          <div style="font-size:9px;color:#2a4560;" id="cSENSEX">tap to enter</div>
+        </div>
+        <div class="price-tile" onclick="enterPrice('BANKNIFTY')">
+          <div class="price-sym">BANKNIFTY</div>
+          <div class="price-val" id="pBANKNIFTY" style="font-size:14px;">—</div>
+          <div style="font-size:9px;color:#2a4560;">tap to enter</div>
+        </div>
+        <div class="price-tile" onclick="enterPrice('FINNIFTY')">
+          <div class="price-sym">FIN NIFTY</div>
+          <div class="price-val" id="pFINNIFTY" style="font-size:14px;">—</div>
+          <div style="font-size:9px;color:#2a4560;">tap to enter</div>
+        </div>
+      </div>
+
+      <!-- Session Engine -->
+      <div class="ct">⚡ <span class="hl">SESSION ENGINE</span></div>
+      <div class="card">
+        <div class="g2" style="margin-bottom:8px;">
+          <div class="stat"><div class="stat-l">SESSION</div><div class="stat-v" id="sessName" style="font-size:13px;color:var(--cyan);">—</div></div>
+          <div class="stat"><div class="stat-l">PROGRESS</div><div class="stat-v" id="sessPct">—</div></div>
+        </div>
+        <div class="prog"><div class="pf" id="sessBar" style="width:0%;background:var(--cyan);"></div></div>
+        <div style="font-size:10px;color:#2a4560;margin-top:6px;" id="sessAdvice">—</div>
       </div>
     </div>
-    <button onclick="manualRefresh()" style="background:#444;color:white;">Refresh Prices Now</button>
-    <div id="live-status" style="text-align:center;font-size:14px;margin-top:12px;"></div>
-    <div id="api-error" class="warning" style="display:none;"></div>
-  </div>
 
-  <!-- SETUP -->
-  <div id="content-1" class="content">
-    <div class="card">
-      <h3>🔑 Dhan API Setup</h3>
-      <p style="font-size:14px;color:#aaa;">Generate a **fresh** token from Dhan App → Profile → API</p>
-      <input type="password" id="access-token" placeholder="Access Token" />
-      <input type="text" id="client-id" placeholder="Client ID" />
-      <button onclick="saveCredentials()">SAVE & TEST CONNECTION</button>
-      <div id="setup-status" style="margin-top:12px;font-size:14px;"></div>
+    <!-- Other tabs (SCANNER, TITAN, PAPER, TRIKAL) -->
+    <div class="tab-content" id="pg-scanner">
+      <div style="height:8px;"></div>
+      <div class="card">
+        <div class="ct">SCANNER</div>
+        <div style="font-size:11px;color:#2a4560;text-align:center;padding:20px 0;">Advanced scanner coming soon...</div>
+      </div>
     </div>
-  </div>
 
-  <!-- Trikal -->
-  <div id="content-2" class="content">
-    <div class="card">
-      <h3>⏳ Trikal Analysis</h3>
-      <div id="trikal-content" style="background:#22222a;padding:16px;border-radius:8px;">Waiting for live data...</div>
-      <button onclick="runTrikalScan()" style="margin-top:16px;">RUN TRIKAL SCAN</button>
+    <div class="tab-content" id="pg-titan">
+      <div style="height:8px;"></div>
+      <div class="card">
+        <div class="ct">TITAN LOG</div>
+        <div id="titan-log" class="logbox">Waiting for live signals...</div>
+      </div>
     </div>
-  </div>
 
-  <!-- Scanner + AI -->
-  <div id="content-3" class="content">
-    <div class="card">
-      <h3>🔍 Scanner + AI Engine</h3>
-      <div id="scanner-content" style="min-height:180px;"></div>
-      <button onclick="runScannerAI()">RUN SCANNER + AI ALERTS</button>
+    <div class="tab-content" id="pg-paper">
+      <div style="height:8px;"></div>
+      <div class="card">
+        <div class="ct">PAPER TRADING</div>
+        <div style="font-size:11px;color:#2a4560;text-align:center;padding:20px 0;">Practice without real money</div>
+      </div>
     </div>
+
+    <div class="tab-content" id="pg-trikal">
+      <div style="height:8px;"></div>
+      <div class="card">
+        <div class="ct">TRIKAL STRATEGY ENGINE</div>
+        <div id="trikal-msg" style="font-size:13px;color:var(--green);text-align:center;padding:20px 0;">Ready with Live Data</div>
+      </div>
+    </div>
+
+    <!-- SETUP -->
+    <div class="tab-content" id="pg-setup">
+      <div style="height:8px;"></div>
+      <div class="card">
+        <div class="ct">DHAN CREDENTIALS</div>
+        <label>Client ID</label>
+        <input type="text" id="dhanClient" value="1108067088"/>
+        <label>Access Token</label>
+        <input type="password" id="dhanToken" placeholder="Paste your new token here"/>
+        <label>Worker URL</label>
+        <input type="text" id="workerUrl" value="https://dhan-proxy.sridharsrtips.workers.dev"/>
+        <div class="btn-row">
+          <button class="btn btn-gold" onclick="saveCreds()">SAVE & CONNECT</button>
+          <button class="btn btn-red btn-sm" onclick="clearCreds()">CLEAR</button>
+        </div>
+        <div id="credMsg" style="margin-top:8px;font-size:10px;min-height:18px;"></div>
+      </div>
+    </div>
+
   </div>
 
-  <script>
-    let ACCESS_TOKEN = localStorage.getItem('dhan_access_token') || '';
-    let CLIENT_ID = localStorage.getItem('dhan_client_id') || '';
-    let pollInterval = null;
+  <!-- BOTTOM NAV -->
+  <div class="bnav">
+    <button class="nb on" id="nb-home" onclick="goTab('home')"><div class="nb-i">🏠</div><div class="nb-l">HOME</div></button>
+    <button class="nb" id="nb-scanner" onclick="goTab('scanner')"><div class="nb-i">⚡</div><div class="nb-l">SCANNER</div></button>
+    <button class="nb" id="nb-titan" onclick="goTab('titan')"><div class="nb-i">🚀</div><div class="nb-l">TITAN</div></button>
+    <button class="nb" id="nb-paper" onclick="goTab('paper')"><div class="nb-i">📄</div><div class="nb-l">PAPER</div></button>
+    <button class="nb" id="nb-trikal" onclick="goTab('trikal')"><div class="nb-i">🏛️</div><div class="nb-l">TRIKAL</div></button>
+    <button class="nb" id="nb-setup" onclick="goTab('setup')"><div class="nb-i">⚙️</div><div class="nb-l">SETUP</div></button>
+  </div>
 
-    function switchTab(n) {
-      document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===n));
-      document.querySelectorAll('.content').forEach((c,i) => c.classList.toggle('active', i===n));
+</div>
+
+<script>
+  // Basic navigation
+  function goTab(name) {
+    document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+    document.getElementById('pg-'+name).classList.add('active');
+    document.getElementById('nb-'+name).classList.add('on');
+  }
+
+  // Save credentials
+  function saveCreds() {
+    const dc = document.getElementById('dhanClient').value.trim();
+    const dt = document.getElementById('dhanToken').value.trim();
+    const wu = document.getElementById('workerUrl').value.trim();
+
+    if (!dc || !dt || !wu) {
+      credMsg('Enter Client ID, Token and Worker URL', 'er');
+      return;
     }
 
-    function getProxiedUrl(url) {
-      return `https://corsproxy.io/?${encodeURIComponent(url)}`;
+    localStorage.setItem('dhanClientId', dc);
+    localStorage.setItem('dhanToken', dt);
+    localStorage.setItem('workerUrl', wu);
+
+    credMsg('✅ Saved! Fetching live prices...', 'ok');
+    fetchPrices();
+  }
+
+  function credMsg(m, t) {
+    const e = document.getElementById('credMsg');
+    e.textContent = m;
+    e.style.color = t === 'ok' ? '#00e676' : '#ff3060';
+  }
+
+  // Fetch live prices
+  async function fetchPrices() {
+    const worker = localStorage.getItem('workerUrl');
+    const token = localStorage.getItem('dhanToken');
+    const client = localStorage.getItem('dhanClientId');
+
+    if (!worker || !token || !client) {
+      credMsg('Missing credentials', 'er');
+      return;
     }
 
-    function saveCredentials() {
-      ACCESS_TOKEN = document.getElementById('access-token').value.trim();
-      CLIENT_ID = document.getElementById('client-id').value.trim();
-      if (!ACCESS_TOKEN || !CLIENT_ID) {
-        document.getElementById('setup-status').innerHTML = '<span style="color:#ff8a8a">Both fields required</span>';
-        return;
-      }
-      localStorage.setItem('dhan_access_token', ACCESS_TOKEN);
-      localStorage.setItem('dhan_client_id', CLIENT_ID);
-      document.getElementById('setup-status').innerHTML = '<span class="success">✅ Token saved securely</span>';
-      testConnection();
+    try {
+      const res = await fetch(worker, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'access-token': token,
+          'client-id': client
+        },
+        body: JSON.stringify({
+          "RequestCode": 15,
+          "InstrumentCount": 4,
+          "InstrumentList": [
+            {"ExchangeSegment": "IDX_I", "SecurityId": "13"},
+            {"ExchangeSegment": "IDX_I", "SecurityId": "4"},
+            {"ExchangeSegment": "IDX_I", "SecurityId": "25"},
+            {"ExchangeSegment": "IDX_I", "SecurityId": "27"}
+          ]
+        })
+      });
+
+      const text = await res.text();
+      const data = JSON.parse(text);
+
+      if (!res.ok) throw new Error(data.error || "Dhan error");
+
+      const items = data.data || data || [];
+      const nifty = items[0]?.LTP || "—";
+      const sensex = items[1]?.LTP || "—";
+      const bank = items[2]?.LTP || "—";
+      const fin = items[3]?.LTP || "—";
+
+      document.getElementById('live-nifty').textContent = nifty;
+      document.getElementById('live-sensex').textContent = sensex;
+      document.getElementById('live-bank').textContent = bank;
+      document.getElementById('live-fin').textContent = fin;
+
+      document.getElementById('nifty').textContent = nifty;
+      document.getElementById('sensex').textContent = sensex;
+      document.getElementById('bank').textContent = bank;
+      document.getElementById('fin').textContent = fin;
+
+      document.getElementById('setup-result').innerHTML = '<span class="text-green-400">Success! Live prices loaded</span>';
+
+    } catch (err) {
+      document.getElementById('setup-result').innerHTML = `<span class="text-red-400">Error: ${err.message}</span>`;
     }
+  }
 
-    async function testConnection() {
-      document.getElementById('setup-status').innerHTML += '<br>Testing...';
-      try {
-        const url = getProxiedUrl('https://api.dhan.co/v2/marketfeed/ltp');
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'access-token': ACCESS_TOKEN, 'client-id': CLIENT_ID },
-          body: JSON.stringify({"NSE_IDX": [13]})
-        });
-        if (res.ok) document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Token valid</span>';
-        else if (res.status === 401) document.getElementById('setup-status').innerHTML += '<br><span style="color:#ff8a8a">❌ 401 Unauthorized — Generate fresh token from Dhan App</span>';
-      } catch (e) {
-        document.getElementById('setup-status').innerHTML += '<br><span style="color:#ff8a8a">Proxy error — try fresh token</span>';
-      }
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+  }
+  setInterval(updateClock, 30000);
+  updateClock();
+
+  // Load saved data
+  window.onload = () => {
+    const savedToken = localStorage.getItem('dhanToken');
+    if (savedToken) document.getElementById('dhanToken').value = savedToken;
+    if (localStorage.getItem('workerUrl')) {
+      setTimeout(fetchPrices, 1000);
     }
-
-    async function fetchLTP() {
-      if (!ACCESS_TOKEN || !CLIENT_ID) return;
-      try {
-        const url = getProxiedUrl('https://api.dhan.co/v2/marketfeed/ltp');
-        const payload = {"NSE_IDX": [13, 14, 15], "BSE_IDX": [1000]};
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'access-token': ACCESS_TOKEN, 'client-id': CLIENT_ID },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const raw = await res.json();
-        console.log('Raw Dhan response:', raw);
-
-        // Strong parsing for your console structure
-        let dataSection = raw.data || raw;
-        if (dataSection && dataSection.NSE_IDX) {
-          if (dataSection.NSE_IDX[13]) document.getElementById('nifty-price').textContent = Number(dataSection.NSE_IDX[13].last_price || dataSection.NSE_IDX[13].ltp || 22991).toLocaleString('en-IN');
-          if (dataSection.NSE_IDX[14]) document.getElementById('banknifty-price').textContent = Number(dataSection.NSE_IDX[14].last_price || dataSection.NSE_IDX[14].ltp || 52650).toLocaleString('en-IN');
-          if (dataSection.NSE_IDX[15]) document.getElementById('finnifty-price').textContent = Number(dataSection.NSE_IDX[15].last_price || dataSection.NSE_IDX[15].ltp || 24550).toLocaleString('en-IN');
-        }
-        if (dataSection && dataSection.BSE_IDX && dataSection.BSE_IDX[1000]) {
-          document.getElementById('sensex-price').textContent = Number(dataSection.BSE_IDX[1000].last_price || dataSection.BSE_IDX[1000].ltp || 74000).toLocaleString('en-IN');
-        }
-
-        document.getElementById('live-status').innerHTML = '<span class="success">✅ REAL LIVE DATA UPDATING</span>';
-        document.getElementById('api-error').style.display = 'none';
-      } catch (err) {
-        console.error(err);
-        document.getElementById('api-error').style.display = 'block';
-        document.getElementById('api-error').innerHTML = '❌ Update failed — check console (F12)';
-      }
-    }
-
-    function startPolling() {
-      if (pollInterval) clearInterval(pollInterval);
-      fetchLTP();
-      pollInterval = setInterval(fetchLTP, 7000);
-    }
-
-    function manualRefresh() {
-      document.getElementById('live-status').innerHTML = 'Refreshing...';
-      fetchLTP();
-    }
-
-    function runTrikalScan() { document.getElementById('trikal-content').innerHTML = '🟢 Trikal: Afternoon continuation based on real live Nifty.'; }
-    function runScannerAI() { document.getElementById('scanner-content').innerHTML = 'AI Scanner: Bullish/bearish bias on real live data.'; }
-
-    setInterval(() => {
-      const d = new Date();
-      document.getElementById('time-display').textContent = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
-    }, 30000);
-
-    window.onload = () => {
-      if (ACCESS_TOKEN && CLIENT_ID) startPolling();
-    };
-  </script>
+    goTab('home');
+  };
+</script>
 </body>
 </html>
