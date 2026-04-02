@@ -32,7 +32,7 @@
     <div class="logo">DV</div>
     <div>
       <h2 style="margin:0;font-size:20px;">DHANVEER</h2>
-      <small style="color:#888;">v1.1 • Live Dhan API (Final)</small>
+      <small style="color:#888;">v1.1 • Live Dhan API</small>
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
       <span class="market-open"><span class="live-dot"></span> MARKET OPEN</span>
@@ -133,7 +133,10 @@
           body: JSON.stringify({"NSE_IDX": [13]})
         });
         if (res.ok) document.getElementById('setup-status').innerHTML += '<br><span class="success">✅ Token valid</span>';
-      } catch (e) {}
+        else if (res.status === 401) document.getElementById('setup-status').innerHTML += '<br><span style="color:#ff8a8a">❌ 401 Unauthorized — Generate fresh token from Dhan App</span>';
+      } catch (e) {
+        document.getElementById('setup-status').innerHTML += '<br><span style="color:#ff8a8a">Proxy error — try fresh token</span>';
+      }
     }
 
     async function fetchLTP() {
@@ -150,7 +153,7 @@
         const raw = await res.json();
         console.log('Raw Dhan response:', raw);
 
-        // Fixed parsing for your exact response structure
+        // Strong parsing for your console structure
         let dataSection = raw.data || raw;
         if (dataSection && dataSection.NSE_IDX) {
           if (dataSection.NSE_IDX[13]) document.getElementById('nifty-price').textContent = Number(dataSection.NSE_IDX[13].last_price || dataSection.NSE_IDX[13].ltp || 22991).toLocaleString('en-IN');
@@ -166,7 +169,7 @@
       } catch (err) {
         console.error(err);
         document.getElementById('api-error').style.display = 'block';
-        document.getElementById('api-error').innerHTML = '❌ Update failed — check console';
+        document.getElementById('api-error').innerHTML = '❌ Update failed — check console (F12)';
       }
     }
 
