@@ -3,331 +3,278 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GAMA-AI Dhanveer v11</title>
+  <title>DHANVEER v11</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #030508;
-      --s1: #06090f;
-      --s2: #090e18;
-      --b1: #0f1e30;
-      --b2: #182840;
-      --gold: #f0a500;
-      --g2: #ffd060;
-      --green: #00e676;
-      --red: #ff3060;
-      --cyan: #00d4ff;
-      --purple: #a855f7;
-      --tx: #94b8d0;
-      --dim: #162330;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx); font-family:'DM Sans',sans-serif; }
-    body { padding-top: env(safe-area-inset-top,0px); }
-    #app { height:100%; display:flex; flex-direction:column; }
-
-    .topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:rgba(0,0,0,.97); border-bottom:1px solid rgba(240,165,0,.1); flex-shrink:0; }
-    .logo-mark { width:34px; height:34px; background:linear-gradient(135deg,#f0a500,#d4891a); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:#000; }
-    .mkt-pill { display:flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:9px; font-weight:700; }
-    .mkt-open { background:rgba(0,230,118,.1); border:1px solid rgba(0,230,118,.25); color:#00e676; }
-    .mkt-close { background:rgba(255,48,96,.08); border:1px solid rgba(255,48,96,.2); color:#ff3060; }
-    .ticker { display:grid; grid-template-columns:repeat(4,1fr); background:rgba(6,9,15,.95); border-bottom:1px solid #0f1e30; flex-shrink:0; }
-    .tick-item { display:flex; flex-direction:column; align-items:center; padding:5px 3px; border-right:1px solid #0f1e30; }
-    .tick-item:last-child { border-right:none; }
-    .tick-sym { font-size:7px; font-weight:700; letter-spacing:1px; color:#2a4560; }
-    .tick-val { font-family:'DM Mono',monospace; font-size:12px; font-weight:700; color:#94b8d0; margin-top:1px; }
-    .tick-val.live { color:#00e676; }
-
-    .main-scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
-    .bnav { display:flex; width:100%; padding:4px 0 calc(4px + env(safe-area-inset-bottom,0px)); background:rgba(0,0,0,.98); border-top:1px solid #0f1e30; flex-shrink:0; }
-    .nb { display:flex; flex-direction:column; align-items:center; gap:2px; padding:5px 2px; border:none; background:none; cursor:pointer; flex:1; position:relative; min-width:0; }
-    .nb-i { font-size:18px; line-height:1; transition:transform .15s; }
-    .nb-l { font-size:6.5px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:#2a4560; white-space:nowrap; }
-    .nb.on .nb-l { color:#f0a500; }
-    .nb.on .nb-i { transform:translateY(-2px); }
-    .nb.on::after { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:20px; height:2px; background:#f0a500; border-radius:0 0 3px 3px; box-shadow:0 0 8px rgba(240,165,0,.5); }
-
-    .card { background:#06090f; border:1px solid #0f1e30; border-radius:14px; padding:14px; margin-bottom:10px; position:relative; overflow:hidden; }
-    .ct { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:3px; color:#2a4560; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
-    .hl { color:#f0a500; }
-    .g2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .price-tile { background:rgba(0,0,0,.3); border:1px solid #0f1e30; border-radius:10px; padding:12px; text-align:center; cursor:pointer; }
-    .price-sym { font-size:8px; letter-spacing:2px; color:#2a4560; margin-bottom:4px; }
-    .price-val { font-family:'DM Mono',monospace; font-size:18px; color:#f0a500; }
-    .price-val.live { color:#00e676; }
-
-    .btn { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; padding:13px; border-radius:12px; border:none; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; cursor:pointer; transition:all .1s; }
-    .btn:active { transform:scale(.97); opacity:.9; }
-    .btn-gold { background:linear-gradient(135deg,#f0a500,#d4891a); color:#000; }
-    .btn-green { background:linear-gradient(135deg,#00e676,#00a855); color:#000; }
-
-    input, select { width:100%; background:#020408; border:1px solid #0f1e30; border-radius:10px; padding:11px 13px; color:#94b8d0; font-family:'DM Mono',monospace; font-size:14px; outline:none; margin-bottom:10px; }
-    input:focus, select:focus { border-color:#f0a500; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; background: #000; color: #fff; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background: #0a0a0a; border-top: 1px solid #333; }
+    .main-content { padding-top: 125px; padding-bottom: 90px; overflow-y: auto; height: 100vh; }
+    .nav-item { transition: all 0.2s; }
+    .nav-item.active { color: #eab308 !important; transform: scale(1.1); }
   </style>
 </head>
 <body>
 
-<div id="app">
-
-  <!-- TOP BAR -->
-  <div class="topbar">
-    <div class="flex items-center gap-2">
-      <div class="logo-mark">DV</div>
-      <div>
-        <div class="text-xl font-bold tracking-widest" style="color:#f0a500;">DHANVEER</div>
-        <div class="text-xs" style="color:#2a4560;letter-spacing:2px;">v11 • LIVE</div>
+  <!-- HEADER -->
+  <div class="fixed top-0 left-0 right-0 bg-black border-b border-gray-800 z-50">
+    <div class="flex items-center justify-between px-4 py-3">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 bg-yellow-500 rounded flex items-center justify-center text-black font-bold text-xl">DV</div>
+        <div class="font-bold text-xl">DHANVEER</div>
       </div>
+      <div id="market-status" class="px-4 py-1 rounded-full text-sm font-medium bg-green-600 text-black">● OPEN</div>
+      <div id="clock" class="text-base font-mono">08:59</div>
     </div>
-    <div class="flex items-center gap-2">
-      <div class="mkt-pill mkt-open" id="mktPill">
-        <div class="mkt-dot mkt-dot-o"></div>
-        <span id="mktTxt">OPEN</span>
-      </div>
-      <div class="font-mono text-sm" id="clk" style="color:#00d4ff;">--:--</div>
+
+    <div class="grid grid-cols-4 text-center text-sm py-2 bg-zinc-900 border-b border-zinc-800">
+      <div><div class="text-gray-500 text-xs">NIFTY</div><div id="nifty" class="font-bold text-green-400 text-lg">—</div></div>
+      <div><div class="text-gray-500 text-xs">SENSEX</div><div id="sensex" class="font-bold text-green-400 text-lg">—</div></div>
+      <div><div class="text-gray-500 text-xs">BANKNIFTY</div><div id="bank" class="font-bold text-green-400 text-lg">—</div></div>
+      <div><div class="text-gray-500 text-xs">FINNIFTY</div><div id="fin" class="font-bold text-green-400 text-lg">—</div></div>
     </div>
   </div>
 
-  <!-- TICKER -->
-  <div class="ticker">
-    <div class="tick-item"><div class="tick-sym">NIFTY</div><div class="tick-val live" id="tNIFTY">—</div></div>
-    <div class="tick-item"><div class="tick-sym">SENSEX</div><div class="tick-val live" id="tSENSEX">—</div></div>
-    <div class="tick-item"><div class="tick-sym">BANKNIFTY</div><div class="tick-val live" id="tBANKNIFTY">—</div></div>
-    <div class="tick-item"><div class="tick-sym">FINNIFTY</div><div class="tick-val live" id="tFINNIFTY">—</div></div>
-  </div>
-
-  <!-- MAIN SCROLL -->
-  <div class="main-scroll">
+  <!-- MAIN CONTENT -->
+  <div class="main-content px-4">
 
     <!-- HOME -->
-    <div class="tab-content active" id="pg-home">
-      <div style="height:8px;"></div>
+    <div id="home" class="tab-content active">
+      <div class="bg-gray-900 rounded-2xl p-4 mb-4 flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl">🤖</div>
+        <div>
+          <div class="text-yellow-400 font-medium">Lunch Zone — Low liquidity</div>
+          <div class="text-xs text-gray-400">Avoid new entries. Manage open positions.</div>
+        </div>
+      </div>
 
-      <!-- Status -->
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <span class="badge badge-g" id="connBadge">✅ CONNECTED</span>
+      <div class="flex gap-2 mb-4">
+        <div class="bg-green-900 text-green-400 text-xs px-3 py-1 rounded-full flex-1 text-center">REST active</div>
+        <div id="market-pill" class="bg-green-500 text-black text-xs px-3 py-1 rounded-full flex-1 text-center font-medium">MARKET OPEN</div>
+      </div>
+
+      <div class="bg-gray-900 rounded-3xl p-4 mb-6">
+        <div class="flex justify-between items-center mb-3">
+          <div class="flex items-center gap-2 text-yellow-400">
+            <span>📊</span>
+            <span class="font-medium">LIVE PRICES</span>
+          </div>
+          <button onclick="saveAndConnect()" class="bg-blue-600 text-white text-xs px-4 py-1 rounded-full">REFRESH</button>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-black rounded-2xl p-4 text-center">
+            <div class="text-gray-400 text-xs">NIFTY</div>
+            <div id="live-nifty" class="text-3xl font-bold text-green-400">—</div>
+          </div>
+          <div class="bg-black rounded-2xl p-4 text-center">
+            <div class="text-gray-400 text-xs">SENSEX</div>
+            <div id="live-sensex" class="text-3xl font-bold text-green-400">—</div>
+          </div>
+          <div class="bg-black rounded-2xl p-4 text-center">
+            <div class="text-gray-400 text-xs">BANK NIFTY</div>
+            <div id="live-bank" class="text-3xl font-bold text-green-400">—</div>
+          </div>
+          <div class="bg-black rounded-2xl p-4 text-center">
+            <div class="text-gray-400 text-xs">FIN NIFTY</div>
+            <div id="live-fin" class="text-3xl font-bold text-green-400">—</div>
           </div>
         </div>
-        <div style="padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.3);font-size:9px;color:#2a4560;" id="dataSource">Real-time Dhan data active</div>
-      </div>
-
-      <!-- Live Prices -->
-      <div class="ct">📊 <span class="hl">LIVE PRICES</span>
-        <button class="btn btn-dim btn-sm" style="margin-left:auto;padding:4px 10px;font-size:9px;" onclick="saveAndConnect()">REFRESH</button>
-      </div>
-      <div class="g2" style="margin-bottom:10px;">
-        <div class="price-tile" onclick="enterPrice('NIFTY')">
-          <div class="price-sym">NIFTY</div>
-          <div class="price-val" id="pNIFTY">—</div>
-          <div style="font-size:9px;color:#2a4560;" id="cNIFTY">tap to enter</div>
-        </div>
-        <div class="price-tile" onclick="enterPrice('SENSEX')">
-          <div class="price-sym">SENSEX</div>
-          <div class="price-val" id="pSENSEX">—</div>
-          <div style="font-size:9px;color:#2a4560;" id="cSENSEX">tap to enter</div>
-        </div>
-        <div class="price-tile" onclick="enterPrice('BANKNIFTY')">
-          <div class="price-sym">BANKNIFTY</div>
-          <div class="price-val" id="pBANKNIFTY" style="font-size:14px;">—</div>
-          <div style="font-size:9px;color:#2a4560;">tap to enter</div>
-        </div>
-        <div class="price-tile" onclick="enterPrice('FINNIFTY')">
-          <div class="price-sym">FIN NIFTY</div>
-          <div class="price-val" id="pFINNIFTY" style="font-size:14px;">—</div>
-          <div style="font-size:9px;color:#2a4560;">tap to enter</div>
-        </div>
-      </div>
-
-      <!-- Session Engine -->
-      <div class="ct">⚡ <span class="hl">SESSION ENGINE</span></div>
-      <div class="card">
-        <div class="g2" style="margin-bottom:8px;">
-          <div class="stat"><div class="stat-l">SESSION</div><div class="stat-v" id="sessName" style="font-size:13px;color:var(--cyan);">—</div></div>
-          <div class="stat"><div class="stat-l">PROGRESS</div><div class="stat-v" id="sessPct">—</div></div>
-        </div>
-        <div class="prog"><div class="pf" id="sessBar" style="width:0%;background:var(--cyan);"></div></div>
-        <div style="font-size:10px;color:#2a4560;margin-top:6px;" id="sessAdvice">—</div>
       </div>
     </div>
 
-    <!-- Other tabs (SCANNER, TITAN, PAPER, TRIKAL) -->
-    <div class="tab-content" id="pg-scanner">
-      <div style="height:8px;"></div>
-      <div class="card">
-        <div class="ct">SCANNER</div>
-        <div style="font-size:11px;color:#2a4560;text-align:center;padding:20px 0;">Advanced scanner coming soon...</div>
+    <!-- SCANNER -->
+    <div id="scanner" class="tab-content">
+      <div class="bg-gray-900 rounded-3xl p-6 text-center">
+        <div class="text-6xl mb-4">⚡</div>
+        <div class="text-xl font-medium">SCANNER</div>
+        <div class="text-gray-400 mt-2">Advanced option scanner coming soon...</div>
       </div>
     </div>
 
-    <div class="tab-content" id="pg-titan">
-      <div style="height:8px;"></div>
-      <div class="card">
-        <div class="ct">TITAN LOG</div>
-        <div id="titan-log" class="logbox">Waiting for live signals...</div>
+    <!-- TITAN -->
+    <div id="titan" class="tab-content">
+      <div class="bg-gray-900 rounded-3xl p-4">
+        <div class="flex justify-between mb-3">
+          <div class="text-yellow-400 font-medium">TITAN LOG</div>
+          <div class="text-xs bg-gray-800 px-3 py-1 rounded">LIVE</div>
+        </div>
+        <div id="titan-log" class="bg-black rounded-2xl p-4 text-xs font-mono text-green-300 h-96 overflow-y-auto">Waiting for live signals...</div>
       </div>
     </div>
 
-    <div class="tab-content" id="pg-paper">
-      <div style="height:8px;"></div>
-      <div class="card">
-        <div class="ct">PAPER TRADING</div>
-        <div style="font-size:11px;color:#2a4560;text-align:center;padding:20px 0;">Practice without real money</div>
+    <!-- PAPER -->
+    <div id="paper" class="tab-content">
+      <div class="bg-gray-900 rounded-3xl p-8 text-center">
+        <div class="text-6xl mb-4">📄</div>
+        <div class="text-xl font-medium">PAPER TRADING MODE</div>
+        <div class="text-gray-400">Practice without real money</div>
       </div>
     </div>
 
-    <div class="tab-content" id="pg-trikal">
-      <div style="height:8px;"></div>
-      <div class="card">
-        <div class="ct">TRIKAL STRATEGY ENGINE</div>
-        <div id="trikal-msg" style="font-size:13px;color:var(--green);text-align:center;padding:20px 0;">Ready with Live Data</div>
+    <!-- TRIKAL -->
+    <div id="trikal" class="tab-content">
+      <div class="bg-gradient-to-br from-purple-900 to-gray-900 rounded-3xl p-6 text-center">
+        <div class="text-5xl mb-6">🏛️</div>
+        <div class="text-2xl font-bold">TRIKAL STRATEGY ENGINE</div>
+        <div id="trikal-msg" class="mt-4 text-green-400">Ready with Live Data</div>
       </div>
     </div>
 
     <!-- SETUP -->
-    <div class="tab-content" id="pg-setup">
-      <div style="height:8px;"></div>
-      <div class="card">
-        <div class="ct">DHAN CREDENTIALS</div>
-        <label>Client ID</label>
-        <input type="text" id="dhanClient" value="1108067088"/>
-        <label>Access Token</label>
-        <input type="password" id="dhanToken" placeholder="Paste your new token here"/>
-        <label>Worker URL</label>
-        <input type="text" id="workerUrl" value="https://dhan-proxy.sridharsrtips.workers.dev"/>
-        <div class="btn-row">
-          <button class="btn btn-gold" onclick="saveCreds()">SAVE & CONNECT</button>
-          <button class="btn btn-red btn-sm" onclick="clearCreds()">CLEAR</button>
+    <div id="setup" class="tab-content">
+      <div class="bg-gray-900 rounded-3xl p-6">
+        <h2 class="text-yellow-400 text-xl font-medium mb-6">🔧 SETUP - Connect to Dhan</h2>
+        
+        <div class="space-y-5">
+          <div>
+            <label class="text-xs text-gray-400 block mb-1">DHAN CLIENT ID</label>
+            <input id="client-id" type="text" value="1108067088" class="w-full bg-black border border-gray-700 rounded-2xl px-4 py-3 text-sm">
+          </div>
+          <div>
+            <label class="text-xs text-gray-400 block mb-1">DHAN ACCESS TOKEN</label>
+            <input id="access-token" type="password" class="w-full bg-black border border-gray-700 rounded-2xl px-4 py-3 text-sm" placeholder="Paste your token">
+          </div>
+          <div>
+            <label class="text-xs text-gray-400 block mb-1">CLOUDFLARE WORKER URL</label>
+            <input id="worker-url" type="text" value="https://dhan-proxy.sridharsrtips.workers.dev" class="w-full bg-black border border-gray-700 rounded-2xl px-4 py-3 text-sm">
+          </div>
+
+          <button onclick="saveAndConnect()" class="w-full bg-green-500 text-black font-medium py-4 rounded-2xl mt-4">
+            SAVE &amp; CONNECT TO DHAN
+          </button>
         </div>
-        <div id="credMsg" style="margin-top:8px;font-size:10px;min-height:18px;"></div>
+
+        <div id="setup-result" class="mt-6 text-center text-sm"></div>
       </div>
     </div>
 
   </div>
 
   <!-- BOTTOM NAV -->
-  <div class="bnav">
-    <button class="nb on" id="nb-home" onclick="goTab('home')"><div class="nb-i">🏠</div><div class="nb-l">HOME</div></button>
-    <button class="nb" id="nb-scanner" onclick="goTab('scanner')"><div class="nb-i">⚡</div><div class="nb-l">SCANNER</div></button>
-    <button class="nb" id="nb-titan" onclick="goTab('titan')"><div class="nb-i">🚀</div><div class="nb-l">TITAN</div></button>
-    <button class="nb" id="nb-paper" onclick="goTab('paper')"><div class="nb-i">📄</div><div class="nb-l">PAPER</div></button>
-    <button class="nb" id="nb-trikal" onclick="goTab('trikal')"><div class="nb-i">🏛️</div><div class="nb-l">TRIKAL</div></button>
-    <button class="nb" id="nb-setup" onclick="goTab('setup')"><div class="nb-i">⚙️</div><div class="nb-l">SETUP</div></button>
+  <div class="bottom-nav bg-black border-t border-gray-800 py-2">
+    <div class="flex justify-around items-center text-xs">
+      <div onclick="switchTab(0)" class="nav-item flex flex-col items-center cursor-pointer active">
+        <div class="text-2xl mb-1">🏠</div>
+        <div class="text-gray-400">HOME</div>
+      </div>
+      <div onclick="switchTab(1)" class="nav-item flex flex-col items-center cursor-pointer">
+        <div class="text-2xl mb-1">⚡</div>
+        <div class="text-gray-400">SCANNER</div>
+      </div>
+      <div onclick="switchTab(2)" class="nav-item flex flex-col items-center cursor-pointer">
+        <div class="text-2xl mb-1">🚀</div>
+        <div class="text-gray-400">TITAN</div>
+      </div>
+      <div onclick="switchTab(3)" class="nav-item flex flex-col items-center cursor-pointer">
+        <div class="text-2xl mb-1">📄</div>
+        <div class="text-gray-400">PAPER</div>
+      </div>
+      <div onclick="switchTab(4)" class="nav-item flex flex-col items-center cursor-pointer">
+        <div class="text-2xl mb-1">🏛️</div>
+        <div class="text-gray-400">TRIKAL</div>
+      </div>
+      <div onclick="switchTab(5)" class="nav-item flex flex-col items-center cursor-pointer">
+        <div class="text-2xl mb-1">⚙️</div>
+        <div class="text-gray-400">SETUP</div>
+      </div>
+    </div>
   </div>
 
-</div>
+  <script>
+    let currentTab = 0;
+    const tabs = ['home','scanner','titan','paper','trikal','setup'];
 
-<script>
-  // Basic navigation
-  function goTab(name) {
-    document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
-    document.getElementById('pg-'+name).classList.add('active');
-    document.getElementById('nb-'+name).classList.add('on');
-  }
-
-  // Save credentials
-  function saveCreds() {
-    const dc = document.getElementById('dhanClient').value.trim();
-    const dt = document.getElementById('dhanToken').value.trim();
-    const wu = document.getElementById('workerUrl').value.trim();
-
-    if (!dc || !dt || !wu) {
-      credMsg('Enter Client ID, Token and Worker URL', 'er');
-      return;
+    function switchTab(n) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabs[n]).classList.add('active');
+      currentTab = n;
     }
 
-    localStorage.setItem('dhanClientId', dc);
-    localStorage.setItem('dhanToken', dt);
-    localStorage.setItem('workerUrl', wu);
+    async function saveAndConnect() {
+      const client = document.getElementById('client-id').value.trim();
+      const token = document.getElementById('access-token').value.trim();
+      const worker = document.getElementById('worker-url').value.trim();
 
-    credMsg('✅ Saved! Fetching live prices...', 'ok');
-    fetchPrices();
-  }
+      if (!client || !token || !worker) {
+        document.getElementById('setup-result').innerHTML = '<span class="text-red-400">Please fill all fields</span>';
+        return;
+      }
 
-  function credMsg(m, t) {
-    const e = document.getElementById('credMsg');
-    e.textContent = m;
-    e.style.color = t === 'ok' ? '#00e676' : '#ff3060';
-  }
+      localStorage.setItem('dhanClientId', client);
+      localStorage.setItem('dhanToken', token);
+      localStorage.setItem('workerUrl', worker);
 
-  // Fetch live prices
-  async function fetchPrices() {
-    const worker = localStorage.getItem('workerUrl');
-    const token = localStorage.getItem('dhanToken');
-    const client = localStorage.getItem('dhanClientId');
+      document.getElementById('setup-result').innerHTML = '<span class="text-blue-400">Fetching live prices from Dhan...</span>';
 
-    if (!worker || !token || !client) {
-      credMsg('Missing credentials', 'er');
-      return;
+      try {
+        const res = await fetch(worker, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'access-token': token,
+            'client-id': client
+          },
+          body: JSON.stringify({
+            "RequestCode": 15,
+            "InstrumentCount": 4,
+            "InstrumentList": [
+              {"ExchangeSegment": "IDX_I", "SecurityId": "13"},
+              {"ExchangeSegment": "IDX_I", "SecurityId": "4"},
+              {"ExchangeSegment": "IDX_I", "SecurityId": "25"},
+              {"ExchangeSegment": "IDX_I", "SecurityId": "27"}
+            ]
+          })
+        });
+
+        const text = await res.text();
+        const data = JSON.parse(text);
+
+        if (!res.ok) throw new Error(data.error || "Dhan error");
+
+        // Safe parsing for different response formats
+        const items = data.data || data || [];
+        const nifty = items[0]?.LTP || items.find?.(i => i.SecurityId === "13")?.LTP || "—";
+        const sensex = items[1]?.LTP || items.find?.(i => i.SecurityId === "4")?.LTP || "—";
+        const bank = items[2]?.LTP || items.find?.(i => i.SecurityId === "25")?.LTP || "—";
+        const fin = items[3]?.LTP || items.find?.(i => i.SecurityId === "27")?.LTP || "—";
+
+        document.getElementById('live-nifty').textContent = nifty;
+        document.getElementById('live-sensex').textContent = sensex;
+        document.getElementById('live-bank').textContent = bank;
+        document.getElementById('live-fin').textContent = fin;
+
+        document.getElementById('nifty').textContent = nifty;
+        document.getElementById('sensex').textContent = sensex;
+        document.getElementById('bank').textContent = bank;
+        document.getElementById('fin').textContent = fin;
+
+        document.getElementById('setup-result').innerHTML = '<span class="text-green-400">Success! Live prices loaded</span>';
+
+      } catch (err) {
+        document.getElementById('setup-result').innerHTML = `<span class="text-red-400">Error: ${err.message}</span>`;
+      }
     }
 
-    try {
-      const res = await fetch(worker, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'access-token': token,
-          'client-id': client
-        },
-        body: JSON.stringify({
-          "RequestCode": 15,
-          "InstrumentCount": 4,
-          "InstrumentList": [
-            {"ExchangeSegment": "IDX_I", "SecurityId": "13"},
-            {"ExchangeSegment": "IDX_I", "SecurityId": "4"},
-            {"ExchangeSegment": "IDX_I", "SecurityId": "25"},
-            {"ExchangeSegment": "IDX_I", "SecurityId": "27"}
-          ]
-        })
-      });
+    // Load saved data on start
+    window.onload = () => {
+      const savedToken = localStorage.getItem('dhanToken');
+      if (savedToken) document.getElementById('access-token').value = savedToken;
+      if (localStorage.getItem('workerUrl')) {
+        setTimeout(saveAndConnect, 1000);
+      }
+      switchTab(0);
+    };
 
-      const text = await res.text();
-      const data = JSON.parse(text);
-
-      if (!res.ok) throw new Error(data.error || "Dhan error");
-
-      const items = data.data || data || [];
-      const nifty = items[0]?.LTP || "—";
-      const sensex = items[1]?.LTP || "—";
-      const bank = items[2]?.LTP || "—";
-      const fin = items[3]?.LTP || "—";
-
-      document.getElementById('live-nifty').textContent = nifty;
-      document.getElementById('live-sensex').textContent = sensex;
-      document.getElementById('live-bank').textContent = bank;
-      document.getElementById('live-fin').textContent = fin;
-
-      document.getElementById('nifty').textContent = nifty;
-      document.getElementById('sensex').textContent = sensex;
-      document.getElementById('bank').textContent = bank;
-      document.getElementById('fin').textContent = fin;
-
-      document.getElementById('setup-result').innerHTML = '<span class="text-green-400">Success! Live prices loaded</span>';
-
-    } catch (err) {
-      document.getElementById('setup-result').innerHTML = `<span class="text-red-400">Error: ${err.message}</span>`;
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
     }
-  }
-
-  // Clock
-  function updateClock() {
-    const now = new Date();
-    document.getElementById('clock').textContent = now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
-  }
-  setInterval(updateClock, 30000);
-  updateClock();
-
-  // Load saved data
-  window.onload = () => {
-    const savedToken = localStorage.getItem('dhanToken');
-    if (savedToken) document.getElementById('dhanToken').value = savedToken;
-    if (localStorage.getItem('workerUrl')) {
-      setTimeout(fetchPrices, 1000);
-    }
-    goTab('home');
-  };
-</script>
+    setInterval(updateClock, 30000);
+    updateClock();
+  </script>
 </body>
 </html>
