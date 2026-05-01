@@ -762,7 +762,7 @@ function tickAfter(){
    Fyers candle API: GET /fyers/data/history
    Params: symbol, resolution, date_format, range_from, range_to
    
-   Dhan fallback: POST /dhan/v2/charts/historical
+   Fyers proxy: GET /fyers/history
 ════════════════════════════════════════════════════════════════ */
 
 /* Date helpers */
@@ -770,140 +770,143 @@ function toISODate(d){ return d.toISOString().split('T')[0]; }
 function daysAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return d; }
 function toEpoch(d){ return Math.floor(d.getTime()/1000); }
 
-/* ── Dhan historical candles via your Cloudflare proxy ──
-   Uses verified Dhan API with correct security IDs:
-   NIFTY=13, BANKNIFTY=25, FINNIFTY=27, SENSEX=51
-   Segment IDX_I for all indices
-   
-   'resolution' param mapping:
-   '1'→1min intraday, '5'→5min intraday, 'D'→daily
-*/
-function dhanHdrs(){
+/* ════════════════════════════════════════════════════════════════
+   ██ FYERS API FUNCTIONS — all data via Cloudflare Worker proxy
+   Worker URL: dhan-proxy.sridharsrtips.workers.dev
+   Routes:
+     /fyers/history      → Fyers historical + intraday candles
+     /fyers/optionchain  → Fyers option chain (ATM CE/PE symbols)
+     /fyers/quotes       → Fyers REST quote (fallback)
+════════════════════════════════════════════════════════════════ */
+
+const PROXY = 'https://dhan-proxy.sridharsrtips.workers.dev';
+
+/* Auth header for Fyers proxy */
+function fyersAuthHdr(){
   const g=gc();
-  return{'Content-Type':'application/json','access-token':g.tok,'client-id':g.cid};
+  return { 'Authorization':`Bearer ${g.cid}:${g.tok}`, 'Content-Type':'application/json' };
 }
 
+/* Date helpers */
+function daysAgo(n){
+  const d=new Date(); d.setDate(d.getDate()-n); return d;
+}
+function toEpoch(d){ return Math.floor(d.getTime()/1000); }
+function toISODate(d){ return d.toISOString().split('T')[0]; }
+
+/* ── Fyers historical candles via proxy ──
+   resolution: '1'=1min '5'=5min '30'=30min '60'=1hr '1D'=daily
+*/
 async function fyersHistory(symbol, resolution, fromDate, toDate){
-  // symbol param is Fyers format e.g. 'NSE:NIFTY50-INDEX'
-  // We convert to Dhan security ID + segment
-  const cfg=IDXS[CUR];
-  const sid  = cfg.sid;
-  const seg  = cfg.hseg;
-  const inst = cfg.inst;
-
-  const isDaily = resolution==='D'||resolution==='1D';
-  const fromStr = toISODate(fromDate);
-  const toStr   = toISODate(toDate);
-
+  const g=gc(); if(!g.tok) return null;
+  const from=toEpoch(fromDate instanceof Date?fromDate:new Date(fromDate));
+  const to  =toEpoch(toDate   instanceof Date?toDate  :new Date(toDate));
+  const url =`${PROXY}/fyers/history?symbol=${encodeURIComponent(symbol)}&resolution=${resolution}&from=${from}&to=${to}`;
   try{
-    if(isDaily){
-      // Dhan daily candles API
-      const r=await fetch(`${PROXY}/v2/charts/historical`,{
-        method:'POST', headers:dhanHdrs(),
-        body:JSON.stringify({
-          securityId:String(sid),
-          exchangeSegment:seg,
-          instrument:inst,
-          expiryCode:0,
-          oi:false,
-          fromDate:fromStr,
-          toDate:toStr,
-        })
-      });
-      if(!r.ok){ console.warn('Dhan daily API',r.status,await r.text()); return null; }
-      const d=await r.json();
-      return parseDhanResp(d);
-    }else{
-      // Dhan intraday candles API
-      // interval must be: 1,5,15,25,60
-      const interval=(['1','3','5','15','25','30','60'].includes(String(resolution)))?
-        (String(resolution)==='3'?'5':String(resolution)) : '5';
-      const r=await fetch(`${PROXY}/v2/charts/intraday`,{
-        method:'POST', headers:dhanHdrs(),
-        body:JSON.stringify({
-          securityId:String(sid),
-          exchangeSegment:seg,
-          instrument:inst,
-          interval:interval,
-          oi:false,
-          fromDate:fromStr+' 09:00:00',
-          toDate:toStr+' 15:35:00',
-        })
-      });
-      if(!r.ok){ console.warn('Dhan intraday API',r.status,await r.text()); return null; }
-      const d=await r.json();
-      return parseDhanResp(d);
-    }
-  }catch(e){ console.warn('fyersHistory error:',e.message); return null; }
-}
-
-/* ── Fetch option candles via Dhan (security ID based) ── */
-async function dhanOptionHistory(secId, seg='NSE_FNO'){
-  if(!secId) return null;
-  const today=toISODate(new Date());
-  try{
-    const r=await fetch(`${PROXY}/v2/charts/intraday`,{
-      method:'POST', headers:dhanHdrs(),
-      body:JSON.stringify({
-        securityId:String(secId),
-        exchangeSegment:seg,
-        instrument:'OPTIDX',
-        interval:'1',
-        oi:false,
-        fromDate:today+' 09:00:00',
-        toDate:today+' 15:35:00',
-      })
-    });
-    if(!r.ok) return null;
+    const r=await fetch(url,{headers:fyersAuthHdr()});
+    if(!r.ok){ console.warn('Fyers history',r.status); return null; }
     const d=await r.json();
-    return parseDhanResp(d);
-  }catch(e){ return null; }
+    if(d.s!=='ok'||!d.candles?.length){ console.warn('Fyers history bad resp',d.message); return null; }
+    // Fyers candles: [timestamp, open, high, low, close, volume]
+    return d.candles.map(c=>({
+      t:c[0]*1000, o:c[1], h:c[2], l:c[3], c:c[4], v:c[5]||0, live:false
+    }));
+  }catch(e){ console.warn('fyersHistory:',e.message); return null; }
 }
 
-/* ── Fetch ATM CE/PE security IDs from Dhan option chain ── */
-async function fetchDhanOptChain(spot){
+/* ── Fyers option chain → returns ATM CE/PE Fyers symbols ── */
+async function fyersOptionChain(indexSym, spot){
+  const g=gc(); if(!g.tok) return null;
   const cfg=IDXS[CUR];
   const atm=Math.round(spot/cfg.step)*cfg.step;
-  const exp=nextExp(cfg.expDay);
+  const url=`${PROXY}/fyers/optionchain?symbol=${encodeURIComponent(indexSym)}&strikecount=3`;
   try{
-    const r=await fetch(`${PROXY}/v2/optionchain`,{
-      method:'POST', headers:dhanHdrs(),
-      body:JSON.stringify({
-        UnderlyingScrip:cfg.sid,
-        UnderlyingSegment:cfg.hseg,
-        Expiry:exp,
-      })
-    });
+    const r=await fetch(url,{headers:fyersAuthHdr()});
     if(!r.ok) return null;
     const d=await r.json();
-    const rows=Array.isArray(d)?d:(d?.data||d?.oc||[]);
-    if(!rows.length) return null;
-    let best=null,bd=Infinity;
-    rows.forEach(row=>{
-      const sp=row.strike_price||row.strikePrice||row.StrikePrice||0;
+    // Fyers option chain response: d.data.optionChain = array of strikes
+    const chain=d?.data?.optionChain||d?.optionChain||[];
+    if(!chain.length) return null;
+    // Find ATM row
+    let best=null, bd=Infinity;
+    chain.forEach(row=>{
+      const sp=row.strikePrice||row.strike_price||0;
       const df=Math.abs(sp-atm);
       if(df<bd){bd=df;best=row;}
     });
     if(!best) return null;
+    // Fyers option symbols format: NSE:NIFTY25JUN24250CE
     return{
       atm,
-      ceSid:best.call_security_id||best.callSecurityId||best.CESecurityId||null,
-      peSid:best.put_security_id ||best.putSecurityId ||best.PESecurityId||null,
+      ceSym: best.call_options?.symbol || best.ce?.symbol || `${cfg.ns}${nextExp(cfg.expDay)}${atm}CE`,
+      peSym: best.put_options?.symbol  || best.pe?.symbol  || `${cfg.ns}${nextExp(cfg.expDay)}${atm}PE`,
     };
-  }catch(e){ return null; }
+  }catch(e){ console.warn('fyersOptionChain:',e.message); return null; }
 }
 
-/* ── Parse Dhan API response → standard candle array ── */
-function parseDhanResp(d){
-  if(!d?.open?.length) return null;
-  return d.open.map((_,i)=>({
-    t:typeof d.timestamp[i]==='number'
-      ? d.timestamp[i]*1000
-      : new Date(d.timestamp[i]).getTime(),
-    o:d.open[i], h:d.high[i], l:d.low[i], c:d.close[i],
-    v:d.volume?.[i]||0, live:false
-  }));
+/* ── Aggregate 1min candles → N-min candles ── */
+function aggregateCandles(candles1m, tfMin){
+  if(tfMin<=1) return candles1m;
+  const ms=tfMin*60000;
+  const buckets={};
+  candles1m.forEach(c=>{
+    const b=c.t-(c.t%ms);
+    if(!buckets[b]) buckets[b]={t:b,o:c.o,h:c.h,l:c.l,c:c.c,v:c.v||0,live:c.live};
+    else{
+      const bk=buckets[b];
+      bk.h=Math.max(bk.h,c.h); bk.l=Math.min(bk.l,c.l);
+      bk.c=c.c; bk.v=(bk.v||0)+(c.v||0); bk.live=c.live;
+    }
+  });
+  return Object.values(buckets).sort((a,b)=>a.t-b.t);
 }
+
+/* ── Build previous day candle from 1min data ── */
+function buildPrevDayCandle(candles1m){
+  const todayStart=makeIST(9,15);
+  const prev=candles1m.filter(c=>c.t<todayStart);
+  if(!prev.length) return null;
+  // Group by day, get last complete day
+  const byDay={};
+  prev.forEach(c=>{
+    const d=new Date(c.t);
+    const key=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    if(!byDay[key]) byDay[key]={o:c.o,h:c.h,l:c.l,c:c.c};
+    else{ byDay[key].h=Math.max(byDay[key].h,c.h); byDay[key].l=Math.min(byDay[key].l,c.l); byDay[key].c=c.c; }
+  });
+  const days=Object.values(byDay);
+  return days.length?days[days.length-1]:null;
+}
+
+/* ── Build week candle from 1min data ── */
+function buildWeekCandle(candles1m){
+  if(!candles1m.length) return null;
+  return{
+    h:Math.max(...candles1m.map(c=>c.h)),
+    l:Math.min(...candles1m.map(c=>c.l)),
+    o:candles1m[0].o,
+    c:candles1m[candles1m.length-1].c,
+  };
+}
+
+/* ── Build 6hr session candle (today 9:15 to now) ── */
+function build6hrCandle(candles1m){
+  const start=makeIST(9,15);
+  const today=candles1m.filter(c=>c.t>=start);
+  if(!today.length) return null;
+  return{
+    h:Math.max(...today.map(c=>c.h)),
+    l:Math.min(...today.map(c=>c.l)),
+    o:today[0].o, c:today[today.length-1].c,
+  };
+}
+
+/* ── WS subscribe message (Fyers format) ── */
+function wsSubscribeMsg(syms){
+  return JSON.stringify({T:'SUB_DATA', SLIST:syms, SUB_T:1});
+}
+
+
 
 /* ── Aggregate 1min candles into higher TF ── */
 function aggregateCandles(candles1m, tfMin){
@@ -1059,42 +1062,51 @@ async function reboot(){
   }
 
   /* ════════════════════════════════════════════
-     STEP 2 — Get ATM CE/PE security IDs from Dhan option chain
-     Then load today's 1min candles for each
+     STEP 2 — Fyers option chain → ATM CE/PE symbols
+     Then load today 1min candles via Fyers proxy
   ════════════════════════════════════════════ */
   const spot2=C.i.length?C.i[C.i.length-1].c:0;
   if(spot2){
-    sbar('📥 Fetching option chain for ATM strikes...','var(--cy)');
-    const chain=await fetchDhanOptChain(spot2);
-    if(chain){
-      STK.ce=chain.atm; STK.pe=chain.atm;
-      updateStrikeBar(spot2,chain.atm);
-      sbar(`✅ ATM: ${chain.atm} | CE secId:${chain.ceSid} PE secId:${chain.peSid}`,'var(--gn)');
-
-      // Load CE 1min candles
-      if(chain.ceSid){
-        sbar('📥 Loading CE option candles (Dhan)...','var(--cy)');
-        const ceC=await dhanOptionHistory(chain.ceSid,'NSE_FNO');
-        if(ceC?.length){
-          C.ce.splice(0,C.ce.length);
-          ceC.forEach(c=>C.ce.push(c));
-          DAYREF.ce=C.ce[0]?.o;
-          sbar(`✅ CE: ${ceC.length} candles loaded`,'var(--gn)');
-        }
-      }
-      // Load PE 1min candles
-      if(chain.peSid){
-        sbar('📥 Loading PE option candles (Dhan)...','var(--cy)');
-        const peC=await dhanOptionHistory(chain.peSid,'NSE_FNO');
-        if(peC?.length){
-          C.pe.splice(0,C.pe.length);
-          peC.forEach(c=>C.pe.push(c));
-          DAYREF.pe=C.pe[0]?.o;
-          sbar(`✅ PE: ${peC.length} candles loaded`,'var(--gn)');
-        }
-      }
+    sbar('📥 Fetching Fyers option chain...','var(--cy)');
+    const atmSyms=await fyersOptionChain(cfg.sym, spot2);
+    if(atmSyms){
+      SYM.ce=atmSyms.ceSym; SYM.pe=atmSyms.peSym;
+      STK.ce=atmSyms.atm;   STK.pe=atmSyms.atm;
+      updateStrikeBar(spot2, atmSyms.atm);
+      sbar(`✅ ATM ${atmSyms.atm} | CE:${atmSyms.ceSym} PE:${atmSyms.peSym}`,'var(--gn)');
     }else{
-      sbar('⚠️ Option chain not available — CE/PE using estimated candles','var(--og)');
+      // Build ATM symbol manually if option chain fails
+      const atm=Math.round(spot2/cfg.step)*cfg.step;
+      const exp=nextExp(cfg.expDay);
+      SYM.ce=`${cfg.ns}${exp}${atm}CE`;
+      SYM.pe=`${cfg.ns}${exp}${atm}PE`;
+      STK.ce=atm; STK.pe=atm;
+      updateStrikeBar(spot2,atm);
+      sbar(`⚠️ Option chain failed → using ATM: ${atm}`,'var(--og)');
+    }
+
+    // Load CE 1min candles via Fyers
+    if(SYM.ce){
+      sbar('📥 Loading CE option candles (Fyers)...','var(--cy)');
+      const ceC=await fyersHistory(SYM.ce,'1',daysAgo(1),new Date());
+      if(ceC?.length){
+        C.ce.splice(0,C.ce.length);
+        ceC.forEach(c=>C.ce.push(c));
+        DAYREF.ce=C.ce[0]?.o;
+        sbar(`✅ CE: ${ceC.length} candles loaded`,'var(--gn)');
+      }
+    }
+
+    // Load PE 1min candles via Fyers
+    if(SYM.pe){
+      sbar('📥 Loading PE option candles (Fyers)...','var(--cy)');
+      const peC=await fyersHistory(SYM.pe,'1',daysAgo(1),new Date());
+      if(peC?.length){
+        C.pe.splice(0,C.pe.length);
+        peC.forEach(c=>C.pe.push(c));
+        DAYREF.pe=C.pe[0]?.o;
+        sbar(`✅ PE: ${peC.length} candles loaded`,'var(--gn)');
+      }
     }
   }
 
